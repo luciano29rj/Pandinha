@@ -1,0 +1,2225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <title>Questões - Laranja Questões</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            min-height: 100vh;
+            background-color: #f1f5f9;
+            transition: background-color 0.3s ease, color 0.2s ease;
+            padding-top: 0;
+            font-size: 14px;
+        }
+        
+        /* Controle de tamanho da fonte */
+        body.font-small {
+            font-size: 13px;
+        }
+        
+        body.font-large {
+            font-size: 16px;
+        }
+        
+        body.font-small .questao-pergunta {
+            font-size: 14px;
+        }
+        
+        body.font-large .questao-pergunta {
+            font-size: 17px;
+        }
+        
+        body.font-small .opcao-texto {
+            font-size: 13px;
+        }
+        
+        body.font-large .opcao-texto {
+            font-size: 16px;
+        }
+        
+        /* Dark Mode - texto claro */
+        body.dark-mode {
+            background-color: #0a0c10 !important;
+            color: #e5e7eb !important;
+        }
+        
+        body.dark-mode .quiz-header,
+        body.dark-mode .filtros-content,
+        body.dark-mode .metadata-item,
+        body.dark-mode .questao-id,
+        body.dark-mode .pagina-btn,
+        body.dark-mode .materia-badge,
+        body.dark-mode .subassunto-badge,
+        body.dark-mode .dica-content {
+            background-color: #1a1a20 !important;
+            border-color: #2d2d35 !important;
+            color: #f3f4f6 !important;
+        }
+        
+        body.dark-mode .text-gray-800,
+        body.dark-mode .text-gray-900,
+        body.dark-mode .questao-titulo,
+        body.dark-mode .questao-pergunta,
+        body.dark-mode .opcao-texto,
+        body.dark-mode .assunto-nome {
+            color: #ffffff !important;
+        }
+        
+        body.dark-mode .text-gray-500,
+        body.dark-mode .text-gray-600,
+        body.dark-mode .text-gray-400,
+        body.dark-mode .questao-meta {
+            color: #d1d5db !important;
+        }
+        
+        body.dark-mode .opcao-item {
+            background: #25252b;
+            border-color: #3a3a45;
+            color: #f3f4f6;
+        }
+        
+        body.dark-mode .opcao-letra {
+            background: #2d2d35;
+            color: #ffffff;
+        }
+        
+        /* CORREÇÃO: Selecionada em dark mode */
+        body.dark-mode .opcao-item.selecionada {
+            background: #1e3a5f;
+            border-color: #3b82f6;
+        }
+        
+        body.dark-mode .opcao-item.selecionada .opcao-letra {
+            background: #2563eb;
+            color: white;
+        }
+        
+        body.dark-mode .opcao-item.correta {
+            background: #064e3b;
+            border-color: #10b981;
+        }
+        
+        body.dark-mode .opcao-item.incorreta {
+            background: #7f1d1d;
+            border-color: #ef4444;
+        }
+        
+        /* Gray Mode - #4b4b4b - TEXTO BRANCO IGUAL DARK MODE */
+        body.gray-mode {
+            background-color: #4b4b4b !important;
+            color: #ffffff !important;
+        }
+        
+        body.gray-mode .quiz-header,
+        body.gray-mode .filtros-content,
+        body.gray-mode .metadata-item,
+        body.gray-mode .questao-id,
+        body.gray-mode .pagina-btn,
+        body.gray-mode .materia-badge,
+        body.gray-mode .subassunto-badge,
+        body.gray-mode .dica-content,
+        body.gray-mode .opcao-item,
+        body.gray-mode .filtro-select,
+        body.gray-mode .btn-limpar-filtros {
+            background-color: #3a3a3a !important;
+            border-color: #5a5a5a !important;
+            color: #ffffff !important;
+        }
+        
+        body.gray-mode .text-gray-800,
+        body.gray-mode .text-gray-900,
+        body.gray-mode .questao-titulo,
+        body.gray-mode .questao-pergunta,
+        body.gray-mode .opcao-texto,
+        body.gray-mode .assunto-nome,
+        body.gray-mode .metadata-item,
+        body.gray-mode .questao-id,
+        body.gray-mode .materia-badge,
+        body.gray-mode .subassunto-badge {
+            color: #ffffff !important;
+        }
+        
+        body.gray-mode .text-gray-500,
+        body.gray-mode .text-gray-600,
+        body.gray-mode .text-gray-400,
+        body.gray-mode .questao-meta {
+            color: #e5e7eb !important;
+        }
+        
+        body.gray-mode .opcao-letra {
+            background: #5a5a5a;
+            color: #ffffff;
+        }
+        
+        /* CORREÇÃO: Selecionada em gray mode */
+        body.gray-mode .opcao-item.selecionada {
+            background: #1e3a5f;
+            border-color: #3b82f6;
+        }
+        
+        body.gray-mode .opcao-item.selecionada .opcao-letra {
+            background: #2563eb;
+            color: white;
+        }
+        
+        body.gray-mode .opcao-item.correta {
+            background: #064e3b;
+            border-color: #10b981;
+        }
+        
+        body.gray-mode .opcao-item.incorreta {
+            background: #7f1d1d;
+            border-color: #ef4444;
+        }
+        
+        body.gray-mode .filtro-select {
+            background: #4a4a4a;
+            color: #ffffff;
+        }
+        
+        /* ============ CORREÇÃO: Botão Limpar Filtros em todos os modos ============ */
+        .btn-limpar-filtros {
+            background: #f1f5f9;
+            border: none;
+            border-radius: 16px;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            grid-column: span 2;
+            margin-top: 8px;
+            border: 1px solid #cbd5e1;
+        }
+        
+        .btn-limpar-filtros:hover {
+            background: #e2e8f0;
+            transform: translateY(-1px);
+        }
+        
+        .btn-limpar-filtros i {
+            color: #2563eb;
+        }
+        
+        /* Dark mode - botão limpar filtros */
+        body.dark-mode .btn-limpar-filtros {
+            background: #2d2d35 !important;
+            color: #ffffff !important;
+            border-color: #4b5563 !important;
+        }
+        
+        body.dark-mode .btn-limpar-filtros i {
+            color: #fbbf24 !important;
+        }
+        
+        body.dark-mode .btn-limpar-filtros:hover {
+            background: #3a3a45 !important;
+        }
+        
+        /* Gray mode - botão limpar filtros */
+        body.gray-mode .btn-limpar-filtros {
+            background: #5a5a5a !important;
+            color: #ffffff !important;
+            border-color: #7a7a7a !important;
+        }
+        
+        body.gray-mode .btn-limpar-filtros i {
+            color: #ffd700 !important;
+        }
+        
+        body.gray-mode .btn-limpar-filtros:hover {
+            background: #6a6a6a !important;
+        }
+        
+        body.gray-mode .theme-toggle {
+            background: #5a5a5a;
+            color: #ffd700;
+        }
+        
+        body.gray-mode .watermark-btn {
+            background-color: rgba(58, 58, 58, 0.9);
+            color: #ffffff;
+            border-color: rgba(90, 90, 90, 0.8);
+        }
+        
+        body.gray-mode .scroll-top-btn {
+            background-color: rgba(58, 58, 58, 0.9);
+            color: #ffffff;
+            border-color: rgba(90, 90, 90, 0.8);
+        }
+        
+        body.gray-mode .back-button {
+            background-color: rgba(58, 58, 58, 0.9);
+            color: #93c5fd;
+            border-color: rgba(90, 90, 90, 0.8);
+        }
+        
+        /* CORREÇÃO: Filtros em gray mode e dark mode - textos dos selects */
+        body.dark-mode .filtro-select,
+        body.gray-mode .filtro-select {
+            color: #ffffff !important;
+            background-color: #2d2d35 !important;
+        }
+        
+        body.dark-mode .filtro-select option,
+        body.gray-mode .filtro-select option {
+            background-color: #1a1a20;
+            color: #ffffff;
+        }
+        
+        body.dark-mode .filtro-label,
+        body.gray-mode .filtro-label {
+            color: #ffffff !important;
+        }
+        
+        body.dark-mode .filtro-label i,
+        body.gray-mode .filtro-label i {
+            color: #fbbf24 !important;
+        }
+        
+        /* Opção tachada */
+        .opcao-item.tachada .opcao-texto {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+        
+        .opcao-item.tachada .opcao-letra {
+            background: #6b7280;
+            color: white;
+        }
+        
+        body.dark-mode .opcao-item.tachada .opcao-letra {
+            background: #4b5563;
+            color: #e5e7eb;
+        }
+        
+        body.gray-mode .opcao-item.tachada .opcao-letra {
+            background: #6b7280;
+            color: white;
+        }
+        
+        /* Tema toggle */
+        .theme-toggle {
+            background: #e2e8f0; 
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+
+        body.dark-mode .theme-toggle {
+            background: #2d2d35;
+            color: #fbbf24;
+        }
+        
+        /* Header */
+        .quiz-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: transparent;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 8px 0;
+            backdrop-filter: blur(8px);
+            margin-bottom: 8px;
+        }
+        
+        .header-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* CORREÇÃO: Botão de voltar para topic.html */
+        .back-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 9999px;
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #2563eb;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(226, 232, 240, 0.5);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .back-button:hover {
+            background-color: rgba(255, 255, 255, 0.95);
+            transform: scale(1.05);
+            color: #1e40af;
+        }
+        
+        /* Botões em marca d'água */
+        .watermark-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 9999px;
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #475569;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(226, 232, 240, 0.5);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .watermark-btn:hover {
+            background-color: rgba(255, 255, 255, 0.95);
+            transform: scale(1.05);
+            color: #2563eb;
+        }
+        
+        body.dark-mode .back-button,
+        body.dark-mode .watermark-btn {
+            background-color: rgba(26, 26, 32, 0.8);
+            color: #d1d5db;
+            border-color: rgba(45, 45, 53, 0.8);
+        }
+        
+        body.gray-mode .back-button,
+        body.gray-mode .watermark-btn {
+            background-color: rgba(58, 58, 58, 0.9);
+            color: #ffffff;
+            border-color: rgba(90, 90, 90, 0.8);
+        }
+        
+        /* Badges de matéria e subassunto */
+        .header-subinfo {
+            max-width: 900px;
+            margin: 0 auto 16px;
+            padding: 0 16px;
+        }
+        
+        .materia-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #2563eb;
+            background: #eef2ff;
+            padding: 8px 20px;
+            border-radius: 40px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        
+        .materia-badge i {
+            font-size: 14px;
+        }
+        
+        .materia-badge span {
+            color: #64748b;
+            font-weight: 500;
+            margin: 0 4px;
+        }
+        
+        body.dark-mode .materia-badge,
+        body.gray-mode .materia-badge {
+            background: #1e3a5f;
+            color: #93c5fd;
+        }
+        
+        body.dark-mode .materia-badge span,
+        body.gray-mode .materia-badge span {
+            color: #cbd5e1;
+        }
+        
+        /* FILTROS - JANELA SUSPENSA - 2 COLUNAS */
+        .filtros-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            background: white;
+            border-radius: 24px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 20px 30px -10px rgba(0,0,0,0.15);
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 80px;
+            width: calc(100% - 32px);
+            max-width: 700px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .filtros-content.show {
+            max-height: 600px;
+            opacity: 1;
+            visibility: visible;
+            overflow-y: auto;
+        }
+        
+        .filtro-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding: 24px;
+        }
+        
+        .filtro-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .filtro-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .filtro-label i {
+            color: #2563eb;
+            font-size: 13px;
+        }
+        
+        .filtro-select {
+            padding: 10px 14px;
+            border-radius: 16px;
+            border: 1.5px solid #e2e8f0;
+            background: white;
+            font-size: 14px;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        
+        .filtro-select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+        
+        /* Overlay para fechar o filtro */
+        .filtro-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 999;
+            display: none;
+            backdrop-filter: blur(2px);
+        }
+        
+        .filtro-overlay.show {
+            display: block;
+        }
+        
+        /* Container das questões */
+        .questoes-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+        
+        .questao-item {
+            background: transparent;
+            border-radius: 0;
+            padding: 24px 0 16px 0;
+            margin-bottom: 0;
+            border: none;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .questao-item:last-child {
+            border-bottom: none;
+        }
+        
+        /* HEADER DA QUESTÃO - layout flexível */
+        .questao-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            width: 100%;
+        }
+        
+        .questao-header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+        
+        /* Container de metadados - ID, assunto, banca, órgão, ano, dificuldade, cargo */
+        .questao-metadata-container {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .questao-id {
+            font-size: 13px;
+            font-weight: 700;
+            color: #2563eb;
+            background: #eef2ff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+        
+        .metadata-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            white-space: nowrap;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            font-size: 13px;
+            color: #475569;
+        }
+        
+        .metadata-item i {
+            font-size: 12px;
+            color: #2563eb;
+        }
+        
+        /* Status da questão */
+        .questao-status-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 9999px;
+            flex-shrink: 0;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(226,232,240,0.5);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+        
+        .status-acertou {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        
+        .status-errou {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        
+        body.dark-mode .status-acertou {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+        
+        body.dark-mode .status-errou {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+        
+        body.gray-mode .status-acertou {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+        
+        body.gray-mode .status-errou {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+        
+        /* ============ NOVO ESTILO PARA IMAGEM DA QUESTÃO ============ */
+        .questao-imagem-container {
+            margin: 16px 0;
+            text-align: center;
+        }
+        
+        .questao-imagem {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        body.dark-mode .questao-imagem,
+        body.gray-mode .questao-imagem {
+            border-color: #4b5563;
+        }
+        
+        .questao-pergunta {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #1e293b;
+            margin-bottom: 16px;
+            font-weight: 400;
+        }
+        
+        .opcoes-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .opcao-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            background: white;
+            user-select: none;
+            touch-action: pan-y;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* CORREÇÃO: Estilo de seleção */
+        .opcao-item.selecionada {
+            border-color: #2563eb;
+            background: #eef2ff;
+        }
+        
+        .opcao-item.selecionada .opcao-letra {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .opcao-item.correta {
+            border-color: #059669;
+            background: #ecfdf3;
+        }
+        
+        .opcao-item.correta .opcao-letra {
+            background: #059669;
+            color: white;
+        }
+        
+        .opcao-item.incorreta {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+        
+        .opcao-item.incorreta .opcao-letra {
+            background: #dc2626;
+            color: white;
+        }
+        
+        /* Letra REDONDA */
+        .opcao-letra {
+            width: 28px;
+            height: 28px;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            background: #f1f5f9;
+            color: #334155;
+            flex-shrink: 0;
+            font-size: 14px;
+            transition: all 0.15s ease;
+        }
+        
+        .opcao-texto {
+            flex: 1;
+            line-height: 1.5;
+            color: #1e293b;
+            font-size: 14px;
+            transition: all 0.15s ease;
+            pointer-events: none;
+        }
+        
+        .questao-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 12px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .footer-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        /* Botão responder VERDE */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.15s ease;
+            border: none;
+            cursor: pointer;
+            gap: 8px;
+            font-size: 13px;
+        }
+        
+        .btn-primary {
+            background: #10b981;
+            color: white;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+        }
+        
+        .btn-primary:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(5, 150, 105, 0.25);
+        }
+        
+        body.dark-mode .btn-primary,
+        body.gray-mode .btn-primary {
+            background: #10b981;
+            color: white;
+        }
+        
+        /* Lâmpada ao lado do botão responder */
+        .lampada-btn-footer {
+            width: 36px;
+            height: 36px;
+            border-radius: 9999px;
+            background: #fef9c3;
+            color: #b45309;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        
+        .lampada-btn-footer:hover {
+            background: #fde68a;
+            transform: scale(1.05);
+        }
+        
+        body.dark-mode .lampada-btn-footer {
+            background: #854d0e;
+            color: #fef9c3;
+        }
+        
+        body.gray-mode .lampada-btn-footer {
+            background: #b45309;
+            color: #fef9c3;
+        }
+        
+        .paginacao {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin: 32px 0 48px;
+            flex-wrap: wrap;
+        }
+        
+        .pagina-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .pagina-btn.ativa {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: white;
+        }
+        
+        /* ============ NOVO DESIGN DA DICA - MAIS LIMPO E COMPACTO ============ */
+        .dica-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 16px;
+            backdrop-filter: blur(3px);
+        }
+        
+        .dica-modal.show {
+            display: flex;
+        }
+        
+        .dica-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            animation: dicaEntrada 0.2s ease;
+        }
+        
+        @keyframes dicaEntrada {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        .dica-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 16px 16px 0 0;
+            flex-shrink: 0;
+        }
+        
+        .dica-titulo {
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+        }
+        
+        .dica-titulo i {
+            color: #f1c40f;
+            font-size: 16px;
+        }
+        
+        .dica-close-btn {
+            background: transparent;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            color: #95a5a6;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .dica-close-btn:hover {
+            background: #e9ecef;
+            color: #e74c3c;
+        }
+        
+        .dica-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+            background: white;
+        }
+        
+        .dica-texto {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #2c3e50;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .dica-texto p {
+            margin-bottom: 12px;
+        }
+        
+        .dica-texto p:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* Scrollbar personalizada */
+        .dica-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .dica-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .dica-body::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 10px;
+        }
+        
+        .dica-body::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+        
+        /* Dark mode */
+        body.dark-mode .dica-header {
+            background: #2d2d35;
+            border-bottom-color: #40404a;
+        }
+        
+        body.dark-mode .dica-titulo {
+            color: #e5e7eb;
+        }
+        
+        body.dark-mode .dica-titulo i {
+            color: #fbbf24;
+        }
+        
+        body.dark-mode .dica-close-btn {
+            color: #9ca3af;
+        }
+        
+        body.dark-mode .dica-close-btn:hover {
+            background: #40404a;
+            color: #f87171;
+        }
+        
+        body.dark-mode .dica-body {
+            background: #1a1a20;
+        }
+        
+        body.dark-mode .dica-texto {
+            color: #f3f4f6;
+        }
+        
+        body.dark-mode .dica-body::-webkit-scrollbar-track {
+            background: #2d2d35;
+        }
+        
+        body.dark-mode .dica-body::-webkit-scrollbar-thumb {
+            background: #4b5563;
+        }
+        
+        body.dark-mode .dica-body::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+        
+        /* Gray mode */
+        body.gray-mode .dica-header {
+            background: #4a4a4a;
+            border-bottom-color: #5a5a5a;
+        }
+        
+        body.gray-mode .dica-titulo {
+            color: #ffffff;
+        }
+        
+        body.gray-mode .dica-titulo i {
+            color: #ffd700;
+        }
+        
+        body.gray-mode .dica-close-btn {
+            color: #cccccc;
+        }
+        
+        body.gray-mode .dica-close-btn:hover {
+            background: #5a5a5a;
+            color: #ff6b6b;
+        }
+        
+        body.gray-mode .dica-body {
+            background: #3a3a3a;
+        }
+        
+        body.gray-mode .dica-texto {
+            color: #ffffff;
+        }
+        
+        body.gray-mode .dica-body::-webkit-scrollbar-track {
+            background: #4a4a4a;
+        }
+        
+        body.gray-mode .dica-body::-webkit-scrollbar-thumb {
+            background: #6a6a6a;
+        }
+        
+        body.gray-mode .dica-body::-webkit-scrollbar-thumb:hover {
+            background: #7a7a7a;
+        }
+        
+        .loading-spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #2563eb;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Botão flutuante de voltar ao topo */
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 44px;
+            height: 44px;
+            border-radius: 9999px;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #475569;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+        }
+        
+        .scroll-top-btn:hover {
+            background-color: white;
+            transform: translateY(-2px);
+            color: #2563eb;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+        
+        body.dark-mode .scroll-top-btn {
+            background-color: rgba(26, 26, 32, 0.9);
+            color: #d1d5db;
+            border-color: rgba(45, 45, 53, 0.8);
+        }
+        
+        body.gray-mode .scroll-top-btn {
+            background-color: rgba(58, 58, 58, 0.9);
+            color: #ffffff;
+            border-color: rgba(90, 90, 90, 0.8);
+        }
+        
+        @media (max-width: 640px) {
+            .filtro-grid {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            
+            .btn-limpar-filtros {
+                grid-column: span 1;
+            }
+            
+            .questao-metadata-container {
+                gap: 4px;
+            }
+            
+            .metadata-item {
+                padding: 3px 8px;
+                font-size: 10px;
+            }
+            
+            .scroll-top-btn {
+                bottom: 16px;
+                right: 16px;
+                width: 40px;
+                height: 40px;
+            }
+            
+            .materia-badge {
+                font-size: 14px;
+                padding: 6px 16px;
+            }
+            
+            .questao-footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .footer-left {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+
+        .theme-toggle.watermark-btn {
+            background: #e2e8f0 !important;
+            color: #475569 !important;
+        }
+
+        body.dark-mode .theme-toggle.watermark-btn {
+            background: #2d2d35 !important;
+            color: #fbbf24 !important;
+        }
+
+        body.gray-mode .theme-toggle.watermark-btn {
+            background: #5a5a5a !important;
+            color: #ffd700 !important;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="quiz-header">
+        <div class="header-container">
+            <div class="header-left">
+                <!-- CORREÇÃO: Botão de voltar para topic.html com JavaScript -->
+                <div class="back-button" onclick="voltarParaTopic()">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <!-- Ícone de aumentar/diminuir letras -->
+                <div class="watermark-btn" onclick="toggleFontSize()" title="Aumentar/Diminuir fonte">
+                    <i class="fas fa-text-height"></i>
+                </div>
+                
+                <!-- FILTRO -->
+                <div class="watermark-btn" onclick="toggleFiltros()" title="Filtros">
+                    <i class="fas fa-sliders-h"></i>
+                </div>
+                
+                <!-- Botão Toggle Tema -->
+                <div id="themeToggle" class="theme-toggle watermark-btn" onclick="toggleTheme()">
+                    <i id="themeIcon" class="fas fa-moon"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Overlay do filtro -->
+    <div id="filtroOverlay" class="filtro-overlay" onclick="toggleFiltros()"></div>
+    
+    <!-- FILTROS CONTEÚDO - JANELA SUSPENSA - 2 COLUNAS -->
+    <div id="filtrosContent" class="filtros-content">
+        <div class="filtro-grid">
+            <div class="filtro-group">
+                <span class="filtro-label"><i class="fas fa-tag"></i> Tipo</span>
+                <select id="filtroTipo" class="filtro-select" onchange="aplicarFiltros()">
+                    <option value="">Todos os tipos</option>
+                    <option value="Múltipla Escolha">Múltipla Escolha</option>
+                    <option value="Certo/Errado">Certo/Errado</option>
+                </select>
+            </div>
+            
+            <div class="filtro-group">
+                <span class="filtro-label"><i class="fas fa-chart-line"></i> Dificuldade</span>
+                <select id="filtroDificuldade" class="filtro-select" onchange="aplicarFiltros()">
+                    <option value="">Todas</option>
+                    <option value="Muito Fácil">Muito Fácil</option>
+                    <option value="Fácil">Fácil</option>
+                    <option value="Média">Média</option>
+                    <option value="Difícil">Difícil</option>
+                    <option value="Muito Difícil">Muito Difícil</option>
+                    <option value="Expert">Expert</option>
+                </select>
+            </div>
+            
+            <div class="filtro-group">
+                <span class="filtro-label"><i class="fas fa-calendar"></i> Ano</span>
+                <select id="filtroAno" class="filtro-select" onchange="aplicarFiltros()">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+            
+            <div class="filtro-group">
+                <span class="filtro-label"><i class="fas fa-building"></i> Órgão</span>
+                <select id="filtroOrgao" class="filtro-select" onchange="aplicarFiltros()">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+            
+            <div class="filtro-group">
+                <span class="filtro-label"><i class="fas fa-university"></i> Banca</span>
+                <select id="filtroBanca" class="filtro-select" onchange="aplicarFiltros()">
+                    <option value="">Todas</option>
+                </select>
+            </div>
+            
+            <div class="filtro-group">
+                <span class="filtro-label"><i class="fas fa-check-circle"></i> Status</span>
+                <select id="filtroStatus" class="filtro-select" onchange="aplicarFiltros()">
+                    <option value="">Todas</option>
+                    <option value="nao-respondida">Não respondidas</option>
+                    <option value="respondida">Respondidas</option>
+                    <option value="acertada">Acertadas</option>
+                    <option value="errada">Erradas</option>
+                </select>
+            </div>
+            
+            <button class="btn-limpar-filtros" onclick="limparFiltros()">
+                <i class="fas fa-undo-alt"></i> Limpar todos os filtros
+            </button>
+        </div>
+    </div>
+    
+    <!-- BADGES DE MATÉRIA E SUBASSUNTO -->
+    <div class="header-subinfo" id="headerSubinfo">
+        <span id="materiaBadge" class="materia-badge hidden">
+            <i class="fas fa-book"></i> <span id="materiaNome"></span> / <span id="assuntoNomeBadge"></span>
+        </span>
+    </div>
+    
+    <!-- MODAL DA DICA - NOVO DESIGN -->
+    <div id="dicaModal" class="dica-modal" onclick="fecharDicaModal(event)">
+        <div class="dica-content" onclick="event.stopPropagation()">
+            <div class="dica-header">
+                <div class="dica-titulo">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>Dica</span>
+                </div>
+                <button onclick="fecharDicaModal()" class="dica-close-btn" title="Fechar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="dica-body">
+                <div id="dicaTexto" class="dica-texto">
+                    Carregando...
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Conteúdo principal -->
+    <main class="container mx-auto px-4 py-4">
+        <div id="questoesContainer" class="questoes-container">
+            <div class="text-center py-12">
+                <div class="loading-spinner mx-auto"></div>
+                <p class="mt-3 text-sm text-gray-500">Carregando questões...</p>
+            </div>
+        </div>
+        
+        <div id="paginacao" class="paginacao hidden"></div>
+    </main>
+    
+    <!-- Botão flutuante de voltar ao topo -->
+    <div class="scroll-top-btn" onclick="scrollToTop()" title="Voltar ao topo">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+    
+    <!-- Modal de resultados -->
+    <div id="resultadoModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full">
+            <div class="text-center">
+                <div class="text-4xl mb-3" id="resultadoEmoji">📊</div>
+                <h2 class="text-xl font-bold mb-1" id="resultadoTitulo">Quiz Concluído!</h2>
+                <p class="text-gray-500 text-sm mb-4" id="resultadoMensagem"></p>
+                
+                <div class="grid grid-cols-2 gap-3 mb-5">
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <div class="text-2xl font-bold text-green-600" id="acertosCount">0</div>
+                        <div class="text-xs text-gray-500">Acertos</div>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <div class="text-2xl font-bold text-red-600" id="errosCount">0</div>
+                        <div class="text-xs text-gray-500">Erros</div>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <div class="text-2xl font-bold text-blue-600" id="totalCount">0</div>
+                        <div class="text-xs text-gray-500">Total</div>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <div class="text-2xl font-bold text-purple-600" id="percentualCount">0%</div>
+                        <div class="text-xs text-gray-500">Aproveitamento</div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-2 justify-center">
+                    <button onclick="reiniciarQuiz()" class="btn btn-primary">
+                        <i class="fas fa-redo mr-1"></i>Refazer
+                    </button>
+                    <button onclick="voltarParaTopic()" class="px-5 py-2.5 bg-gray-200 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-300 transition">
+                        <i class="fas fa-book mr-1"></i>Voltar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============ CONFIGURAÇÃO ============
+        let questoes = [];
+        let questoesFiltradas = [];
+        let respostas = {};
+        let tachados = {};
+        let paginaAtual = 1;
+        let totalPaginas = 1;
+        // ============ CORREÇÃO: 20 questões por página ============
+        let questoesPorPagina = 20;
+        let materiaAtual = '';
+        let assuntoAtual = '';
+        let assuntoPai = '';
+        
+        // Controle de swipe
+        let touchStartX = 0;
+        let touchEndX = 0;
+        let currentOpcao = null;
+        let isSwiping = false;
+        
+        // Controle de tamanho da fonte
+        let fontSizeIndex = 0;
+        const fontSizes = ['font-small', '', 'font-large'];
+        
+        // Filtros
+        let filtrosAtivos = {
+            tipo: '',
+            dificuldade: '',
+            ano: '',
+            orgao: '',
+            banca: '',
+            status: ''
+        };
+
+        // ============ FUNÇÃO PARA VOLTAR PARA TOPIC.HTML ============
+        window.voltarParaTopic = function() {
+            if (materiaAtual) {
+                window.location.href = '/laranja/topic?materia=' + encodeURIComponent(materiaAtual);
+            } else {
+                window.location.href = '/laranja/topic';
+            }
+        };
+
+        // ============ TAMANHO DA FONTE ============
+        window.toggleFontSize = function() {
+            const body = document.body;
+            body.classList.remove('font-small', 'font-large');
+            
+            fontSizeIndex = (fontSizeIndex + 1) % fontSizes.length;
+            if (fontSizes[fontSizeIndex]) {
+                body.classList.add(fontSizes[fontSizeIndex]);
+            }
+            localStorage.setItem('laranja-font-size', fontSizeIndex);
+        };
+
+        function loadFontSize() {
+            const saved = localStorage.getItem('laranja-font-size');
+            if (saved !== null) {
+                fontSizeIndex = parseInt(saved, 10);
+                const body = document.body;
+                body.classList.remove('font-small', 'font-large');
+                if (fontSizes[fontSizeIndex]) {
+                    body.classList.add(fontSizes[fontSizeIndex]);
+                }
+            }
+        }
+
+        // ============ TEMA - 3 MODOS ============
+        let themeIndex = 0;
+        const themes = ['light', 'dark', 'gray'];
+        
+        window.toggleTheme = function() {
+            const body = document.body;
+            const icon = document.getElementById('themeIcon');
+            
+            body.classList.remove('dark-mode', 'gray-mode');
+            
+            themeIndex = (themeIndex + 1) % themes.length;
+            const newTheme = themes[themeIndex];
+            
+            if (newTheme === 'dark') {
+                body.classList.add('dark-mode');
+                icon.classList.remove('fa-moon', 'fa-sun', 'fa-cloud');
+                icon.classList.add('fa-moon');
+                localStorage.setItem('laranja-theme', 'dark');
+            } else if (newTheme === 'gray') {
+                body.classList.add('gray-mode');
+                icon.classList.remove('fa-moon', 'fa-sun', 'fa-cloud');
+                icon.classList.add('fa-cloud');
+                localStorage.setItem('laranja-theme', 'gray');
+            } else {
+                icon.classList.remove('fa-moon', 'fa-sun', 'fa-cloud');
+                icon.classList.add('fa-sun');
+                localStorage.setItem('laranja-theme', 'light');
+            }
+        };
+
+        function loadTheme() {
+            const saved = localStorage.getItem('laranja-theme');
+            const body = document.body;
+            const icon = document.getElementById('themeIcon');
+            
+            if (saved === 'dark') {
+                body.classList.add('dark-mode');
+                themeIndex = 1;
+                if (icon) {
+                    icon.classList.remove('fa-moon', 'fa-sun', 'fa-cloud');
+                    icon.classList.add('fa-moon');
+                }
+            } else if (saved === 'gray') {
+                body.classList.add('gray-mode');
+                themeIndex = 2;
+                if (icon) {
+                    icon.classList.remove('fa-moon', 'fa-sun', 'fa-cloud');
+                    icon.classList.add('fa-cloud');
+                }
+            } else {
+                themeIndex = 0;
+                if (icon) {
+                    icon.classList.remove('fa-moon', 'fa-sun', 'fa-cloud');
+                    icon.classList.add('fa-sun');
+                }
+            }
+        }
+
+        // ============ FILTROS ============
+        window.toggleFiltros = function() {
+            const content = document.getElementById('filtrosContent');
+            const overlay = document.getElementById('filtroOverlay');
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                overlay.classList.remove('show');
+            } else {
+                content.classList.add('show');
+                overlay.classList.add('show');
+            }
+        };
+        
+        function carregarOpcoesFiltros(questoes) {
+            const anos = [...new Set(questoes.map(q => q.metadata?.ano).filter(a => a))].sort((a,b) => b-a);
+            const selectAno = document.getElementById('filtroAno');
+            selectAno.innerHTML = '<option value="">Todos os anos</option>';
+            anos.forEach(ano => selectAno.innerHTML += `<option value="${ano}">${ano}</option>`);
+            
+            const orgaos = [...new Set(questoes.map(q => q.metadata?.orgao).filter(o => o))].sort();
+            const selectOrgao = document.getElementById('filtroOrgao');
+            selectOrgao.innerHTML = '<option value="">Todos os órgãos</option>';
+            orgaos.forEach(orgao => selectOrgao.innerHTML += `<option value="${orgao}">${orgao}</option>`);
+            
+            const bancas = [...new Set(questoes.map(q => q.metadata?.banca).filter(b => b))].sort();
+            const selectBanca = document.getElementById('filtroBanca');
+            selectBanca.innerHTML = '<option value="">Todas as bancas</option>';
+            bancas.forEach(banca => selectBanca.innerHTML += `<option value="${banca}">${banca}</option>`);
+        }
+        
+        window.aplicarFiltros = function() {
+            filtrosAtivos = {
+                tipo: document.getElementById('filtroTipo').value,
+                dificuldade: document.getElementById('filtroDificuldade').value,
+                ano: document.getElementById('filtroAno').value,
+                orgao: document.getElementById('filtroOrgao').value,
+                banca: document.getElementById('filtroBanca').value,
+                status: document.getElementById('filtroStatus').value
+            };
+            
+            questoesFiltradas = questoes.filter(q => {
+                if (filtrosAtivos.tipo && q.tipo !== filtrosAtivos.tipo) return false;
+                if (filtrosAtivos.dificuldade && q.metadata?.dificuldade !== filtrosAtivos.dificuldade) return false;
+                if (filtrosAtivos.ano && q.metadata?.ano != filtrosAtivos.ano) return false;
+                if (filtrosAtivos.orgao && q.metadata?.orgao !== filtrosAtivos.orgao) return false;
+                if (filtrosAtivos.banca && q.metadata?.banca !== filtrosAtivos.banca) return false;
+                
+                if (filtrosAtivos.status) {
+                    const index = questoes.indexOf(q);
+                    const resp = respostas[index];
+                    if (filtrosAtivos.status === 'nao-respondida' && resp?.respondida) return false;
+                    if (filtrosAtivos.status === 'respondida' && !resp?.respondida) return false;
+                    if (filtrosAtivos.status === 'acertada' && !resp?.acertou) return false;
+                    if (filtrosAtivos.status === 'errada' && (!resp?.respondida || resp?.acertou)) return false;
+                }
+                
+                return true;
+            });
+            
+            paginaAtual = 1;
+            totalPaginas = Math.ceil(questoesFiltradas.length / questoesPorPagina);
+            exibirQuestoes();
+            
+            // Fechar o filtro após aplicar
+            toggleFiltros();
+        };
+        
+        window.limparFiltros = function() {
+            document.getElementById('filtroTipo').value = '';
+            document.getElementById('filtroDificuldade').value = '';
+            document.getElementById('filtroAno').value = '';
+            document.getElementById('filtroOrgao').value = '';
+            document.getElementById('filtroBanca').value = '';
+            document.getElementById('filtroStatus').value = '';
+            
+            filtrosAtivos = { tipo: '', dificuldade: '', ano: '', orgao: '', banca: '', status: '' };
+            
+            questoesFiltradas = [...questoes];
+            paginaAtual = 1;
+            totalPaginas = Math.ceil(questoesFiltradas.length / questoesPorPagina);
+            exibirQuestoes();
+            
+            toggleFiltros();
+        };
+        
+        // ============ MODAL DA DICA ============
+        window.abrirDicaModal = function(dica, event) {
+            if (event) event.stopPropagation();
+            document.getElementById('dicaTexto').innerHTML = dica || 'Nenhuma dica disponível para esta questão.';
+            document.getElementById('dicaModal').classList.add('show');
+        };
+        
+        window.fecharDicaModal = function(event) {
+            if (!event || event.target === document.getElementById('dicaModal')) {
+                document.getElementById('dicaModal').classList.remove('show');
+            }
+        };
+        
+        // ============ SCROLL TO TOP ============
+        window.scrollToTop = function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+        
+        // ============ SWIPE CORRIGIDO ============
+        function initSwipeGestures() {
+            document.addEventListener('touchstart', (e) => {
+                const opcao = e.target.closest('.opcao-item');
+                if (!opcao) return;
+                
+                currentOpcao = opcao;
+                touchStartX = e.changedTouches[0].screenX;
+                isSwiping = false;
+                opcao.classList.add('swiping');
+            }, { passive: true });
+            
+            document.addEventListener('touchmove', (e) => {
+                if (!currentOpcao) return;
+                touchEndX = e.changedTouches[0].screenX;
+                const diffX = Math.abs(touchEndX - touchStartX);
+                if (diffX > 10) {
+                    isSwiping = true;
+                }
+            }, { passive: true });
+            
+            document.addEventListener('touchend', (e) => {
+                if (!currentOpcao) return;
+                
+                const diffX = touchEndX - touchStartX;
+                const questaoIndex = currentOpcao.closest('.questao-item')?.dataset.index;
+                const opcaoLetra = currentOpcao.querySelector('.opcao-letra')?.textContent;
+                
+                if (questaoIndex && opcaoLetra && isSwiping && Math.abs(diffX) > 30) {
+                    const key = `${questaoIndex}-${opcaoLetra}`;
+                    
+                    if (tachados[key]) {
+                        delete tachados[key];
+                        currentOpcao.classList.remove('tachada');
+                    } else {
+                        tachados[key] = true;
+                        currentOpcao.classList.add('tachada');
+                    }
+                    
+                    e.preventDefault();
+                }
+                
+                currentOpcao.classList.remove('swiping');
+                currentOpcao = null;
+                touchStartX = 0;
+                touchEndX = 0;
+                isSwiping = false;
+            }, { passive: true });
+            
+            // Mouse events para desktop
+            let mouseStartX = 0;
+            let mouseEndX = 0;
+            let mouseOpcao = null;
+            let mouseIsSwiping = false;
+            
+            document.addEventListener('mousedown', (e) => {
+                const opcao = e.target.closest('.opcao-item');
+                if (!opcao) return;
+                
+                mouseOpcao = opcao;
+                mouseStartX = e.screenX;
+                mouseIsSwiping = false;
+                opcao.classList.add('swiping');
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!mouseOpcao) return;
+                mouseEndX = e.screenX;
+                const diffX = Math.abs(mouseEndX - mouseStartX);
+                if (diffX > 10) {
+                    mouseIsSwiping = true;
+                }
+            });
+            
+            document.addEventListener('mouseup', (e) => {
+                if (!mouseOpcao) return;
+                
+                const diffX = mouseEndX - mouseStartX;
+                const questaoIndex = mouseOpcao.closest('.questao-item')?.dataset.index;
+                const opcaoLetra = mouseOpcao.querySelector('.opcao-letra')?.textContent;
+                
+                if (questaoIndex && opcaoLetra && mouseIsSwiping && Math.abs(diffX) > 20) {
+                    const key = `${questaoIndex}-${opcaoLetra}`;
+                    
+                    if (tachados[key]) {
+                        delete tachados[key];
+                        mouseOpcao.classList.remove('tachada');
+                    } else {
+                        tachados[key] = true;
+                        mouseOpcao.classList.add('tachada');
+                    }
+                    
+                    e.preventDefault();
+                }
+                
+                mouseOpcao.classList.remove('swiping');
+                mouseOpcao = null;
+                mouseStartX = 0;
+                mouseEndX = 0;
+                mouseIsSwiping = false;
+            });
+        }
+
+        // ============ INICIALIZAR ============
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTheme();
+            loadFontSize();
+            carregarQuestoes();
+            initSwipeGestures();
+        });
+        
+        // ============ CARREGAR QUESTÕES ============
+        async function carregarQuestoes() {
+            const container = document.getElementById('questoesContainer');
+            const assuntoNomeEl = document.getElementById('assuntoNome');
+            const assuntoNomeBadge = document.getElementById('assuntoNomeBadge');
+            const materiaNomeEl = document.getElementById('materiaNome');
+            const materiaBadge = document.getElementById('materiaBadge');
+            
+            try {
+                const params = new URLSearchParams(window.location.search);
+                assuntoAtual = params.get('assunto_nome') || localStorage.getItem('laranja-assunto');
+                assuntoPai = params.get('assunto_pai') || localStorage.getItem('laranja-assunto-pai');
+                materiaAtual = params.get('materia') || localStorage.getItem('laranja-materia');
+                
+                if (!assuntoAtual) {
+                    window.location.href = '/laranja/topic';
+                    return;
+                }
+                
+                // Formatar o badge como "Matéria / Assunto"
+                if (materiaAtual && assuntoPai) {
+                    materiaNomeEl.textContent = materiaAtual;
+                    assuntoNomeBadge.textContent = assuntoPai;
+                    materiaBadge.classList.remove('hidden');
+                } else if (materiaAtual) {
+                    materiaNomeEl.textContent = materiaAtual;
+                    assuntoNomeBadge.textContent = assuntoAtual;
+                    materiaBadge.classList.remove('hidden');
+                } else {
+                    assuntoNomeBadge.textContent = assuntoAtual;
+                    materiaBadge.classList.remove('hidden');
+                }
+                
+                const todasResponse = await fetch(`/laranja/api/questoes-admin`);
+                if (!todasResponse.ok) throw new Error(`Erro ${todasResponse.status}`);
+                
+                const todasQuestoes = await todasResponse.json();
+                
+                // ============ Filtrar questões por assunto com contexto completo ============
+                let questoesProcessadas = todasQuestoes.filter(q => {
+                    // Se tem assuntoPai, significa que veio de um subassunto específico
+                    if (assuntoPai) {
+                        // Verificar se pertence ao assunto pai e é o subassunto específico
+                        const matchAssuntoPai = q.assunto && q.assunto.toLowerCase() === assuntoPai.toLowerCase();
+                        const matchSubAssunto = q.sub_assunto && q.sub_assunto.toLowerCase() === assuntoAtual.toLowerCase();
+                        const matchMateria = materiaAtual ? q.materia && q.materia.toLowerCase() === materiaAtual.toLowerCase() : true;
+                        return matchAssuntoPai && matchSubAssunto && matchMateria;
+                    } else {
+                        // Veio do botão "Todas" - pegar todas as questões do assunto, independente de subassunto
+                        const matchAssunto = q.assunto && q.assunto.toLowerCase() === assuntoAtual.toLowerCase();
+                        const matchMateria = materiaAtual ? q.materia && q.materia.toLowerCase() === materiaAtual.toLowerCase() : true;
+                        return matchAssunto && matchMateria;
+                    }
+                }).map(q => ({
+                    id: q.id,
+                    tipo: q.tipo || 'Múltipla Escolha',
+                    metadata: {
+                        ano: q.ano || '',
+                        banca: q.banca || '',
+                        orgao: q.orgao || '',
+                        cargo: q.cargo || '',
+                        nivel: q.nivel || '',
+                        materia: q.materia || '',
+                        assunto: q.assunto || '',
+                        dificuldade: q.dificuldade || ''
+                    },
+                    pergunta: q.pergunta || '',
+                    opcoes: [
+                        { letra: 'A', texto: q.opcao_1 || '' },
+                        { letra: 'B', texto: q.opcao_2 || '' },
+                        { letra: 'C', texto: q.opcao_3 || '' },
+                        { letra: 'D', texto: q.opcao_4 || '' },
+                        { letra: 'E', texto: q.opcao_5 || '' }
+                    ].filter(opcao => opcao.texto.trim() !== ''),
+                    resposta_correta: q.gabarito ? q.gabarito.trim().toUpperCase() : '',
+                    explicacao: q.dica || '',
+                    imagem: q.imagem || ''  // ============ NOVO CAMPO ============
+                }));
+                
+                if (questoesProcessadas.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-16">
+                            <div class="text-4xl mb-3">📭</div>
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">Nenhuma questão encontrada</h3>
+                            <p class="text-gray-500 text-sm mb-5">Não há questões cadastradas para este assunto.</p>
+                            <button onclick="window.history.back()" class="btn btn-primary">
+                                <i class="fas fa-arrow-left mr-1"></i>Voltar
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                questoes = questoesProcessadas;
+                questoesFiltradas = [...questoes];
+                
+                carregarOpcoesFiltros(questoes);
+                
+                totalPaginas = Math.ceil(questoesFiltradas.length / questoesPorPagina);
+                paginaAtual = 1;
+                
+                respostas = {};
+                tachados = {};
+                questoes.forEach((_, index) => {
+                    respostas[index] = { respondida: false, resposta: null, acertou: false };
+                });
+                
+                exibirQuestoes();
+                
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                container.innerHTML = `
+                    <div class="text-center py-16">
+                        <div class="text-4xl mb-3">😟</div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">Erro ao carregar</h3>
+                        <p class="text-gray-500 text-sm mb-5">${error.message}</p>
+                        <button onclick="carregarQuestoes()" class="btn btn-primary">
+                            <i class="fas fa-redo mr-1"></i>Tentar novamente
+                        </button>
+                    </div>
+                `;
+            }
+        }
+        
+        // ============ EXIBIR QUESTÕES ============
+        function exibirQuestoes() {
+            const container = document.getElementById('questoesContainer');
+            const paginacao = document.getElementById('paginacao');
+            
+            container.innerHTML = '';
+            
+            if (questoesFiltradas.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16">
+                        <div class="text-4xl mb-3">🔍</div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">Nenhuma questão encontrada</h3>
+                        <p class="text-gray-500 text-sm mb-5">Tente remover alguns filtros.</p>
+                        <button onclick="limparFiltros()" class="btn btn-primary">
+                            <i class="fas fa-undo-alt mr-1"></i>Limpar filtros
+                        </button>
+                    </div>
+                `;
+                paginacao.classList.add('hidden');
+                return;
+            }
+            
+            const inicio = (paginaAtual - 1) * questoesPorPagina;
+            const fim = inicio + questoesPorPagina;
+            const questoesPagina = questoesFiltradas.slice(inicio, fim);
+            
+            questoesPagina.forEach((questao, index) => {
+                const questaoIndex = questoes.indexOf(questao);
+                const questaoElement = criarQuestaoElement(questao, questaoIndex);
+                container.appendChild(questaoElement);
+            });
+            
+            exibirPaginacao();
+        }
+        
+        // ============ CRIAR ELEMENTO DA QUESTÃO ============
+        function criarQuestaoElement(questao, index) {
+            const resposta = respostas[index];
+            const respondida = resposta?.respondida || false;
+            const acertou = resposta?.acertou || false;
+            
+            const div = document.createElement('div');
+            div.className = 'questao-item';
+            div.dataset.index = index;
+            
+            // HEADER da questão
+            const header = document.createElement('div');
+            header.className = 'questao-header';
+            
+            // Lado esquerdo - metadados
+            const headerLeft = document.createElement('div');
+            headerLeft.className = 'questao-header-left';
+            
+            const metadataContainer = document.createElement('div');
+            metadataContainer.className = 'questao-metadata-container';
+            
+            // ID
+            const idSpan = document.createElement('span');
+            idSpan.className = 'questao-id';
+            idSpan.textContent = `P${questao.id || (index + 1)}`;
+            metadataContainer.appendChild(idSpan);
+            
+            // ============ Assunto SEMPRE aparece ============
+            if (questao.metadata.assunto) {
+                const assuntoSpan = document.createElement('span');
+                assuntoSpan.className = 'metadata-item';
+                assuntoSpan.innerHTML = `<i class="fas fa-tag"></i>${questao.metadata.assunto}`;
+                metadataContainer.appendChild(assuntoSpan);
+            }
+            
+            // Banca
+            if (questao.metadata.banca) {
+                const bancaSpan = document.createElement('span');
+                bancaSpan.className = 'metadata-item';
+                bancaSpan.innerHTML = `<i class="fas fa-university"></i>${questao.metadata.banca}`;
+                metadataContainer.appendChild(bancaSpan);
+            }
+            
+            // Órgão
+            if (questao.metadata.orgao) {
+                const orgaoSpan = document.createElement('span');
+                orgaoSpan.className = 'metadata-item';
+                orgaoSpan.innerHTML = `<i class="fas fa-building"></i>${questao.metadata.orgao}`;
+                metadataContainer.appendChild(orgaoSpan);
+            }
+            
+            // Ano
+            if (questao.metadata.ano) {
+                const anoSpan = document.createElement('span');
+                anoSpan.className = 'metadata-item';
+                anoSpan.innerHTML = `<i class="fas fa-calendar"></i>${questao.metadata.ano}`;
+                metadataContainer.appendChild(anoSpan);
+            }
+            
+            // Dificuldade
+            if (questao.metadata.dificuldade) {
+                const dificuldadeSpan = document.createElement('span');
+                dificuldadeSpan.className = 'metadata-item';
+                dificuldadeSpan.innerHTML = `<i class="fas fa-chart-line"></i>${questao.metadata.dificuldade}`;
+                metadataContainer.appendChild(dificuldadeSpan);
+            }
+            
+            // Cargo
+            if (questao.metadata.cargo) {
+                const cargoSpan = document.createElement('span');
+                cargoSpan.className = 'metadata-item';
+                cargoSpan.innerHTML = `<i class="fas fa-briefcase"></i>${questao.metadata.cargo}`;
+                metadataContainer.appendChild(cargoSpan);
+            }
+            
+            headerLeft.appendChild(metadataContainer);
+            header.appendChild(headerLeft);
+            
+            // Lado direito - Ícone de status leve (se respondida)
+            if (respondida) {
+                const statusIcon = document.createElement('div');
+                statusIcon.className = `questao-status-icon ${acertou ? 'status-acertou' : 'status-errou'}`;
+                statusIcon.innerHTML = `<i class="fas fa-${acertou ? 'check' : 'times'}"></i>`;
+                header.appendChild(statusIcon);
+            }
+            
+            div.appendChild(header);
+            
+            // ============ NOVO: Exibir imagem da questão se existir ============
+            if (questao.imagem) {
+                const imagemContainer = document.createElement('div');
+                imagemContainer.className = 'questao-imagem-container';
+                
+                const imagem = document.createElement('img');
+                imagem.className = 'questao-imagem';
+                
+                // CORREÇÃO: Montar o caminho correto da imagem
+                if (questao.imagem.startsWith('http')) {
+                    // É uma URL completa
+                    imagem.src = questao.imagem;
+                } else if (questao.imagem.startsWith('/')) {
+                    // Já é um caminho absoluto
+                    imagem.src = questao.imagem;
+                } else {
+                    // É um caminho relativo - adicionar o prefixo /laranja/img/
+                    imagem.src = `/laranja/img/${questao.imagem}`;
+                }
+                
+                imagem.alt = 'Imagem da questão';
+                imagem.onerror = function() {
+                    console.log('Erro ao carregar imagem:', this.src);
+                    this.style.display = 'none';
+                };
+                
+                imagemContainer.appendChild(imagem);
+                div.appendChild(imagemContainer);
+            }
+            
+            // Pergunta
+            const perguntaDiv = document.createElement('div');
+            perguntaDiv.className = 'questao-pergunta';
+            perguntaDiv.innerHTML = questao.pergunta;
+            div.appendChild(perguntaDiv);
+            
+            // Opções
+            const opcoesDiv = document.createElement('div');
+            opcoesDiv.className = 'opcoes-container';
+            
+            questao.opcoes.forEach(opcao => {
+                const opcaoDiv = document.createElement('div');
+                opcaoDiv.className = 'opcao-item';
+                
+                const key = `${index}-${opcao.letra}`;
+                if (tachados[key]) opcaoDiv.classList.add('tachada');
+                
+                if (respondida) {
+                    if (opcao.letra === questao.resposta_correta) {
+                        opcaoDiv.classList.add('correta');
+                    } else if (resposta?.resposta === opcao.letra && !acertou) {
+                        opcaoDiv.classList.add('incorreta');
+                    }
+                    
+                    opcaoDiv.style.cursor = 'default';
+                    opcaoDiv.onclick = null;
+                } else {
+                    opcaoDiv.onclick = (e) => {
+                        if (isSwiping) {
+                            e.preventDefault();
+                            return;
+                        }
+                        selecionarOpcao(index, opcao.letra);
+                    };
+                }
+                
+                opcaoDiv.innerHTML = `
+                    <div class="opcao-letra">${opcao.letra}</div>
+                    <div class="opcao-texto">${opcao.texto}</div>
+                `;
+                
+                opcoesDiv.appendChild(opcaoDiv);
+            });
+            
+            div.appendChild(opcoesDiv);
+            
+            // Footer - Botão Responder e Lâmpada
+            if (!respondida) {
+                const footer = document.createElement('div');
+                footer.className = 'questao-footer';
+                
+                const footerLeft = document.createElement('div');
+                footerLeft.className = 'footer-left';
+                
+                const responderBtn = document.createElement('button');
+                responderBtn.className = 'btn btn-primary';
+                responderBtn.innerHTML = '<i class="fas fa-check mr-1"></i>Responder';
+                responderBtn.onclick = () => responderQuestao(index);
+                footerLeft.appendChild(responderBtn);
+                
+                // Lâmpada ao lado do botão responder
+                const lampadaBtn = document.createElement('button');
+                lampadaBtn.className = 'lampada-btn-footer';
+                lampadaBtn.innerHTML = '<i class="fas fa-lightbulb"></i>';
+                lampadaBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    abrirDicaModal(questao.explicacao.replace(/'/g, "\\'").replace(/\n/g, ' '), e);
+                };
+                footerLeft.appendChild(lampadaBtn);
+                
+                footer.appendChild(footerLeft);
+                div.appendChild(footer);
+            }
+            
+            return div;
+        }
+        
+        // ============ FUNÇÕES DE INTERAÇÃO ============
+        function selecionarOpcao(index, letra) {
+            if (respostas[index]?.respondida) return;
+            
+            const questaoDiv = document.querySelector(`.questao-item[data-index="${index}"]`);
+            if (!questaoDiv) return;
+            
+            const opcoes = questaoDiv.querySelectorAll('.opcao-item');
+            opcoes.forEach(opcao => opcao.classList.remove('selecionada'));
+            
+            opcoes.forEach(opcao => {
+                if (opcao.querySelector('.opcao-letra').textContent === letra) {
+                    opcao.classList.add('selecionada');
+                }
+            });
+            
+            if (!respostas[index]) respostas[index] = { respondida: false, resposta: null, acertou: false };
+            respostas[index].resposta = letra;
+        }
+        
+        function responderQuestao(index) {
+            const resposta = respostas[index]?.resposta;
+            if (!resposta) { alert('Selecione uma opção'); return; }
+            
+            const questao = questoes[index];
+            const acertou = resposta === questao.resposta_correta;
+            
+            respostas[index] = { respondida: true, resposta, acertou };
+            exibirQuestoes();
+        }
+        
+        // ============ PAGINAÇÃO ============
+        function exibirPaginacao() {
+            const container = document.getElementById('paginacao');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            if (totalPaginas <= 1) {
+                container.classList.add('hidden');
+                return;
+            }
+            
+            container.classList.remove('hidden');
+            
+            if (paginaAtual > 1) {
+                const btnAnterior = document.createElement('button');
+                btnAnterior.className = 'pagina-btn';
+                btnAnterior.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                btnAnterior.onclick = () => mudarPagina(paginaAtual - 1);
+                container.appendChild(btnAnterior);
+            }
+            
+            const inicio = Math.max(1, paginaAtual - 2);
+            const fim = Math.min(totalPaginas, paginaAtual + 2);
+            
+            for (let i = inicio; i <= fim; i++) {
+                const btnPagina = document.createElement('button');
+                btnPagina.className = `pagina-btn ${i === paginaAtual ? 'ativa' : ''}`;
+                btnPagina.textContent = i;
+                btnPagina.onclick = () => mudarPagina(i);
+                container.appendChild(btnPagina);
+            }
+            
+            if (paginaAtual < totalPaginas) {
+                const btnProxima = document.createElement('button');
+                btnProxima.className = 'pagina-btn';
+                btnProxima.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                btnProxima.onclick = () => mudarPagina(paginaAtual + 1);
+                container.appendChild(btnProxima);
+            }
+        }
+        
+        function mudarPagina(pagina) {
+            if (pagina < 1 || pagina > totalPaginas) return;
+            paginaAtual = pagina;
+            exibirQuestoes();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // ============ FINALIZAR ============
+        window.finalizarQuiz = function() {
+            const respondidas = Object.values(respostas).filter(r => r.respondida).length;
+            if (respondidas === 0) { alert('Responda pelo menos uma questão'); return; }
+            
+            let acertos = 0;
+            Object.values(respostas).forEach(r => { if (r.acertou) acertos++; });
+            
+            const erros = respondidas - acertos;
+            const percentual = respondidas > 0 ? Math.round((acertos / respondidas) * 100) : 0;
+            
+            document.getElementById('acertosCount').textContent = acertos;
+            document.getElementById('errosCount').textContent = erros;
+            document.getElementById('totalCount').textContent = questoes.length;
+            document.getElementById('percentualCount').textContent = `${percentual}%`;
+            
+            let emoji = '📊', mensagem = `Você acertou ${acertos} de ${respondidas} questões (${percentual}%)`;
+            if (percentual >= 90) { emoji = '🏆'; mensagem = 'Excelente! Domínio completo do assunto.'; }
+            else if (percentual >= 70) { emoji = '⭐'; mensagem = 'Muito bom! Continue praticando.'; }
+            else if (percentual >= 50) { emoji = '👍'; mensagem = 'Bom trabalho! Revise os erros.'; }
+            else { emoji = '💪'; mensagem = 'Continue estudando! Você vai melhorar.'; }
+            
+            document.getElementById('resultadoEmoji').textContent = emoji;
+            document.getElementById('resultadoTitulo').textContent = 'Quiz Concluído!';
+            document.getElementById('resultadoMensagem').textContent = mensagem;
+            document.getElementById('resultadoModal').classList.add('show');
+        };
+        
+        window.reiniciarQuiz = function() {
+            document.getElementById('resultadoModal').classList.remove('show');
+            respostas = {};
+            questoes.forEach((_, index) => { respostas[index] = { respondida: false, resposta: null, acertou: false }; });
+            tachados = {};
+            paginaAtual = 1;
+            questoesFiltradas = [...questoes];
+            totalPaginas = Math.ceil(questoesFiltradas.length / questoesPorPagina);
+            exibirQuestoes();
+        };
+    </script>
+</body>
+</html>

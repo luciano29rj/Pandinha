@@ -1,0 +1,23 @@
+{
+  "name": "Panda Estudos",
+  "short_name": "Panda",
+  "description": "App de questões para crianças e concurseiros",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "theme_color": "#FF4D6D",
+  "background_color": "#FFFFFF",
+  "icons": [
+    {
+      "src": "/imagens/icone-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/imagens/icone-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

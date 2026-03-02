@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estatísticas - Panda Estudos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .tab-button {
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            background: #f1f5f9;
+            color: #64748b;
+        }
+        
+        .tab-button.active {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: #e2e8f0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .assunto-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 2px;
+        }
+        
+        .status-excelente {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-bom {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-regular {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-6">
+
+    <!-- Cabeçalho -->
+    <div class="max-w-7xl mx-auto mb-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-black text-white">
+                    📊 Estatísticas de Desempenho
+                </h1>
+                <p class="text-white/80 text-lg mt-2" id="subtitulo">
+                    Selecione um perfil para ver as estatísticas
+                </p>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button onclick="voltarParaPaginaAnterior()" 
+                        class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl font-semibold transition flex items-center gap-2">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seletor de Perfil (aparece sempre) -->
+    <div class="max-w-7xl mx-auto mb-8">
+        <div class="glass-card p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-user mr-2"></i> Selecione o Perfil
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <select id="perfilSelect" class="w-full p-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition bg-white">
+                        <option value="">Carregando perfis...</option>
+                    </select>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div id="perfilInfo" class="flex-1">
+                        <p class="text-gray-500">Nenhum perfil selecionado</p>
+                    </div>
+                    
+                    <button onclick="zerarEstatisticas()" id="btnZerar" class="bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-xl font-semibold transition flex items-center gap-2" disabled>
+                        <i class="fas fa-trash-alt"></i> Zerar Estatísticas
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conteúdo Principal (só aparece quando perfil é selecionado) -->
+    <div id="conteudoEstatisticas" class="max-w-7xl mx-auto" style="display: none;">
+        
+        <!-- Abas -->
+        <div class="mb-8">
+            <div class="glass-card p-4">
+                <div class="flex flex-wrap gap-2">
+                    <button class="tab-button active" onclick="mostrarAba('resumo', this)">
+                        <i class="fas fa-chart-pie mr-2"></i> Resumo Geral
+                    </button>
+                    <button class="tab-button" onclick="mostrarAba('materias', this)">
+                        <i class="fas fa-book mr-2"></i> Por Matéria
+                    </button>
+                    <button class="tab-button" onclick="mostrarAba('assuntos', this)">
+                        <i class="fas fa-list mr-2"></i> Por Assunto
+                    </button>
+                    <button class="tab-button" onclick="mostrarAba('evolucao', this)">
+                        <i class="fas fa-chart-line mr-2"></i> Evolução
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA: RESUMO GERAL -->
+        <div id="aba-resumo" class="aba-conteudo">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="stat-card p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">Total de Questões</p>
+                            <p id="totalQuestoes" class="text-3xl font-bold text-gray-800">0</p>
+                        </div>
+                        <i class="fas fa-question-circle text-3xl text-blue-500"></i>
+                    </div>
+                </div>
+                
+                <div class="stat-card p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">Acertos</p>
+                            <p id="totalAcertos" class="text-3xl font-bold text-green-600">0</p>
+                        </div>
+                        <i class="fas fa-check-circle text-3xl text-green-500"></i>
+                    </div>
+                </div>
+                
+                <div class="stat-card p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">Erros</p>
+                            <p id="totalErros" class="text-3xl font-bold text-red-600">0</p>
+                        </div>
+                        <i class="fas fa-times-circle text-3xl text-red-500"></i>
+                    </div>
+                </div>
+                
+                <div class="stat-card p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">Taxa de Acerto</p>
+                            <p id="percentualTotal" class="text-3xl font-bold text-purple-600">0%</p>
+                        </div>
+                        <i class="fas fa-percentage text-3xl text-purple-500"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Gráfico de Matérias -->
+                <div class="stat-card p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-chart-donut mr-2"></i> Desempenho por Matéria
+                    </h3>
+                    <canvas id="graficoMaterias" height="250"></canvas>
+                </div>
+                
+                <!-- Análise -->
+                <div class="stat-card p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-lightbulb mr-2"></i> Análise do Desempenho
+                    </h3>
+                    <div id="analiseTexto" class="text-gray-600 mb-6">
+                        <p>Selecione um perfil para ver a análise de desempenho.</p>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-bold text-gray-700 mb-2">Pontos Fortes:</h4>
+                            <div id="pontosFortes" class="flex flex-wrap gap-2">
+                                <span class="text-gray-500">-</span>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold text-gray-700 mb-2">Pontos a Melhorar:</h4>
+                            <div id="pontosFracos" class="flex flex-wrap gap-2">
+                                <span class="text-gray-500">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA: POR MATÉRIA -->
+        <div id="aba-materias" class="aba-conteudo" style="display: none;">
+            <div class="stat-card p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-book-open mr-2"></i> Desempenho por Matéria
+                </h3>
+                <div id="listaMaterias" class="space-y-4">
+                    <!-- Matérias serão carregadas aqui -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA: POR ASSUNTO -->
+        <div id="aba-assuntos" class="aba-conteudo" style="display: none;">
+            <div class="stat-card p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-list-ul mr-2"></i> Desempenho por Assunto
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-left text-gray-500 border-b">
+                                <th class="pb-3 font-semibold">Matéria</th>
+                                <th class="pb-3 font-semibold">Assunto</th>
+                                <th class="pb-3 font-semibold">Total</th>
+                                <th class="pb-3 font-semibold">Acertos</th>
+                                <th class="pb-3 font-semibold">%</th>
+                                <th class="pb-3 font-semibold">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaAssuntos">
+                            <tr>
+                                <td colspan="6" class="py-8 text-center text-gray-500">
+                                    Nenhum dado de desempenho por assunto disponível.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA: EVOLUÇÃO (CORRIGIDA) -->
+        <div id="aba-evolucao" class="aba-conteudo" style="display: none;">
+            <div class="stat-card p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-chart-line mr-2"></i> Evolução do Desempenho
+                </h3>
+                <canvas id="graficoEvolucao" height="200"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Mensagem quando não há dados -->
+    <div id="semDados" class="max-w-7xl mx-auto text-center py-12" style="display: none;">
+        <div class="glass-card p-8">
+            <i class="fas fa-chart-bar text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-bold text-gray-700 mb-2">Nenhum Dado Disponível</h3>
+            <p class="text-gray-500 mb-6">
+                Este perfil ainda não respondeu nenhuma questão.<br>
+                As estatísticas serão geradas automaticamente quando começar a estudar.
+            </p>
+            <button onclick="window.location.href='materias.html'" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold transition">
+                <i class="fas fa-play mr-2"></i> Começar a Estudar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis globais
+        let usuarioSelecionado = null;
+        let estatisticasDetalhadas = null;
+        let graficoMaterias = null;
+        let graficoEvolucao = null;
+        let todosPerfis = [];
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('Página estatisticas.html carregada');
+            
+            // Carregar perfis
+            await carregarPerfis();
+        });
+        
+        // Carregar lista de perfis
+        async function carregarPerfis() {
+            try {
+                console.log('Carregando lista de perfis...');
+                
+                const response = await fetch('/api/usuarios?ativos=1', {
+                    credentials: "include"
+                });
+                if (!response.ok) throw new Error('Erro ao carregar perfis');
+                
+                const data = await response.json();
+                
+                // Verificar formato da resposta
+                if (data.success && data.usuarios) {
+                    todosPerfis = data.usuarios;
+                } else if (Array.isArray(data)) {
+                    todosPerfis = data;
+                } else {
+                    todosPerfis = [];
+                }
+                
+                console.log(`Perfis carregados: ${todosPerfis.length}`);
+                
+                const select = document.getElementById('perfilSelect');
+                select.innerHTML = '<option value="">Selecione um perfil...</option>';
+                
+                todosPerfis.forEach(perfil => {
+                    const option = document.createElement('option');
+                    option.value = perfil.id;
+                    option.textContent = `${perfil.nome} (${perfil.email})`;
+                    select.appendChild(option);
+                });
+                
+                // Adicionar evento de mudança
+                select.addEventListener('change', async (e) => {
+                    const usuarioId = e.target.value;
+                    if (usuarioId) {
+                        await carregarEstatisticasUsuario(usuarioId);
+                    } else {
+                        esconderConteudo();
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Erro ao carregar perfis:', error);
+                document.getElementById('perfilSelect').innerHTML = '<option value="">Erro ao carregar perfis</option>';
+            }
+        }
+        
+        // Carregar estatísticas do usuário selecionado
+        async function carregarEstatisticasUsuario(usuarioId) {
+            try {
+                showLoading('Carregando estatísticas...');
+                
+                // Buscar dados do perfil
+                const perfil = todosPerfis.find(p => p.id == usuarioId) || 
+                              { id: usuarioId, nome: localStorage.getItem('usuario_nome'), email: '' };
+                
+                if (perfil) {
+                    usuarioSelecionado = perfil;
+                    atualizarInfoPerfil(perfil);
+                    
+                    // Habilitar botão de zerar
+                    document.getElementById('btnZerar').disabled = false;
+                }
+                
+                // Buscar estatísticas usando a rota existente
+                const response = await fetch(`/api/estatisticas/usuario/${usuarioId}`, {
+                    credentials: "include"
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Dados recebidos da API:', data);
+                
+                estatisticasDetalhadas = data;
+                
+                // Verificar se há dados
+                if (data.total === 0 || !data.total) {
+                    // Mostrar mensagem de sem dados
+                    document.getElementById('conteudoEstatisticas').style.display = 'none';
+                    document.getElementById('semDados').style.display = 'block';
+                } else {
+                    // Mostrar conteúdo
+                    document.getElementById('conteudoEstatisticas').style.display = 'block';
+                    document.getElementById('semDados').style.display = 'none';
+                    
+                    // Atualizar todas as abas
+                    atualizarResumo();
+                    atualizarAbaMaterias();
+                    atualizarAbaAssuntos();
+                    atualizarAbaEvolucao();
+                }
+                
+                hideLoading();
+                
+            } catch (error) {
+                console.error('Erro ao carregar estatísticas:', error);
+                
+                // Mostrar mensagem de erro
+                document.getElementById('conteudoEstatisticas').style.display = 'none';
+                document.getElementById('semDados').innerHTML = `
+                    <div class="glass-card p-8">
+                        <i class="fas fa-exclamation-triangle text-6xl text-red-300 mb-4"></i>
+                        <h3 class="text-xl font-bold text-gray-700 mb-2">Erro ao Carregar Dados</h3>
+                        <p class="text-gray-500 mb-4">Não foi possível carregar as estatísticas.</p>
+                        <p class="text-sm text-gray-400">Erro: ${error.message}</p>
+                    </div>
+                `;
+                document.getElementById('semDados').style.display = 'block';
+                
+                hideLoading();
+            }
+        }
+        
+        // Atualizar informações do perfil selecionado
+        function atualizarInfoPerfil(perfil) {
+            const container = document.getElementById('perfilInfo');
+            container.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-2xl">
+                        ${perfil.avatar || '👤'}
+                    </div>
+                    <div>
+                        <p class="font-bold text-gray-800">${perfil.nome}</p>
+                        <p class="text-sm text-gray-500">${perfil.email || 'Sem email'}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Esconder conteúdo quando nenhum perfil está selecionado
+        function esconderConteudo() {
+            document.getElementById('conteudoEstatisticas').style.display = 'none';
+            document.getElementById('semDados').style.display = 'none';
+            document.getElementById('perfilInfo').innerHTML = '<p class="text-gray-500">Nenhum perfil selecionado</p>';
+            document.getElementById('btnZerar').disabled = true;
+            usuarioSelecionado = null;
+            estatisticasDetalhadas = null;
+        }
+        
+        // Atualizar aba Resumo
+        function atualizarResumo() {
+            if (!estatisticasDetalhadas) return;
+            
+            console.log('Atualizando resumo com dados:', estatisticasDetalhadas);
+            
+            // Atualizar indicadores
+            document.getElementById('totalQuestoes').textContent = estatisticasDetalhadas.total || 0;
+            document.getElementById('totalAcertos').textContent = estatisticasDetalhadas.acertos || 0;
+            document.getElementById('totalErros').textContent = estatisticasDetalhadas.erros || 0;
+            document.getElementById('percentualTotal').textContent = `${estatisticasDetalhadas.percentual || 0}%`;
+            
+            // Criar gráfico de matérias
+            criarGraficoMaterias(estatisticasDetalhadas.materias);
+            
+            // Atualizar análise
+            atualizarAnalise();
+        }
+        
+        // Criar gráfico de matérias
+        function criarGraficoMaterias(dadosMaterias) {
+            const ctx = document.getElementById('graficoMaterias');
+            if (graficoMaterias) graficoMaterias.destroy();
+            
+            if (!dadosMaterias || typeof dadosMaterias !== 'object' || Object.keys(dadosMaterias).length === 0) {
+                ctx.parentElement.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-chart-pie text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">Nenhum dado de desempenho por matéria disponível.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Formatar dados para o gráfico
+            const labels = [];
+            const dados = [];
+            const cores = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+            
+            Object.entries(dadosMaterias).forEach(([materia, valor], index) => {
+                labels.push(materia);
+                dados.push(valor);
+            });
+            
+            graficoMaterias = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: dados,
+                        backgroundColor: cores.slice(0, labels.length),
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Atualizar análise
+        function atualizarAnalise() {
+            if (!estatisticasDetalhadas) return;
+            
+            const total = estatisticasDetalhadas.total || 0;
+            const percentual = estatisticasDetalhadas.percentual || 0;
+            const materias = estatisticasDetalhadas.materias || {};
+            
+            let analise = '';
+            let pontosFortes = [];
+            let pontosFracos = [];
+            
+            if (total === 0) {
+                analise = 'Este perfil ainda não respondeu nenhuma questão.';
+            } else if (percentual >= 80) {
+                analise = '🎉 <strong>Excelente desempenho!</strong> O aluno demonstra domínio da maioria dos conteúdos.';
+            } else if (percentual >= 60) {
+                analise = '👍 <strong>Bom desempenho!</strong> Com mais prática pode alcançar a excelência.';
+            } else if (percentual >= 40) {
+                analise = '📚 <strong>Desempenho regular.</strong> Recomenda-se focar nos conteúdos com menor taxa de acerto.';
+            } else {
+                analise = '🎯 <strong>Atenção necessária.</strong> Identificamos dificuldades significativas que precisam de reforço.';
+            }
+            
+            // Identificar pontos fortes e fracos
+            Object.entries(materias).forEach(([materia, percentualMateria]) => {
+                if (percentualMateria >= 75) {
+                    pontosFortes.push(materia);
+                } else if (percentualMateria <= 40) {
+                    pontosFracos.push(materia);
+                }
+            });
+            
+            document.getElementById('analiseTexto').innerHTML = `<p class="text-lg">${analise}</p>`;
+            
+            // Atualizar pontos fortes
+            const containerFortes = document.getElementById('pontosFortes');
+            containerFortes.innerHTML = '';
+            
+            if (pontosFortes.length > 0) {
+                pontosFortes.forEach(ponto => {
+                    const span = document.createElement('span');
+                    span.className = 'assunto-badge status-excelente';
+                    span.textContent = ponto;
+                    containerFortes.appendChild(span);
+                });
+            } else if (total > 0) {
+                containerFortes.innerHTML = '<span class="text-gray-500">Nenhum ponto forte identificado acima de 75%</span>';
+            }
+            
+            // Atualizar pontos fracos
+            const containerFracos = document.getElementById('pontosFracos');
+            containerFracos.innerHTML = '';
+            
+            if (pontosFracos.length > 0) {
+                pontosFracos.forEach(ponto => {
+                    const span = document.createElement('span');
+                    span.className = 'assunto-badge status-regular';
+                    span.textContent = ponto;
+                    containerFracos.appendChild(span);
+                });
+            } else if (total > 0) {
+                containerFracos.innerHTML = '<span class="text-gray-500">Nenhum ponto fraco significativo identificado</span>';
+            }
+        }
+        
+        // Atualizar aba Matérias
+        function atualizarAbaMaterias() {
+            const container = document.getElementById('listaMaterias');
+            
+            if (!estatisticasDetalhadas || !estatisticasDetalhadas.materias || 
+                Object.keys(estatisticasDetalhadas.materias).length === 0) {
+                
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-book text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">Nenhum dado de desempenho por matéria disponível.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            const materias = estatisticasDetalhadas.materias;
+            
+            Object.entries(materias).forEach(([materia, percentual]) => {
+                const cor = percentual >= 70 ? 'bg-green-500' : 
+                            percentual >= 50 ? 'bg-yellow-500' : 'bg-red-500';
+                
+                // Calcular total de questões para esta matéria (aproximação)
+                const totalGeral = estatisticasDetalhadas.total || 0;
+                const numMaterias = Object.keys(materias).length;
+                const estimativaQuestoes = Math.round(totalGeral / numMaterias);
+                const acertosEstimados = Math.round(estimativaQuestoes * (percentual / 100));
+                
+                const materiaDiv = document.createElement('div');
+                materiaDiv.className = 'p-4 bg-gray-50 rounded-xl';
+                
+                materiaDiv.innerHTML = `
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-book text-blue-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-lg">${materia}</h4>
+                                <p class="text-sm text-gray-500">Aprox. ${estimativaQuestoes} questões</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-2xl font-bold ${percentual >= 70 ? 'text-green-600' : 
+                                percentual >= 50 ? 'text-yellow-600' : 'text-red-600'}">
+                                ${percentual}%
+                            </p>
+                            <p class="text-sm text-gray-500">Taxa de acerto</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="flex justify-between text-sm text-gray-600 mb-1">
+                            <span>Progresso</span>
+                            <span>${acertosEstimados}/${estimativaQuestoes} acertos</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill ${cor}" style="width: ${percentual}%"></div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(materiaDiv);
+            });
+        }
+        
+        // Atualizar aba Assuntos
+        function atualizarAbaAssuntos() {
+            const tbody = document.getElementById('tabelaAssuntos');
+            
+            if (!estatisticasDetalhadas || !estatisticasDetalhadas.assuntos || 
+                Object.keys(estatisticasDetalhadas.assuntos).length === 0) {
+                
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="py-8 text-center text-gray-500">
+                            Nenhum dado de desempenho por assunto disponível.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            const assuntos = estatisticasDetalhadas.assuntos;
+            
+            Object.entries(assuntos).forEach(([assunto, dados]) => {
+                const percentual = dados.percentual || 0;
+                let status = '', statusCor = '';
+                
+                if (percentual >= 70) {
+                    status = 'Excelente';
+                    statusCor = 'status-excelente';
+                } else if (percentual >= 50) {
+                    status = 'Bom';
+                    statusCor = 'status-bom';
+                } else {
+                    status = 'Precisa melhorar';
+                    statusCor = 'status-regular';
+                }
+                
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-gray-100 hover:bg-gray-50';
+                
+                tr.innerHTML = `
+                    <td class="py-4 font-medium">${dados.materia || 'Não especificada'}</td>
+                    <td class="py-4">${assunto}</td>
+                    <td class="py-4">${dados.total || 0}</td>
+                    <td class="py-4 font-semibold">${dados.acertos || 0}</td>
+                    <td class="py-4 font-bold ${percentual >= 70 ? 'text-green-600' : 
+                        percentual >= 50 ? 'text-yellow-600' : 'text-red-600'}">
+                        ${percentual}%
+                    </td>
+                    <td class="py-4">
+                        <span class="assunto-badge ${statusCor}">
+                            ${status}
+                        </span>
+                    </td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // =============================================
+        // FUNÇÃO CORRIGIDA - USA DADOS JÁ CARREGADOS
+        // =============================================
+        function atualizarAbaEvolucao() {
+            // Verificar se o elemento canvas existe
+            const canvas = document.getElementById('graficoEvolucao');
+            
+            if (!canvas) {
+                console.log('Canvas graficoEvolucao não encontrado');
+                return;
+            }
+            
+            // Destruir gráfico anterior se existir
+            if (graficoEvolucao) {
+                graficoEvolucao.destroy();
+                graficoEvolucao = null;
+            }
+            
+            // Verificar se temos um usuário selecionado
+            if (!usuarioSelecionado) {
+                const container = canvas.parentElement;
+                if (container) {
+                    container.innerHTML = `
+                        <div class="text-center py-12">
+                            <i class="fas fa-user text-5xl text-gray-300 mb-3"></i>
+                            <p class="text-gray-500 text-base">Selecione um perfil</p>
+                        </div>
+                    `;
+                }
+                return;
+            }
+            
+            const container = canvas.parentElement;
+            if (!container) return;
+            
+            // Mostrar loading
+            container.innerHTML = `
+                <div class="text-center py-8">
+                    <div class="loading-spinner mx-auto mb-4"></div>
+                    <p class="text-gray-500">Carregando evolução...</p>
+                </div>
+            `;
+            
+            // BUSCAR DADOS DO BANCO
+            fetch(`/api/estatisticas/evolucao/${usuarioSelecionado.id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.labels && data.labels.length > 0) {
+                        
+                        // Criar mapa para acesso rápido aos dados existentes
+                        const dadosMap = {};
+                        for (let i = 0; i < data.labels.length; i++) {
+                            dadosMap[data.labels[i]] = {
+                                acertos: data.acertos[i],
+                                erros: data.erros[i]
+                            };
+                        }
+                        
+                        // Gerar os últimos 31 dias
+                        const hoje = new Date();
+                        const todosOsDias = [];
+                        const acertosCompletos = [];
+                        const errosCompletos = [];
+                        
+                        for (let i = 30; i >= 0; i--) {
+                            const data = new Date(hoje);
+                            data.setDate(hoje.getDate() - i);
+                            
+                            const dia = data.getDate().toString().padStart(2, '0');
+                            const mes = (data.getMonth() + 1).toString().padStart(2, '0');
+                            const dataStr = `${dia}/${mes}`;
+                            
+                            todosOsDias.push(dataStr);
+                            
+                            // Se tem dados para este dia, usa; senão, coloca 0
+                            if (dadosMap[dataStr]) {
+                                acertosCompletos.push(dadosMap[dataStr].acertos);
+                                errosCompletos.push(dadosMap[dataStr].erros);
+                            } else {
+                                acertosCompletos.push(0);
+                                errosCompletos.push(0);
+                            }
+                        }
+                        
+                        // Recriar o canvas
+                        container.innerHTML = '<canvas id="graficoEvolucao" height="100"></canvas>';
+                        const novoCanvas = document.getElementById('graficoEvolucao');
+                        
+                        if (!novoCanvas) return;
+                        
+                        // Criar gráfico
+                        graficoEvolucao = new Chart(novoCanvas, {
+                            type: 'line',
+                            data: {
+                                labels: todosOsDias,
+                                datasets: [
+                                    {
+                                        label: 'Acertos',
+                                        data: acertosCompletos,
+                                        borderColor: '#3b82f6',
+                                        backgroundColor: 'transparent',
+                                        borderWidth: 2.5,
+                                        tension: 0,
+                                        pointRadius: 3.5,
+                                        pointHoverRadius: 5,
+                                        pointBackgroundColor: '#3b82f6',
+                                        pointBorderColor: 'white',
+                                        pointBorderWidth: 2,
+                                        fill: false
+                                    },
+                                    {
+                                        label: 'Erros',
+                                        data: errosCompletos,
+                                        borderColor: '#ef4444',
+                                        backgroundColor: 'transparent',
+                                        borderWidth: 2.5,
+                                        tension: 0,
+                                        pointRadius: 3.5,
+                                        pointHoverRadius: 5,
+                                        pointBackgroundColor: '#ef4444',
+                                        pointBorderColor: 'white',
+                                        pointBorderWidth: 2,
+                                        fill: false
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: true,
+                                plugins: {
+                                    legend: {
+                                        position: 'top',
+                                        labels: {
+                                            boxWidth: 12,
+                                            padding: 12,
+                                            font: { size: 13, weight: 'bold' },
+                                            usePointStyle: true,
+                                            pointStyle: 'circle'
+                                        }
+                                    },
+                                    tooltip: {
+                                        mode: 'index',
+                                        intersect: false,
+                                        backgroundColor: 'rgba(255,255,255,0.95)',
+                                        titleColor: '#333',
+                                        bodyColor: '#666',
+                                        borderColor: '#ddd',
+                                        borderWidth: 1,
+                                        titleFont: { size: 14, weight: 'bold' },
+                                        bodyFont: { size: 14 },
+                                        padding: 8
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        grid: { color: '#e5e7eb', lineWidth: 0.5 },
+                                        ticks: { 
+                                            stepSize: 1,
+                                            font: { size: 14, weight: '500' },
+                                            color: '#333',
+                                            maxTicksLimit: 6,
+                                            padding: 5
+                                        }
+                                    },
+                                    x: {
+                                        grid: { display: false },
+                                        ticks: { 
+                                            maxRotation: 45, 
+                                            minRotation: 45, 
+                                            font: { size: 14, weight: '500' },
+                                            color: '#333',
+                                            maxTicksLimit: 10,
+                                            padding: 5
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        container.innerHTML = `
+                            <div class="text-center py-12">
+                                <i class="fas fa-chart-line text-5xl text-gray-300 mb-3"></i>
+                                <p class="text-gray-500 text-base">Nenhum dado de evolução encontrado</p>
+                                <p class="text-sm text-gray-400 mt-2">Continue estudando para gerar estatísticas!</p>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar evolução:', error);
+                    container.innerHTML = `
+                        <div class="text-center py-12">
+                            <i class="fas fa-exclamation-triangle text-5xl text-red-300 mb-3"></i>
+                            <p class="text-gray-500 text-base">Erro ao carregar dados</p>
+                            <p class="text-sm text-gray-400 mt-2">Tente novamente mais tarde</p>
+                        </div>
+                    `;
+                });
+        }
+        
+        // Alternar entre abas
+        function mostrarAba(aba, btn) {
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.aba-conteudo').forEach(div => div.style.display = 'none');
+            document.getElementById(`aba-${aba}`).style.display = 'block';
+        }
+        
+        // Zerar estatísticas
+        async function zerarEstatisticas() {
+            if (!usuarioSelecionado) return;
+
+            const confirmar = confirm(
+                `⚠️ ADMINISTRADOR\n\nDeseja zerar TODAS as estatísticas de:\n\n${usuarioSelecionado.nome}\n\nEssa ação é irreversível.`
+            );
+            if (!confirmar) return;
+
+            try {
+                showLoading("Zerando estatísticas...");
+
+                const response = await fetch(
+                    `/api/admin/estatisticas/zerar/${usuarioSelecionado.id}`,
+                    {
+                        method: "DELETE"
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || "Erro ao zerar");
+                }
+
+                alert("✅ Estatísticas zeradas com sucesso (ADMIN)");
+
+                // Recarregar dados do usuário
+                await carregarEstatisticasUsuario(usuarioSelecionado.id);
+
+            } catch (error) {
+                console.error(error);
+                alert("❌ " + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Voltar para página anterior
+        function voltarParaPaginaAnterior() {
+            window.location.href = 'admin.html';
+        }
+        
+        // Funções de loading
+        function showLoading(mensagem = 'Carregando...') {
+            let loading = document.getElementById('loadingOverlay');
+            if (!loading) {
+                loading = document.createElement('div');
+                loading.id = 'loadingOverlay';
+                loading.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                document.body.appendChild(loading);
+            }
+            loading.innerHTML = `
+                <div class="bg-white p-8 rounded-2xl shadow-xl">
+                    <div class="flex flex-col items-center gap-4">
+                        <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        <p class="font-bold text-gray-700">${mensagem}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function hideLoading() {
+            const loading = document.getElementById('loadingOverlay');
+            if (loading) {
+                loading.remove();
+            }
+        }
+        
+    </script>
+</body>
+</html>

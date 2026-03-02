@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+    <title>Matérias - Panda Estudos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================
+        BASE DO APP
+        ========================= */
+        body { 
+            font-family: 'Poppins', cursive;
+            background: linear-gradient(180deg, #CFE9FA 0%, #FFFFFF 50%, #FFF9D1 100%);
+            min-height: 100vh;
+        }
+
+        /* =========================
+        ROADMAP / MATÉRIAS
+        ========================= */
+        .roadmap-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: #fbcfe8;
+            transform: translateX(-50%);
+            z-index: 0;
+        }
+
+        .card-materia {
+            position: relative;
+            z-index: 10;
+            transition: transform 0.2s;
+            min-height: 80px;
+        }
+
+        .card-materia:hover { transform: scale(1.04); }
+        .card-materia:active { transform: scale(0.97); }
+
+        /* =========================
+        MODAL (JANELA SUSPENSA)
+        ========================= */
+        dialog {
+            border: none;
+            border-radius: 26px;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+            padding: 22px;
+            max-width: 90vw;
+            width: 420px;
+            background: #FFFDF7;
+        }
+
+        dialog::backdrop {
+            background: rgba(0,0,0,0.45);
+        }
+
+        /* =========================
+        MODAL ESTATÍSTICAS
+        ========================= */
+        .modal-estatisticas {
+            text-align: center;
+        }
+
+        /* =========================
+        CARDS (TOTAL / ACERTOS / ERROS)
+        ========================= */
+        .cards-estatisticas {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            width: 100px;
+            height: 88px;
+            border-radius: 22px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.08);
+            border: 3px solid rgba(255,255,255,0.9);
+        }
+
+        /* Texto do card */
+        .card .titulo {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .card .numero {
+            font-size: 28px;
+            font-weight: 800;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+        }
+
+        /* Cores fofas */
+        .card.total {
+            background: #E3F2FD;
+            color: #1565C0;
+        }
+
+        .card.acertos {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .card.erros {
+            background: #FCE4EC;
+            color: #C2185B;
+        }
+
+        /* =========================
+        GRÁFICO
+        ========================= */
+        .grafico-container {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 14px auto;
+        }
+
+        /* Legenda */
+        .legenda-grafico {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .bolinha {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        /* =========================
+        TAXA DE ACERTO
+        ========================= */
+        #taxaAcerto {
+            font-size: 40px;
+            font-weight: 700;
+            color: #da8300;
+        }
+
+        .text-center p {
+            font-size: 16px;
+            color: #FF4081;
+        }
+
+        /* Emoji animado */
+        #emojiAcerto {
+            font-size: 38px;
+            margin-top: 6px;
+            animation: pulse 1.6s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* =========================
+        LOADING
+        ========================= */
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(237, 75, 130, 0.3);
+            border-top-color: #ed4b82;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="pb-10">
+
+<header class="bg-[#ed4b82] p-4 text-white rounded-b-[25px] shadow-lg mb-6">
+    <div class="max-w-xl mx-auto flex items-center justify-between">
+        <!-- Botão Voltar (seta para esquerda) -->
+        <button onclick="sair()" class="bg-white/20 p-2 rounded-full hover:bg-white/30 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path>
+            </svg>
+        </button>
+
+        <!-- Informações do Usuário (no centro) -->
+        <div class="flex items-center gap-2">
+            <div id="avatar" class="text-2xl bg-white p-1.5 rounded-lg shadow-inner">🐲</div>
+            <div>
+                <h1 id="nome" class="text-xl font-black leading-tight">Carregando...</h1>
+                <p class="text-xs opacity-90">Escolha uma matéria</p>
+            </div>
+        </div>
+
+        <!-- Botões à direita (Sair e Configurações) -->
+        <div class="flex items-center gap-2">
+            <!-- Ícone de Configurações -->
+            <button onclick="abrirModalEdicao()" class="bg-white/20 p-2 rounded-full hover:bg-white/30 transition" title="Configurações">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.545-.163 1.11-.163 1.655 0 .545.163 1.11.163 1.655 0zM12 15a3 3 0 100-6 3 3 0 000 6z"></path>
+                </svg>
+            </button>
+
+            <!-- Botão para ver estatísticas (adicione onde quiser) -->
+            <button onclick="abrirModalEstatisticas()" class="bg-white/20 p-2 rounded-full hover:bg-white/30 transition" title="Meu Desempenho">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+            </button>
+
+            <script>
+            function verMinhasEstatisticas() {
+                // Salvar flag de que é acesso do aluno
+                localStorage.setItem('acesso_aluno', 'true');
+                // Redirecionar para estatísticas
+                window.location.href = 'estatisticas.html';
+            }
+            </script>
+
+            <!-- Ícone de Sair -->
+            <button onclick="fazerLogout()" class="bg-white/20 p-2 rounded-full hover:bg-white/30 transition" title="Sair">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-md mx-auto px-4 relative">
+    <div class="roadmap-line"></div>
+
+    <div id="materias" class="space-y-4">
+        <!-- Tela de loading inicial -->
+        <div id="loadingContent" class="text-center py-16">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-gray-600">Carregando suas matérias...</p>
+        </div>
+    </div>
+
+    <div class="mt-8 flex justify-center">
+        <div class="bg-white/80 backdrop-blur rounded-full shadow-md px-4 py-2 flex items-center gap-2 border border-pink-50">
+            <span class="text-lg">🐼</span>
+            <span class="font-bold text-gray-600 text-sm">Vamos estudar!</span>
+        </div>
+    </div>
+</main>
+
+<!-- Modal de Edição de Perfil -->
+<dialog id="editModal" class="p-6 bg-gradient-to-b from-pink-50 to-purple-50 rounded-3xl shadow-2xl border border-pink-200 max-w-[90vw] w-[420px] backdrop-blur-sm">
+    <div class="text-center mb-6">
+        <span class="text-4xl block mb-2">✨</span>
+        <h2 class="text-2xl font-black text-pink-600 drop-shadow-sm">Editar Perfil</h2>
+        <p class="text-sm text-gray-600 mt-1">Deixa seu Panda ainda mais a sua cara! 🐼💕</p>
+    </div>
+
+    <form id="editForm" class="space-y-5">
+        <div>
+            <label class="block text-sm font-bold text-pink-700 mb-1.5">Nome</label>
+            <input type="text" id="editNome" class="w-full px-4 py-3 rounded-2xl border border-pink-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent bg-white/70 shadow-inner" required>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-bold text-pink-700 mb-1.5">E-mail</label>
+            <input type="email" id="editEmail" class="w-full px-4 py-3 rounded-2xl border border-pink-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent bg-white/70 shadow-inner" required>
+        </div>
+        
+        <div class="input-senha relative">
+            <label class="block text-sm font-bold text-pink-700 mb-1.5">Senha Atual</label>
+            <input type="password" id="senhaAtual" class="w-full px-4 py-3 rounded-2xl border border-pink-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent bg-white/70 shadow-inner" placeholder="Sua senha atual">
+            <span class="olho" onclick="toggleSenha('senhaAtual')">👁️</span>
+        </div>
+        
+        <div class="input-senha relative">
+            <label class="block text-sm font-bold text-pink_700 mb-1.5">Nova Senha</label>
+            <input type="password" id="novaSenha" class="w-full px-4 py-3 rounded-2xl border border-pink-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent bg-white/70 shadow-inner" placeholder="Deixe em branco para não alterar">
+            <span class="olho" onclick="toggleSenha('novaSenha')">👁️</span>
+        </div>
+        
+        <div class="input-senha relative">
+            <label class="block text-sm font-bold text-pink-700 mb-1.5">Confirme Nova Senha</label>
+            <input type="password" id="confirmeSenha" class="w-full px-4 py-3 rounded-2xl border border-pink-300 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent bg-white/70 shadow-inner" placeholder="Confirme a nova senha">
+            <span class="olho" onclick="toggleSenha('confirmeSenha')">👁️</span>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-bold text-pink-700 mb-1.5">Escolha seu avatar</label>
+            <div id="avatarGrid" class="grid grid-cols-5 gap-3 justify-items-center"></div>
+            <input type="hidden" id="editAvatar" value="🐼">
+        </div>
+        
+        <div class="flex justify-end gap-3 mt-6">
+            <button type="button" onclick="fecharModalEdicao()" class="bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-2xl hover:bg-gray-300 transition active:scale-95 shadow-sm">
+                Cancelar
+            </button>
+            <button type="submit" class="bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold py-3 px-6 rounded-2xl hover:from-pink-600 hover:to-purple-600 transition active:scale-95 shadow-md">
+                Salvar Mudanças 💖
+            </button>
+        </div>
+    </form>
+</dialog>
+
+<script>
+// Variáveis globais
+let usuarioId = null;
+let authToken = null;
+
+// FUNÇÃO ÚNICA DE VERIFICAÇÃO E CARREGAMENTO
+async function inicializarPagina() {
+    try {
+        // Mostrar loading
+        document.getElementById('loadingContent').style.display = 'block';
+        
+        // Obter token e ID
+        authToken = localStorage.getItem("auth_token");
+        usuarioId = localStorage.getItem("usuario_id");
+        
+        // Verificar se temos os dados mínimos
+        if (!authToken || !usuarioId) {
+            console.log("Dados de autenticação não encontrados, redirecionando...");
+            window.location.href = "index.html";
+            return;
+        }
+        
+        // Verificar autenticação com o servidor
+        const resAuth = await fetch("/api/auth/check", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token: authToken })
+        });
+        
+        const authData = await resAuth.json();
+        
+        if (!authData.success) {
+            console.log("Token inválido ou expirado");
+            limparDadosLocalStorage();
+            window.location.href = "index.html";
+            return;
+        }
+        
+        // Carregar dados do usuário
+        const resUser = await fetch(`/api/usuarios/${usuarioId}`);
+        
+        if (!resUser.ok) {
+            throw new Error("Erro ao carregar dados do usuário");
+        }
+        
+        const userData = await resUser.json();
+        
+        if (!userData.success || !userData.user) {
+            throw new Error("Dados do usuário inválidos");
+        }
+        
+        const usuario = userData.user;
+        
+        // Atualizar interface com dados do usuário
+        document.getElementById("nome").textContent = usuario.nome || "Aluno";
+        document.getElementById("avatar").textContent = usuario.avatar || "🐼";
+        
+        // Preencher formulário de edição
+        document.getElementById("editNome").value = usuario.nome || "";
+        document.getElementById("editEmail").value = usuario.email || "";
+        document.getElementById("editAvatar").value = usuario.avatar || "🐼";
+        
+        // Renderizar avatares
+        renderizarAvatares();
+        
+        // Esconder loading e carregar matérias
+        document.getElementById('loadingContent').style.display = 'none';
+        await carregarMaterias();
+        
+    } catch (error) {
+        console.error("Erro na inicialização:", error);
+        
+        // Mostrar mensagem de erro
+        document.getElementById('loadingContent').innerHTML = `
+            <div class="text-center py-8">
+                <div class="text-red-500 text-4xl mb-4">⚠️</div>
+                <p class="text-gray-700 mb-2">Ocorreu um erro ao carregar</p>
+                <button onclick="inicializarPagina()" class="mt-4 bg-pink-500 text-white px-6 py-2 rounded-full font-bold hover:bg-pink-600 transition">
+                    Tentar novamente
+                </button>
+                <button onclick="fazerLogout()" class="mt-2 bg-gray-200 text-gray-800 px-6 py-2 rounded-full font-bold hover:bg-gray-300 transition block mx-auto">
+                    Voltar ao início
+                </button>
+            </div>
+        `;
+    }
+}
+
+// FUNÇÃO PARA CARREGAR MATÉRIAS
+async function carregarMaterias() {
+    try {
+        const container = document.getElementById("materias");
+        
+        // Usar a rota correta do app.py atualizado
+        const response = await fetch("/api/materias/detalhes");
+        
+        if (!response.ok) {
+            throw new Error("Erro ao carregar matérias");
+        }
+        
+        const materias = await response.json();
+        
+        if (materias.length === 0) {
+            container.innerHTML = `
+                <div class="text-center p-8">
+                    <div class="text-yellow-500 text-4xl mb-4">📚</div>
+                    <p class="text-gray-600 mb-2">Nenhuma matéria disponível no momento</p>
+                    <p class="text-sm text-gray-500">Entre em contato com o administrador</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = "";
+        
+        materias.forEach(m => {
+            const card = document.createElement("div");
+            card.className = `card-materia bg-white rounded-2xl p-4 shadow-md border-2 border-white flex items-center justify-between cursor-pointer active:scale-95`;
+            
+            card.onclick = () => abrirAssuntos(m.nome);
+            
+            card.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="p-3 rounded-xl text-2xl" style="background-color: ${m.cor}20; color: ${m.cor};">
+                        ${m.icone}
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-base">${m.nome}</h3>
+                        <p class="text-xs text-gray-400 font-bold uppercase mt-1">Clique para ver os assuntos</p>
+                    </div>
+                </div>
+                <div class="text-pink-500 text-2xl">▶</div>
+            `;
+            
+            container.appendChild(card);
+        });
+        
+    } catch (err) {
+        console.error("Erro ao carregar matérias:", err);
+        document.getElementById("materias").innerHTML = `
+            <div class="text-center p-8">
+                <div class="text-red-500 text-4xl mb-4">😿</div>
+                <p class="text-gray-700 mb-2">Erro ao carregar matérias</p>
+                <button onclick="carregarMaterias()" class="mt-4 bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition">
+                    Tentar novamente
+                </button>
+            </div>
+        `;
+    }
+}
+
+// FUNÇÃO PARA LIMPAR DADOS DO LOCALSTORAGE
+function limparDadosLocalStorage() {
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("usuario_id");
+    localStorage.removeItem("usuario_nome");
+    localStorage.removeItem("usuario_avatar");
+    localStorage.removeItem("usuario_email");
+    localStorage.removeItem("currentMateria");
+}
+
+// FUNÇÃO DE LOGOUT
+function fazerLogout() {
+    if (authToken) {
+        fetch("/api/auth/logout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token: authToken })
+        }).catch(console.error);
+    }
+    
+    limparDadosLocalStorage();
+    window.location.href = "index.html";
+}
+
+// FUNÇÃO PARA VOLTAR (SAIR)
+function sair() {
+    fazerLogout();
+}
+
+// FUNÇÃO PARA ABRIR ASSUNTOS
+function abrirAssuntos(materia) {
+    localStorage.setItem("currentMateria", materia);
+    window.location.href = "assuntos.html";
+}
+
+// FUNÇÕES DO MODAL DE EDIÇÃO
+function abrirModalEdicao() {
+    renderizarAvatares();
+    document.getElementById('editModal').showModal();
+}
+
+function fecharModalEdicao() {
+    document.getElementById('editModal').close();
+}
+
+// Renderiza grade de avatares
+function renderizarAvatares() {
+    const grid = document.getElementById("avatarGrid");
+    grid.innerHTML = "";
+    
+    const avatares = ["🐶","🐼","🐨","🐷","🐺","🦄","🦋","🐵","🦊","🐰","🐲","🐱","🦁","🐻","🐮"];
+    const atual = document.getElementById("editAvatar").value || "🐼";
+    
+    avatares.forEach(emo => {
+        const div = document.createElement("div");
+        div.className = "cursor-pointer text-4xl p-2 rounded-xl transition-all duration-200 hover:scale-110 hover:bg-pink-100";
+        
+        if (emo === atual) {
+            div.classList.add("bg-pink-200", "ring-4", "ring-pink-400", "scale-110");
+        }
+        
+        div.textContent = emo;
+        div.onclick = () => {
+            document.getElementById("editAvatar").value = emo;
+            renderizarAvatares();
+        };
+        
+        grid.appendChild(div);
+    });
+}
+
+// Toggle senha
+function toggleSenha(id) {
+    const input = document.getElementById(id);
+    input.type = input.type === "password" ? "text" : "password";
+}
+
+// Handle submit do form de edição
+document.getElementById('editForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const nome = document.getElementById('editNome').value.trim();
+    const email = document.getElementById('editEmail').value.trim();
+    const avatar = document.getElementById('editAvatar').value;
+    const senhaAtual = document.getElementById('senhaAtual').value.trim();
+    const novaSenha = document.getElementById('novaSenha').value.trim();
+    const confirmeSenha = document.getElementById('confirmeSenha').value.trim();
+    
+    // Validações básicas
+    if (!nome || !email) {
+        alert('Nome e e-mail são obrigatórios!');
+        return;
+    }
+    
+    if (novaSenha && novaSenha !== confirmeSenha) {
+        alert('As novas senhas precisam ser iguais!');
+        return;
+    }
+    
+    if (novaSenha && !senhaAtual) {
+        alert('Informe a senha atual para alterar a senha!');
+        return;
+    }
+    
+    try {
+        // Preparar dados para a rota padrão de atualização
+        const dados = {
+            nome: nome,
+            email: email,
+            avatar: avatar
+        };
+        
+        // Adicionar senha se fornecida
+        if (novaSenha) {
+            dados.senha = novaSenha;
+        }
+        
+        // Usar a rota PUT padrão
+        const res = await fetch(`/api/usuarios/${usuarioId}`, {
+            method: 'PUT',
+            headers: { 
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dados)
+        });
+        
+        const resultado = await res.json();
+        
+        if (resultado.success) {
+            // Atualizar interface
+            document.getElementById("nome").textContent = nome;
+            document.getElementById("avatar").textContent = avatar;
+            
+            // Atualizar localStorage
+            localStorage.setItem("usuario_nome", nome);
+            localStorage.setItem("usuario_avatar", avatar);
+            localStorage.setItem("usuario_email", email);
+            
+            alert('Perfil atualizado com sucesso!');
+            fecharModalEdicao();
+        } else {
+            alert(`Erro: ${resultado.message || 'Erro desconhecido'}`);
+        }
+    } catch (err) {
+        console.error('Erro ao salvar perfil:', err);
+        alert('Erro de conexão com o servidor');
+    }
+});
+
+// INICIALIZAR PÁGINA QUANDO CARREGAR
+document.addEventListener("DOMContentLoaded", inicializarPagina);
+
+
+// Variável global para o gráfico (para destruir e recriar se necessário)
+let chartDesempenho = null;
+
+function abrirModalEstatisticas() {
+    const modal = document.getElementById('estatisticasModal');
+    document.getElementById('loadingStats').style.display = 'block';
+    document.getElementById('conteudoStats').classList.add('hidden');
+    
+    modal.showModal();
+    carregarEstatisticas();
+    carregarDesempenhoPorMateria();
+}
+
+function fecharModalEstatisticas() {
+    document.getElementById('estatisticasModal').close();
+}
+
+async function carregarEstatisticas() {
+    try {
+        const usuarioId = localStorage.getItem("usuario_id");
+        if (!usuarioId) throw new Error("Usuário não identificado");
+
+        // Supondo que exista uma rota /api/usuarios/:id/estatisticas
+        // que retorna algo como: { total_questoes, acertos, erros }
+        const res = await fetch(`/api/estatisticas/${usuarioId}`);
+        
+        if (!res.ok) throw new Error("Erro ao buscar estatísticas");
+        
+        const dados = await res.json();
+        
+        if (!dados.success) throw new Error(dados.message || "Erro desconhecido");
+
+        const stats = dados.stats || { total_questoes: 0, acertos: 0, erros: 0 };
+        const total = stats.total_questoes || 0;
+        const acertos = stats.acertos || 0;
+        const erros = stats.erros || 0;
+        const taxa = total > 0 ? Math.round((acertos / total) * 100) : 0;
+
+        // Preencher textos
+        document.getElementById('totalQuestoes').textContent = total.toLocaleString();
+        document.getElementById('acertos').textContent = acertos.toLocaleString();
+        document.getElementById('taxaAcerto').textContent = taxa + "%";
+        document.getElementById("erros").textContent = erros;
+
+        // Emoji fofo de acordo com a taxa
+        const emojiEl = document.getElementById('emojiAcerto');
+        if (taxa >= 80) emojiEl.textContent = "🌟";
+        else if (taxa >= 60) emojiEl.textContent = "😊";
+        else if (taxa >= 40) emojiEl.textContent = "👍";
+        else emojiEl.textContent = "💪";
+
+        // Gráfico simples e colorido (pizza ou barras)
+        const ctx = document.getElementById('graficoDesempenho').getContext('2d');
+        
+        if (chartDesempenho) chartDesempenho.destroy();
+        
+        chartDesempenho = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Acertos', 'Erros'],
+                datasets: [{
+                    data: [acertos, erros],
+                    backgroundColor: ['#34d399', '#f87171'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            font: { size: 12 }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Mostrar conteúdo e esconder loading
+        document.getElementById('loadingStats').style.display = 'none';
+        document.getElementById('conteudoStats').classList.remove('hidden');
+
+    } catch (err) {
+        console.error("Erro ao carregar estatísticas:", err);
+        document.getElementById('loadingStats').innerHTML = `
+            <div class="text-red-500 text-5xl mb-4">😿</div>
+            <p class="text-gray-700">Não consegui carregar as estatísticas...</p>
+            <p class="text-sm text-gray-500 mt-2">${err.message}</p>
+        `;
+    }
+}
+
+async function carregarDesempenhoPorMateria() {
+    const usuarioId = localStorage.getItem("usuario_id");
+    if (!usuarioId) return;
+
+    const res = await fetch(`/api/estatisticas/${usuarioId}/materias`);
+    const data = await res.json();
+    if (!data.success) return;
+
+    const container = document.getElementById("listaMaterias");
+    container.innerHTML = "";
+
+    data.materias.forEach(m => {
+        const div = document.createElement("div");
+        div.className = "bg-white/80 rounded-xl p-3 shadow-inner border";
+
+        div.innerHTML = `
+            <div class="flex justify-between items-center mb-1">
+                <span class="font-bold text-gray-700">${m.materia}</span>
+                <span class="font-black text-pink-600">${m.percentual}%</span>
+            </div>
+
+            <div class="w-full bg-gray-200 rounded-full h-3 mb-2 overflow-hidden">
+                <div class="h-3 bg-gradient-to-r from-green-400 to-green-600"
+                     style="width:${m.percentual}%"></div>
+            </div>
+
+            <div class="flex justify-between text-xs text-gray-600 font-bold">
+                <span>📘 ${m.total} questões</span>
+                <span>✅ ${m.acertos}</span>
+                <span>❌ ${m.erros}</span>
+            </div>
+        `;
+
+        container.appendChild(div);
+    });
+}
+
+
+</script>
+
+<!-- Modal de Estatísticas - Fofo e colorido -->
+<dialog id="estatisticasModal" class="p-6 bg-gradient-to-br from-pink-50 via-purple-50 to-yellow-50 rounded-3xl shadow-2xl border-4 border-pink-300 max-w-[90vw] w-[460px] backdrop-blur-md">
+    <div class="text-center mb-6">
+        <span class="text-5xl block mb-2 animate-bounce">🏆</span>
+        <h2 class="text-3xl font-black text-pink-600 drop-shadow-md">Meu Desempenho 🐼✨</h2>
+        <p class="text-sm text-gray-600 mt-1">Você está incrível!</p>
+    </div>
+
+    <div id="loadingStats" class="text-center py-8">
+        <div class="loading-spinner mx-auto mb-4"></div>
+        <p class="text-pink-600 font-medium">Buscando suas conquistas...</p>
+    </div>
+
+    <div id="conteudoStats" class="hidden space-y-6">
+        <!-- Resumo em cards fofos -->
+        <div class="cards-estatisticas">
+            <div class="card total">
+                <span id="totalQuestoes" class="numero">0</span>
+                <span class="titulo">📘 Total</span>
+            </div>
+
+            <div class="card acertos">
+                <span id="acertos" class="numero">0</span>
+                <span class="titulo">✅ Acertos</span>
+            </div>
+
+            <div class="card erros">
+                <span id="erros" class="numero">0</span>
+                <span class="titulo">❌ Erros</span>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <p class="text-4xl font-black" id="taxaAcerto">0%</p>
+            <p class="text-lg font-bold text-pink-700 -mt-1">Taxa de acerto</p>
+            <div class="mt-2 text-3xl" id="emojiAcerto">😊</div>
+        </div>
+
+        <!-- Gráfico fofo -->
+        <div class="grafico-container">
+            <canvas id="graficoDesempenho"></canvas>
+        </div>
+    </div>
+        
+        <!-- Desempenho por matéria -->
+        <div class="mt-6">
+            <h3 class="text-lg font-black text-purple-600 mb-3 text-center">
+                📚 Desempenho por matéria
+            </h3>
+
+            <div id="listaMaterias" class="space-y-3"></div>
+        </div>
+
+    <div class="flex justify-center mt-8">
+        <button onclick="fecharModalEstatisticas()" class="bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold py-3 px-10 rounded-2xl hover:from-pink-600 hover:to-purple-600 transition active:scale-95 shadow-lg">
+            Fechar 🐼
+        </button>
+    </div>
+</dialog>
+
+<!-- Chart.js CDN - leve e necessário para o gráfico -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+
+
+
+</body>
+</html>

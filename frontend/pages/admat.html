@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Bloqueio de Assuntos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .orkut-container {
+            background: white;
+            border-radius: 15px;
+            border: 3px solid #3b82f6;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        .orkut-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+        .orkut-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .orkut-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .orkut-button-secondary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        .orkut-button-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        .toggle-checkbox:checked {
+            transform: translateX(24px);
+            border-color: #10b981;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #10b981;
+        }
+        .toggle-checkbox:not(:checked) {
+            border-color: #ef4444;
+        }
+        .toggle-checkbox:not(:checked) + .toggle-label {
+            background-color: #ef4444;
+        }
+        .toggle-checkbox {
+            transition: all 0.3s ease;
+        }
+        .materia-card {
+            border-left: 5px solid;
+            transition: all 0.3s;
+        }
+        .materia-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        .assunto-item {
+            transition: all 0.3s;
+        }
+        .assunto-item:hover {
+            background-color: #f8fafc !important;
+            transform: translateX(5px);
+        }
+        .assunto-liberado {
+            background: linear-gradient(90deg, #d1fae5 0%, #ecfdf5 100%);
+            border-left: 4px solid #10b981;
+        }
+        .assunto-bloqueado {
+            background: linear-gradient(90deg, #fee2e2 0%, #fef2f2 100%);
+            border-left: 4px solid #ef4444;
+        }
+        .hidden {
+            display: none !important;
+        }
+
+        /* ESTILOS PARA O COMBOBOX */
+        .combobox-container {
+            position: relative;
+        }
+        
+        .combobox-input-container {
+            position: relative;
+        }
+        
+        .combobox-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 2px;
+        }
+        
+        .combobox-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.2s;
+        }
+        
+        .combobox-item:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .combobox-item.active {
+            background-color: #eff6ff;
+        }
+        
+        .combobox-item-avatar {
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #f3f4f6;
+        }
+        
+        .combobox-item-info {
+            flex: 1;
+        }
+        
+        .combobox-item-name {
+            font-weight: 600;
+            color: #111827;
+        }
+        
+        .combobox-item-email {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .combobox-item-status {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 9999px;
+        }
+        
+        .combobox-item-status.active {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .combobox-item-status.inactive {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .no-results {
+            padding: 16px;
+            text-align: center;
+            color: #6b7280;
+            font-style: italic;
+        }
+        
+        /* Scrollbar estilizada */
+        .combobox-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .combobox-list::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        
+        .combobox-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        .combobox-list::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Estilos para os selects */
+        .select-info {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .select-optional {
+            border-left: 3px solid #f59e0b;
+            padding-left: 8px;
+        }
+
+        .select-required {
+            border-left: 3px solid #ef4444;
+            padding-left: 8px;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-6">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- CONTAINER NO ESTILO ORKUT -->
+        <div class="orkut-container">
+            <!-- CABEÇALHO -->
+            <div class="orkut-header p-6">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                            <i class="fas fa-lock text-2xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl md:text-3xl font-black">Controle de Bloqueio de Assuntos</h1>
+                            <p class="text-white/90">Gerencie o acesso dos usuários aos assuntos</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="window.location.href='/admin.html'" 
+                                class="orkut-button flex items-center gap-2">
+                            <i class="fas fa-arrow-left"></i> Voltar ao Admin
+                        </button>
+                        <button onclick="recarregarTudo()" 
+                                class="orkut-button orkut-button-secondary flex items-center gap-2">
+                            <i class="fas fa-sync-alt"></i> Recarregar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTEÚDO PRINCIPAL -->
+            <div class="p-6">
+                <!-- SELEÇÃO DE USUÁRIO COM COMBOBOX -->
+                <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 mb-8 border border-blue-100">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="md:col-span-2">
+                            <h2 class="text-xl font-bold text-gray-800 mb-2">
+                                <i class="fas fa-user mr-2"></i>1. Selecione um Usuário
+                            </h2>
+                            <p class="text-gray-600 mb-4">Digite o nome ou email, ou clique na seta para ver todos</p>
+                            
+                            <!-- COMBOBOX CONTAINER -->
+                            <div class="combobox-container">
+                                <div class="combobox-input-container">
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                            <i class="fas fa-search text-gray-400"></i>
+                                        </div>
+                                        <input type="text" 
+                                            id="usuarioSearch" 
+                                            placeholder="Digite o nome ou email do usuário..."
+                                            class="w-full p-3 pl-10 pr-12 border-2 border-blue-200 rounded-lg bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+                                            autocomplete="off"
+                                            spellcheck="false">
+                                        <!-- BOTÃO PARA MOSTRAR/ESCONDER LISTA -->
+                                        <button type="button" 
+                                                id="toggleLista" 
+                                                class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+                                                aria-label="Mostrar lista de usuários">
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- LISTA DE SUGESTÕES (inicialmente escondida) -->
+                                    <div id="sugestoesLista" class="combobox-list hidden">
+                                        <!-- Itens serão inseridos aqui via JavaScript -->
+                                    </div>
+                                    
+                                    <!-- INPUT OCULTO PARA GUARDAR O ID DO USUÁRIO -->
+                                    <input type="hidden" id="usuarioIdSelecionado">
+                                </div>
+                            </div>
+                            
+                            <p class="text-sm text-gray-500 mt-2">
+                                <i class="fas fa-info-circle mr-1"></i>Comece a digitar para filtrar ou clique na seta para ver todos os usuários
+                            </p>
+                        </div>
+                        
+                        <!-- CONTADOR DE USUÁRIOS -->
+                        <div class="bg-white p-4 rounded-lg border border-blue-200">
+                            <div class="text-center">
+                                <div class="text-3xl mb-2 text-blue-600">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <p class="text-sm text-gray-600">Usuários Ativos</p>
+                                <p id="contadorUsuarios" class="text-2xl font-bold text-gray-800">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- INFO DO USUÁRIO SELECIONADO -->
+                    <div id="usuarioInfo" class="hidden mt-6 bg-white p-4 rounded-lg border border-green-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div id="usuarioAvatar" class="text-2xl bg-green-100 text-green-600 p-3 rounded-full">
+                                    👤
+                                </div>
+                                <div>
+                                    <h3 id="usuarioNome" class="font-bold text-lg text-gray-800"></h3>
+                                    <p id="usuarioEmail" class="text-sm text-gray-600"></p>
+                                    <p id="usuarioStatus" class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 inline-block">
+                                        Ativo
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="liberarTudoUsuario()" 
+                                        class="orkut-button orkut-button-secondary flex items-center gap-2">
+                                    <i class="fas fa-unlock"></i> Liberar Tudo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTROLE PARA TODOS -->
+                <div class="bg-gradient-to-r from-red-50 to-pink-50 rounded-xl p-6 mb-8 border border-red-100">
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">
+                        <i class="fas fa-users mr-2"></i>2. Controle Geral (Todos os Usuários)
+                    </h2>
+                    <p class="text-gray-600 mb-4">Estas ações afetam TODOS os usuários simultaneamente (ativos e inativos)</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-white p-4 rounded-lg border border-red-200">
+                            <h3 class="font-bold text-gray-700 mb-2 flex items-center gap-2">
+                                <i class="fas fa-ban text-red-500"></i>Bloquear Assunto para Todos
+                            </h3>
+                            
+                            <div class="mb-3">
+                                <div class="flex gap-2 mb-1">
+                                    <select id="materiaTodos" 
+                                            class="flex-1 p-2 border rounded select-required">
+                                        <option value="">Selecione matéria...</option>
+                                    </select>
+                                </div>
+                                <p class="select-info">✅ Obrigatório</p>
+                                
+                                <div class="flex gap-2 mt-2">
+                                    <select id="assuntoTodos" 
+                                            class="flex-1 p-2 border rounded select-optional">
+                                        <option value="">Selecione assunto (opcional)...</option>
+                                    </select>
+                                </div>
+                                <p class="select-info">⚪ Opcional - Se vazio, bloqueia TODOS os assuntos da matéria</p>
+                            </div>
+                            
+                            <button onclick="bloquearParaTodos()" 
+                                    class="w-full orkut-button orkut-button-danger flex items-center justify-center gap-2">
+                                <i class="fas fa-ban"></i> Bloquear para Todos
+                            </button>
+                        </div>
+                        
+                        <div class="bg-white p-4 rounded-lg border border-green-200">
+                            <h3 class="font-bold text-gray-700 mb-2 flex items-center gap-2">
+                                <i class="fas fa-unlock text-green-500"></i>Liberar Assunto para Todos
+                            </h3>
+                            
+                            <div class="mb-3">
+                                <div class="flex gap-2 mb-1">
+                                    <select id="materiaTodosLiberar" 
+                                            class="flex-1 p-2 border rounded select-required">
+                                        <option value="">Selecione matéria...</option>
+                                    </select>
+                                </div>
+                                <p class="select-info">✅ Obrigatório</p>
+                                
+                                <div class="flex gap-2 mt-2">
+                                    <select id="assuntoTodosLiberar" 
+                                            class="flex-1 p-2 border rounded select-optional">
+                                        <option value="">Selecione assunto (opcional)...</option>
+                                    </select>
+                                </div>
+                                <p class="select-info">⚪ Opcional - Se vazio, libera TODOS os assuntos da matéria</p>
+                            </div>
+                            
+                            <button onclick="liberarParaTodos()" 
+                                    class="w-full orkut-button orkut-button-secondary flex items-center justify-center gap-2">
+                                <i class="fas fa-unlock"></i> Liberar para Todos
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-info-circle text-yellow-500 mt-0.5"></i>
+                            <div class="text-sm text-yellow-800">
+                                <p class="font-bold">Atenção:</p>
+                                <p>• Estas ações afetam <span class="font-bold">TODOS</span> os usuários do sistema (ativos e inativos)</p>
+                                <p>• Se deixar o assunto em branco, a ação será aplicada a <span class="font-bold">TODOS</span> os assuntos da matéria selecionada</p>
+                                <p>• Use com cuidado!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LISTA DE MATÉRIAS E ASSUNTOS -->
+                <div id="conteudo">
+                    <!-- LOADING INICIAL (só aparece no início) -->
+                    <div id="loadingInicial" class="text-center py-12">
+                        <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500 mb-4"></div>
+                        <p class="text-gray-600">Carregando dados do sistema...</p>
+                    </div>
+
+                    <!-- INSTRUÇÕES (aparece quando nenhum usuário está selecionado) -->
+                    <div id="instrucoes" class="hidden bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-6 mb-8 border border-yellow-100">
+                        <div class="text-center">
+                            <div class="text-4xl mb-4">👆</div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Selecione um usuário acima</h3>
+                            <p class="text-gray-600">Use a caixa de busca para encontrar um usuário pelo nome ou email.</p>
+                            <p class="text-gray-600 mt-2">Clique na seta para ver todos os usuários disponíveis.</p>
+                        </div>
+                    </div>
+
+                    <!-- LOADING AO CARREGAR ASSUNTOS DO USUÁRIO -->
+                    <div id="loadingAssuntos" class="hidden text-center py-12">
+                        <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+                        <p class="text-gray-600">Carregando assuntos do usuário...</p>
+                    </div>
+
+                    <!-- LISTA DE MATÉRIAS -->
+                    <div id="materiasContainer" class="space-y-6 hidden">
+                        <!-- Matérias serão carregadas aqui -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- RODAPÉ -->
+            <div class="border-t border-gray-200 p-4 text-center text-gray-600 text-sm">
+                <p>🐼 Sistema de Gerenciamento Panda Estudos - <span id="anoAtual"></span></p>
+                <p class="text-xs mt-1">Cada usuário tem seu controle independente. Alterações não afetam outros usuários.</p>
+            </div>
+        </div>
+    </div>
+
+<script>
+// ============================================
+// CÓDIGO ATUALIZADO DO ADMAT.HTML
+// COM COMBOBOX FUNCIONAL E FLUXO CORRETO
+// ============================================
+
+// Variáveis globais
+let usuarioSelecionado = null;
+let todasMaterias = {};
+let todosUsuarios = [];
+let itemAtivoIndex = -1;
+
+// Elementos DOM
+const usuarioSearch = document.getElementById('usuarioSearch');
+const toggleLista = document.getElementById('toggleLista');
+const sugestoesLista = document.getElementById('sugestoesLista');
+const usuarioIdSelecionado = document.getElementById('usuarioIdSelecionado');
+const usuarioInfo = document.getElementById('usuarioInfo');
+const usuarioNome = document.getElementById('usuarioNome');
+const usuarioAvatar = document.getElementById('usuarioAvatar');
+const usuarioEmail = document.getElementById('usuarioEmail');
+const usuarioStatus = document.getElementById('usuarioStatus');
+const materiasContainer = document.getElementById('materiasContainer');
+const loadingInicial = document.getElementById('loadingInicial');
+const loadingAssuntos = document.getElementById('loadingAssuntos');
+const instrucoes = document.getElementById('instrucoes');
+
+// Inicializar quando a página carrega
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // Configurar ano atual
+        document.getElementById('anoAtual').textContent = new Date().getFullYear();
+        
+        // 1. Carregar usuários
+        await carregarUsuarios();
+        
+        // 2. Carregar matérias e assuntos
+        await carregarMateriasAssuntos();
+        
+        // 3. Configurar controle geral
+        configurarControleGeral();
+        
+        // 4. Configurar eventos do combobox
+        configurarCombobox();
+        
+        // 5. Esconder loading inicial e mostrar instruções
+        loadingInicial.classList.add('hidden');
+        instrucoes.classList.remove('hidden');
+        
+    } catch (error) {
+        console.error('Erro na inicialização:', error);
+        loadingInicial.innerHTML = `
+            <div class="text-red-500">
+                <p>Erro ao carregar dados: ${error.message}</p>
+                <button onclick="location.reload()" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">
+                    Recarregar página
+                </button>
+            </div>
+        `;
+    }
+});
+
+// Configurar eventos do combobox
+function configurarCombobox() {
+    // Mostrar/esconder lista ao clicar na seta
+    toggleLista.addEventListener('click', function() {
+        if (sugestoesLista.classList.contains('hidden')) {
+            mostrarTodosUsuariosLista();
+        } else {
+            esconderLista();
+        }
+    });
+    
+    // Ao digitar no input
+    usuarioSearch.addEventListener('input', function() {
+        const termo = this.value.trim();
+        if (termo.length > 0) {
+            filtrarUsuarios(termo);
+        } else {
+            esconderLista();
+        }
+    });
+    
+    // Ao focar no input
+    usuarioSearch.addEventListener('focus', function() {
+        if (this.value.trim().length > 0) {
+            filtrarUsuarios(this.value.trim());
+        }
+    });
+    
+    // Eventos de teclado
+    usuarioSearch.addEventListener('keydown', function(e) {
+        const itens = sugestoesLista.querySelectorAll('.combobox-item');
+        
+        switch(e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                if (itens.length > 0) {
+                    itemAtivoIndex = (itemAtivoIndex + 1) % itens.length;
+                    atualizarItemAtivo(itens);
+                }
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                if (itens.length > 0) {
+                    itemAtivoIndex = itemAtivoIndex <= 0 ? itens.length - 1 : itemAtivoIndex - 1;
+                    atualizarItemAtivo(itens);
+                }
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (itemAtivoIndex >= 0 && itemAtivoIndex < itens.length) {
+                    itens[itemAtivoIndex].click();
+                }
+                break;
+            case 'Escape':
+                esconderLista();
+                break;
+        }
+    });
+    
+    // Clicar fora para fechar
+    document.addEventListener('click', function(e) {
+        if (!usuarioSearch.contains(e.target) && !sugestoesLista.contains(e.target) && !toggleLista.contains(e.target)) {
+            esconderLista();
+        }
+    });
+}
+
+// Função para carregar usuários
+async function carregarUsuarios() {
+    try {
+        const response = await fetch('/api/admin/usuarios');
+        todosUsuarios = await response.json();
+        
+        // Atualizar contador
+        const ativos = todosUsuarios.filter(u => u.ativo).length;
+        document.getElementById('contadorUsuarios').textContent = `${ativos}/${todosUsuarios.length}`;
+        
+    } catch (error) {
+        console.error('Erro ao carregar usuários:', error);
+        throw error;
+    }
+}
+
+// Mostrar todos os usuários na lista
+function mostrarTodosUsuariosLista() {
+    renderizarListaUsuarios(todosUsuarios);
+    sugestoesLista.classList.remove('hidden');
+    itemAtivoIndex = -1;
+}
+
+// Filtrar usuários pelo termo
+function filtrarUsuarios(termo) {
+    const termoLower = termo.toLowerCase();
+    const usuariosFiltrados = todosUsuarios.filter(usuario => {
+        return usuario.nome.toLowerCase().includes(termoLower) || 
+               usuario.email.toLowerCase().includes(termoLower);
+    });
+    
+    renderizarListaUsuarios(usuariosFiltrados);
+    sugestoesLista.classList.remove('hidden');
+    itemAtivoIndex = -1;
+}
+
+// Renderizar lista de usuários
+function renderizarListaUsuarios(usuarios) {
+    sugestoesLista.innerHTML = '';
+    
+    if (usuarios.length === 0) {
+        sugestoesLista.innerHTML = `
+            <div class="no-results">
+                <i class="fas fa-user-times mr-2"></i>
+                Nenhum usuário encontrado
+            </div>
+        `;
+        return;
+    }
+    
+    usuarios.forEach((usuario, index) => {
+        const item = document.createElement('div');
+        item.className = 'combobox-item';
+        item.dataset.index = index;
+        item.dataset.usuarioId = usuario.id;
+        
+        item.innerHTML = `
+            <div class="combobox-item-avatar">
+                ${usuario.avatar || '👤'}
+            </div>
+            <div class="combobox-item-info">
+                <div class="combobox-item-name">${usuario.nome}</div>
+                <div class="combobox-item-email">${usuario.email}</div>
+            </div>
+            <div class="combobox-item-status ${usuario.ativo ? 'active' : 'inactive'}">
+                ${usuario.ativo ? 'Ativo' : 'Inativo'}
+            </div>
+        `;
+        
+        item.addEventListener('click', function() {
+            selecionarUsuarioCombobox(usuario);
+        });
+        
+        sugestoesLista.appendChild(item);
+    });
+}
+
+// Atualizar item ativo (navegação por teclado)
+function atualizarItemAtivo(itens) {
+    itens.forEach((item, index) => {
+        item.classList.toggle('active', index === itemAtivoIndex);
+        if (index === itemAtivoIndex) {
+            item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+    });
+}
+
+// Esconder lista
+function esconderLista() {
+    sugestoesLista.classList.add('hidden');
+    itemAtivoIndex = -1;
+}
+
+// Selecionar usuário do combobox
+function selecionarUsuarioCombobox(usuario) {
+    usuarioSearch.value = `${usuario.nome} (${usuario.email})`;
+    usuarioIdSelecionado.value = usuario.id;
+    
+    esconderLista();
+    selecionarUsuario(usuario);
+}
+
+// Selecionar usuário
+function selecionarUsuario(usuario) {
+    usuarioSelecionado = usuario;
+    
+    // Mostrar informações
+    usuarioNome.textContent = usuario.nome;
+    usuarioAvatar.textContent = usuario.avatar || '👤';
+    usuarioEmail.textContent = usuario.email;
+    
+    usuarioStatus.textContent = usuario.ativo ? 'Ativo' : 'Inativo';
+    usuarioStatus.className = usuario.ativo 
+        ? 'text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 inline-block'
+        : 'text-xs px-2 py-1 rounded-full bg-red-100 text-red-700 inline-block';
+    
+    // Mostrar seção do usuário
+    usuarioInfo.classList.remove('hidden');
+    instrucoes.classList.add('hidden');
+    materiasContainer.classList.add('hidden');
+    loadingAssuntos.classList.remove('hidden');
+    
+    // Carregar bloqueios
+    carregarBlocosUsuario(usuario.id);
+}
+
+// Função para carregar matérias e assuntos
+async function carregarMateriasAssuntos() {
+    try {
+        const response = await fetch('/api/admin/materias-assuntos');
+        const data = await response.json();
+        
+        if (data) {
+            todasMaterias = data;
+        } else {
+            throw new Error('Erro ao carregar matérias');
+        }
+        
+    } catch (error) {
+        console.error('Erro ao carregar matérias:', error);
+        // Usar fallback
+        await carregarMateriasFallback();
+    }
+}
+
+// Fallback para carregar matérias
+async function carregarMateriasFallback() {
+    try {
+        const response = await fetch('/api/materias');
+        const materiasLista = await response.json();
+        
+        todasMaterias = {};
+        for (const materia of materiasLista) {
+            // Carregar assuntos de cada matéria
+            const resAssuntos = await fetch(`/api/assuntos?materia=${encodeURIComponent(materia)}`);
+            const assuntos = await resAssuntos.json();
+            todasMaterias[materia] = assuntos.map(a => typeof a === 'object' ? a.nome : a);
+        }
+        
+    } catch (error) {
+        console.error('Erro no fallback:', error);
+    }
+}
+
+// Configurar controle geral
+function configurarControleGeral() {
+    // Preencher selects de matérias
+    ['materiaTodos', 'materiaTodosLiberar'].forEach(id => {
+        const select = document.getElementById(id);
+        if (select) {
+            select.innerHTML = '<option value="">Selecione matéria...</option>';
+            
+            Object.keys(todasMaterias).forEach(materia => {
+                const option = document.createElement('option');
+                option.value = materia;
+                option.textContent = materia;
+                select.appendChild(option);
+            });
+            
+            // Quando mudar a matéria, carregar assuntos
+            select.addEventListener('change', function() {
+                const targetId = id.includes('Liberar') ? 'assuntoTodosLiberar' : 'assuntoTodos';
+                preencherAssuntosSelect(targetId, this.value);
+            });
+        }
+    });
+}
+
+// Preencher select de assuntos
+function preencherAssuntosSelect(selectId, materia) {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">Selecione assunto...</option>';
+    
+    if (materia && todasMaterias[materia]) {
+        todasMaterias[materia].forEach(assunto => {
+            const option = document.createElement('option');
+            option.value = assunto;
+            option.textContent = assunto;
+            select.appendChild(option);
+        });
+    }
+}
+
+// Carregar blocos de um usuário
+async function carregarBlocosUsuario(usuarioId) {
+    try {
+        // Carregar bloqueios do usuário
+        const response = await fetch(`/api/admin/bloqueios/${usuarioId}`);
+        const bloqueios = await response.json();
+        
+        // Converter para formato mais fácil de usar
+        const bloqueiosMap = {};
+        bloqueios.forEach(b => {
+            const key = `${b.materia}|${b.assunto}`;
+            bloqueiosMap[key] = b.bloqueado;
+        });
+        
+        // Renderizar matérias e assuntos
+        renderizarMaterias(bloqueiosMap);
+        
+        // Esconder loading e mostrar conteúdo
+        loadingAssuntos.classList.add('hidden');
+        materiasContainer.classList.remove('hidden');
+        
+    } catch (error) {
+        console.error('Erro ao carregar blocos:', error);
+        loadingAssuntos.innerHTML = `
+            <div class="text-red-500">
+                <p>Erro ao carregar bloqueios do usuário</p>
+                <button onclick="carregarBlocosUsuario(${usuarioId})" class="bg-blue-500 text-white px-4 py-2 rounded mt-2">
+                    Tentar novamente
+                </button>
+            </div>
+        `;
+    }
+}
+
+// Renderizar matérias e assuntos
+function renderizarMaterias(bloqueiosMap) {
+    materiasContainer.innerHTML = '';
+    
+    Object.keys(todasMaterias).forEach(materia => {
+        const assuntos = todasMaterias[materia];
+        
+        // Criar card da matéria
+        const materiaCard = document.createElement('div');
+        materiaCard.className = 'materia-card bg-white rounded-xl shadow-lg mb-6 overflow-hidden';
+        materiaCard.style.borderLeftColor = '#3b82f6';
+        
+        // Cabeçalho da matéria
+        materiaCard.innerHTML = `
+            <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-4 border-b">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="text-2xl bg-blue-100 p-2 rounded-lg">
+                            ${obterIconeMateria(materia)}
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-800">${materia}</h3>
+                            <p class="text-sm text-gray-600">${assuntos.length} assunto(s)</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="liberarTodosAssuntos('${materia}')" 
+                                class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-sm">
+                            ✅ Liberar Todos
+                        </button>
+                        <button onclick="bloquearTodosAssuntos('${materia}')" 
+                                class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm">
+                            🔒 Bloquear Todos
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4">
+                <div class="space-y-2" id="assuntos-${materia.replace(/\s+/g, '-')}">
+                    <!-- Assuntos serão inseridos aqui -->
+                </div>
+            </div>
+        `;
+        
+        materiasContainer.appendChild(materiaCard);
+        
+        // Adicionar assuntos
+        const containerAssuntos = materiaCard.querySelector(`#assuntos-${materia.replace(/\s+/g, '-')}`);
+        
+        assuntos.forEach(assunto => {
+            const key = `${materia}|${assunto}`;
+            const bloqueado = bloqueiosMap[key] === true;
+            
+            const assuntoItem = document.createElement('div');
+            assuntoItem.className = `assunto-item p-3 rounded-lg ${bloqueado ? 'assunto-bloqueado' : 'assunto-liberado'} flex justify-between items-center`;
+            
+            assuntoItem.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="${bloqueado ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'} p-2 rounded-lg">
+                        ${bloqueado ? '🔒' : '🔓'}
+                    </div>
+                    <div>
+                        <h4 class="font-medium">${assunto}</h4>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-medium ${bloqueado ? 'text-red-600' : 'text-green-600'}">
+                        ${bloqueado ? 'Bloqueado' : 'Liberado'}
+                    </span>
+                    <label class="switch">
+                        <input type="checkbox" ${bloqueado ? '' : 'checked'} 
+                               onchange="alternarBloqueio('${materia}', '${assunto.replace(/'/g, "\\'")}', this.checked)">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            `;
+            
+            containerAssuntos.appendChild(assuntoItem);
+        });
+    });
+    
+    // Adicionar estilos CSS para o switch
+    adicionarEstilosSwitch();
+}
+
+// Adicionar estilos CSS para os switches
+function adicionarEstilosSwitch() {
+    if (!document.getElementById('switch-styles')) {
+        const style = document.createElement('style');
+        style.id = 'switch-styles';
+        style.textContent = `
+            .switch {
+                position: relative;
+                display: inline-block;
+                width: 50px;
+                height: 26px;
+            }
+            .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #ef4444;
+                transition: .4s;
+                border-radius: 34px;
+            }
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 18px;
+                width: 18px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+            input:checked + .slider {
+                background-color: #10b981;
+            }
+            input:checked + .slider:before {
+                transform: translateX(24px);
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
+// Obter ícone da matéria
+function obterIconeMateria(materia) {
+    const icones = {
+        "Português": "📖",
+        "Matemática": "🔢",
+        "História": "🏛️",
+        "Ciências": "🔬",
+        "Geografia": "🌍",
+        "Inglês": "🇬🇧"
+    };
+    return icones[materia] || "📄";
+}
+
+// FUNÇÕES AUXILIARES ADICIONAIS (Função para verificar se o backend suporta bloqueio de inativos)
+async function verificarSuporteInativos() {
+    try {
+        // Tenta pegar um usuário inativo para testar
+        const usuariosInativos = todosUsuarios.filter(u => !u.ativo);
+        if (usuariosInativos.length > 0) {
+            console.log(`✅ Sistema suporta bloqueio para ${usuariosInativos.length} usuários inativos`);
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.warn('Aviso ao verificar suporte a inativos:', error);
+        return false;
+    }
+}
+
+// Função para contar usuários afetados
+function contarUsuariosAfetados() {
+    const totalUsuarios = todosUsuarios.length;
+    const usuariosAtivos = todosUsuarios.filter(u => u.ativo).length;
+    const usuariosInativos = totalUsuarios - usuariosAtivos;
+    
+    return {
+        total: totalUsuarios,
+        ativos: usuariosAtivos,
+        inativos: usuariosInativos
+    };
+}
+
+// Gerar mensagem de confirmação com contagem
+function getMensagemComContagem(materia, assunto, acao) {
+    const contagem = contarUsuariosAfetados();
+    
+    let baseMensagem;
+    if (!assunto) {
+        baseMensagem = `Deseja ${acao} TODOS os assuntos da matéria "${materia}"?`;
+    } else {
+        baseMensagem = `Deseja ${acao} o assunto "${assunto}" da matéria "${materia}"?`;
+    }
+    
+    return `${baseMensagem}\n\n📊 Afetará:\n• ${contagem.total} usuários no total\n• ${contagem.ativos} ativos\n• ${contagem.inativos} inativos`;
+}
+
+
+
+
+
+// Alternar bloqueio de um assunto - VERSÃO CORRIGIDA
+async function alternarBloqueio(materia, assunto, liberar) {
+    if (!usuarioSelecionado) {
+        alert('Selecione um usuário primeiro!');
+        return;
+    }
+    
+    // Se liberar = true (checkbox marcado), então bloquear = false
+    // Se liberar = false (checkbox desmarcado), então bloquear = true
+    const bloquear = !liberar;
+    
+    try {
+        const response = await fetch('/api/admin/bloquear', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                usuario_id: usuarioSelecionado.id,
+                materia: materia,
+                assunto: assunto,
+                bloquear: bloquear  // O backend espera "bloquear", não "bloqueado"
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            mostrarMensagem(data.message, 'success');
+            // Recarregar os blocos do usuário
+            await carregarBlocosUsuario(usuarioSelecionado.id);
+        } else {
+            mostrarMensagem(data.message || 'Erro ao alterar bloqueio', 'error');
+        }
+        
+    } catch (error) {
+        console.error('Erro ao alternar bloqueio:', error);
+        mostrarMensagem('Erro de conexão com o servidor: ' + error.message, 'error');
+    }
+}
+
+// Bloquear todos os assuntos de uma matéria
+async function bloquearTodosAssuntos(materia) {
+    if (!usuarioSelecionado) {
+        alert('Selecione um usuário primeiro!');
+        return;
+    }
+    
+    if (!confirm(`Deseja bloquear TODOS os assuntos de ${materia} para este usuário?`)) {
+        return;
+    }
+    
+    const assuntos = todasMaterias[materia] || [];
+    
+    try {
+        for (const assunto of assuntos) {
+            await fetch('/api/admin/bloquear', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    usuario_id: usuarioSelecionado.id,
+                    materia: materia,
+                    assunto: assunto,
+                    bloquear: true
+                })
+            });
+        }
+        
+        mostrarMensagem(`Todos os assuntos de ${materia} foram bloqueados!`, 'success');
+        await carregarBlocosUsuario(usuarioSelecionado.id);
+        
+    } catch (error) {
+        console.error('Erro ao bloquear todos:', error);
+        mostrarMensagem('Erro ao bloquear assuntos: ' + error.message, 'error');
+    }
+}
+
+// Liberar todos os assuntos de uma matéria - FUNÇÃO FALTANTE
+async function liberarTodosAssuntos(materia) {
+    if (!usuarioSelecionado) {
+        alert('Selecione um usuário primeiro!');
+        return;
+    }
+    
+    if (!confirm(`Deseja liberar TODOS os assuntos de ${materia} para este usuário?`)) {
+        return;
+    }
+    
+    const assuntos = todasMaterias[materia] || [];
+    
+    try {
+        for (const assunto of assuntos) {
+            await fetch('/api/admin/bloquear', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    usuario_id: usuarioSelecionado.id,
+                    materia: materia,
+                    assunto: assunto,
+                    bloquear: false  // false = desbloquear/liberar
+                })
+            });
+        }
+        
+        mostrarMensagem(`Todos os assuntos de ${materia} foram liberados!`, 'success');
+        await carregarBlocosUsuario(usuarioSelecionado.id);
+        
+    } catch (error) {
+        console.error('Erro ao liberar todos:', error);
+        mostrarMensagem('Erro ao liberar assuntos: ' + error.message, 'error');
+    }
+}
+
+// Liberar TODOS os assuntos para o usuário
+async function liberarTudoUsuario() {
+    if (!usuarioSelecionado) {
+        alert('Selecione um usuário primeiro!');
+        return;
+    }
+    
+    if (!confirm('Deseja liberar TODOS os assuntos bloqueados para este usuário?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/admin/liberar-tudo/${usuarioSelecionado.id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            mostrarMensagem(data.message, 'success');
+            await carregarBlocosUsuario(usuarioSelecionado.id);
+        } else {
+            mostrarMensagem(data.message || 'Erro ao liberar assuntos', 'error');
+        }
+        
+    } catch (error) {
+        console.error('Erro ao liberar tudo:', error);
+        mostrarMensagem('Erro de conexão com o servidor: ' + error.message, 'error');
+    }
+}
+
+// Bloquear assunto para TODOS os usuários
+async function bloquearParaTodos() {
+    const materia = document.getElementById('materiaTodos').value;
+    const assunto = document.getElementById('assuntoTodos').value;
+    
+    if (!materia) {
+        mostrarMensagem('Selecione pelo menos uma matéria!', 'error');
+        return;
+    }
+    
+    // Usa a função auxiliar para gerar mensagem
+    const mensagemConfirmacao = getMensagemComContagem(materia, assunto, 'bloquear');
+    
+    if (!confirm(mensagemConfirmacao)) return;
+    
+    try {
+        mostrarMensagem('⏳ Processando bloqueio...', 'info');
+        
+        // Verifica suporte a inativos (apenas para log)
+        const suportaInativos = await verificarSuporteInativos();
+        if (!suportaInativos) {
+            console.log('⚠️ Sistema pode não suportar bloqueio para usuários inativos');
+        }
+        
+        if (!assunto) {
+            // Bloquear todos os assuntos da matéria
+            const assuntos = todasMaterias[materia] || [];
+            
+            if (assuntos.length === 0) {
+                mostrarMensagem('Esta matéria não tem assuntos cadastrados.', 'error');
+                return;
+            }
+            
+            let sucessos = 0;
+            let falhas = 0;
+            
+            for (const assuntoItem of assuntos) {
+                try {
+                    const response = await fetch('/api/admin/bloquear-todos-assuntos', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ materia, assunto: assuntoItem })
+                    });
+                    
+                    const data = await response.json();
+                    data.success ? sucessos++ : falhas++;
+                    
+                } catch (e) {
+                    falhas++;
+                    console.warn(`Erro ao bloquear "${assuntoItem}":`, e);
+                }
+            }
+            
+            mostrarMensagem(
+                `✅ ${sucessos} assuntos bloqueados | ❌ ${falhas} falhas\nTotal: ${assuntos.length} assuntos`,
+                sucessos > 0 ? 'success' : 'error'
+            );
+            
+        } else {
+            // Bloquear apenas um assunto específico
+            const response = await fetch('/api/admin/bloquear-todos-assuntos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ materia, assunto })
+            });
+            
+            const data = await response.json();
+            mostrarMensagem(data.message, data.success ? 'success' : 'error');
+        }
+        
+        // Atualizar interface se tiver usuário selecionado
+        if (usuarioSelecionado) {
+            await carregarBlocosUsuario(usuarioSelecionado.id);
+        }
+        
+    } catch (error) {
+        console.error('Erro ao bloquear para todos:', error);
+        mostrarMensagem('Erro: ' + error.message, 'error');
+    }
+}
+
+// Liberar assunto para TODOS os usuários
+async function liberarParaTodos() {
+    const materia = document.getElementById('materiaTodosLiberar').value;
+    const assunto = document.getElementById('assuntoTodosLiberar').value;
+    
+    if (!materia) {
+        mostrarMensagem('Selecione pelo menos uma matéria!', 'error');
+        return;
+    }
+    
+    // Usa a função auxiliar para gerar mensagem
+    const mensagemConfirmacao = getMensagemComContagem(materia, assunto, 'liberar');
+    
+    if (!confirm(mensagemConfirmacao)) return;
+    
+    try {
+        mostrarMensagem('⏳ Processando liberação...', 'info');
+        
+        // Verifica suporte a inativos (apenas para log)
+        const suportaInativos = await verificarSuporteInativos();
+        if (!suportaInativos) {
+            console.log('⚠️ Sistema pode não suportar liberação para usuários inativos');
+        }
+        
+        if (!assunto) {
+            // Liberar todos os assuntos da matéria
+            const assuntos = todasMaterias[materia] || [];
+            
+            if (assuntos.length === 0) {
+                mostrarMensagem('Esta matéria não tem assuntos cadastrados.', 'error');
+                return;
+            }
+            
+            let sucessos = 0;
+            let falhas = 0;
+            
+            for (const assuntoItem of assuntos) {
+                try {
+                    const response = await fetch('/api/admin/liberar-todos-assuntos', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ materia, assunto: assuntoItem })
+                    });
+                    
+                    const data = await response.json();
+                    data.success ? sucessos++ : falhas++;
+                    
+                } catch (e) {
+                    falhas++;
+                    console.warn(`Erro ao liberar "${assuntoItem}":`, e);
+                }
+            }
+            
+            mostrarMensagem(
+                `✅ ${sucessos} assuntos liberados | ❌ ${falhas} falhas\nTotal: ${assuntos.length} assuntos`,
+                sucessos > 0 ? 'success' : 'error'
+            );
+            
+        } else {
+            // Liberar apenas um assunto específico
+            const response = await fetch('/api/admin/liberar-todos-assuntos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ materia, assunto })
+            });
+            
+            const data = await response.json();
+            mostrarMensagem(data.message, data.success ? 'success' : 'error');
+        }
+        
+        // Atualizar interface se tiver usuário selecionado
+        if (usuarioSelecionado) {
+            await carregarBlocosUsuario(usuarioSelecionado.id);
+        }
+        
+    } catch (error) {
+        console.error('Erro ao liberar para todos:', error);
+        mostrarMensagem('Erro: ' + error.message, 'error');
+    }
+}
+
+// Mostrar mensagem de feedback
+function mostrarMensagem(texto, tipo) {
+    // Remover mensagem anterior se existir
+    const mensagemAnterior = document.getElementById('feedback-message');
+    if (mensagemAnterior) {
+        mensagemAnterior.remove();
+    }
+    
+    // Criar nova mensagem
+    const mensagem = document.createElement('div');
+    mensagem.id = 'feedback-message';
+    
+    let bgColor = 'bg-blue-500';
+    let icon = '⏳';
+    
+    if (tipo === 'success') {
+        bgColor = 'bg-green-500';
+        icon = '✅';
+    } else if (tipo === 'error') {
+        bgColor = 'bg-red-500';
+        icon = '❌';
+    } else if (tipo === 'info') {
+        bgColor = 'bg-blue-500';
+        icon = 'ℹ️';
+    }
+    
+    mensagem.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 text-white ${bgColor}`;
+    mensagem.innerHTML = `
+        <div class="flex items-center gap-2">
+            <span class="text-lg">${icon}</span>
+            <span>${texto}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(mensagem);
+    
+    // Remover após 3 segundos
+    setTimeout(() => {
+        if (mensagem.parentNode) {
+            mensagem.remove();
+        }
+    }, 3000);
+}
+
+// Recarregar tudo
+function recarregarTudo() {
+    location.reload();
+}
+
+// Funções globais
+window.bloquearParaTodos = bloquearParaTodos;
+window.liberarParaTodos = liberarParaTodos;
+window.liberarTudoUsuario = liberarTudoUsuario;
+window.liberarTodosAssuntos = liberarTodosAssuntos;
+window.bloquearTodosAssuntos = bloquearTodosAssuntos;
+window.recarregarTudo = recarregarTudo;
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Questões</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1001;
+        }
+        .toast-success { background-color: #10b981; }
+        .toast-error { background-color: #ef4444; }
+        .checkbox-cell { width: 40px; text-align: center; }
+        .bulk-actions {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 15px;
+            border-top: 2px solid #e5e7eb;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+        .active-tab {
+            background-color: #ed4b82;
+            color: white;
+            border-bottom: 2px solid #ed4b82;
+        }
+        .tab-button {
+            transition: all 0.2s;
+        }
+        .campo-destaque {
+            background-color: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="bg-[#ed4b82] p-6 text-white">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <button onclick="window.location.href='admin.html'" class="bg-white/20 p-2 rounded-full hover:bg-white/30 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <div>
+                    <h1 class="text-2xl font-bold">Painel Administrativo — Questões</h1>
+                    <p class="text-sm opacity-90">Gerenciar questões do Panda Estudos</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="exportarExcel()" class="bg-[#2ecc71] hover:bg-[#27ae60] px-4 py-2 rounded-lg flex items-center gap-2 font-semibold transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Exportar Excel
+                </button>
+
+                <label class="bg-[#3498db] hover:bg-[#2980b9] px-4 py-2 rounded-lg flex items-center gap-2 font-semibold transition cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    Importar Excel
+                    <input type="file" id="importFile" hidden accept=".xlsx,.xls">
+                </label>
+
+                <button onclick="abrirModalNova()" class="bg-white text-[#ed4b82] hover:bg-gray-100 px-4 py-2 rounded-lg flex items-center gap-2 font-bold transition">
+                    <span class="text-xl">+</span> Nova Questão
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- BULK ACTIONS BAR -->
+    <div id="bulkActions" class="bulk-actions">
+        <div class="flex items-center gap-4">
+            <span id="selectedCount" class="font-semibold text-gray-700">0 questões selecionadas</span>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="excluirSelecionadas()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-semibold transition">
+                <i class="fas fa-trash"></i> Excluir Selecionadas
+            </button>
+            <button onclick="limparSelecao()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-semibold transition">
+                Limpar Seleção
+            </button>
+        </div>
+    </div>
+
+    <!-- CONTAINER PRINCIPAL -->
+    <main class="max-w-7xl mx-auto p-6">
+
+        <!-- FILTROS -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-8 flex flex-wrap items-end gap-6">
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-gray-600 text-sm font-semibold mb-2">Matéria:</label>
+                <select id="materiaFilter" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20" onchange="filtrarPorMateria()">
+                    <option value="todas">Todas</option>
+                </select>
+            </div>
+
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-gray-600 text-sm font-semibold mb-2">Assunto:</label>
+                <select id="assuntoFilter" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20" onchange="filtrarPorAssunto()">
+                    <option value="todos">Todos</option>
+                </select>
+            </div>
+
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-gray-600 text-sm font-semibold mb-2">Dificuldade:</label>
+                <select id="dificuldadeFilter" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20" onchange="atualizarTabela()">
+                    <option value="todas">Todas</option>
+                    <option value="Fácil">Fácil</option>
+                    <option value="Médio">Médio</option>
+                    <option value="Difícil">Difícil</option>
+                </select>
+            </div>
+
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-gray-600 text-sm font-semibold mb-2">Tipo:</label>
+                <select id="tipoFilter" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20" onchange="atualizarTabela()">
+                    <option value="todos">Todos</option>
+                    <option value="multipla_escolha">📝 Múltipla Escolha</option>
+                    <option value="voz">🎤 Voz</option>
+                    <option value="voz_multipla">🎤➕ Voz + Múltipla</option>
+                </select>
+            </div>
+
+            <div class="text-center px-4">
+                <p class="text-gray-400 text-xs font-bold uppercase tracking-wider">Total</p>
+                <p id="totalQuestoes" class="text-[#ed4b82] text-3xl font-black">0</p>
+            </div>
+        </div>
+
+        <!-- TABELA DE QUESTÕES -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-400 text-xs uppercase font-bold border-b">
+                            <th class="px-6 py-4 checkbox-cell">
+                                <input type="checkbox" id="selectAll" class="select-all-checkbox" onchange="toggleSelectAll(this)">
+                            </th>
+                            <th class="px-6 py-4">ID</th>
+                            <th class="px-6 py-4">Matéria</th>
+                            <th class="px-6 py-4">Assunto</th>
+                            <th class="px-6 py-4">Pergunta</th>
+                            <th class="px-6 py-4">Tipo</th>
+                            <th class="px-6 py-4">Mídia</th>
+                            <th class="px-6 py-4">Dificuldade</th>
+                            <th class="px-6 py-4 text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaQuestoes" class="text-sm text-gray-700 divide-y divide-gray-100">
+                        <!-- Questões serão carregadas aqui -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MENSAGEM SEM RESULTADOS -->
+        <div id="noResults" class="bg-white rounded-xl shadow-sm p-12 text-center mt-8 hidden">
+            <div class="text-gray-400 text-6xl mb-4">📚</div>
+            <h3 class="text-xl font-bold text-gray-600 mb-2">Nenhuma questão encontrada</h3>
+            <p class="text-gray-400">Tente ajustar os filtros ou adicione novas questões.</p>
+        </div>
+    </main>
+
+    <!-- MODAL DE EDIÇÃO/CRIAÇÃO -->
+    <div id="modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800" id="modalTitulo">Nova Questão</h2>
+                <button onclick="fecharModal()" class="text-gray-400 hover:text-gray-600 text-2xl">×</button>
+            </div>
+
+            <!-- Abas -->
+            <div class="flex border-b border-gray-200 mb-6">
+                <button id="tabNormal" class="tab-button flex-1 py-2 px-4 text-center font-semibold hover:text-[#ed4b82]" onclick="ativarAba('normal')">
+                    📝 Padrão
+                </button>
+                <button id="tabIngles" class="tab-button flex-1 py-2 px-4 text-center font-semibold hover:text-[#ed4b82]" onclick="ativarAba('ingles')">
+                    🗽 Inglês (com voz)
+                </button>
+            </div>
+
+            <!-- MODAL PADRÃO -->
+            <div id="modalNormal">
+                <div class="grid gap-4">
+                    <div>
+                        <label class="block text-gray-600 text-sm font-semibold mb-2">Matéria: <span class="text-red-500">*</span></label>
+                        <input id="materia_normal" list="materias-list" placeholder="Digite ou selecione a matéria" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20" required>
+                        <datalist id="materias-list">
+                            <option value="Português">
+                            <option value="Matemática">
+                            <option value="História">
+                            <option value="Geografia">
+                            <option value="Ciências">
+                            <option value="Inglês">
+                            <option value="Artes">
+                            <option value="Física">
+                            <option value="Química">
+                            <option value="Biologia">
+                        </datalist>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-600 text-sm font-semibold mb-2">Assunto:</label>
+                        <input id="assunto_normal" placeholder="Ex: Verbos, Geometria, etc." class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-600 text-sm font-semibold mb-2">Pergunta: <span class="text-red-500">*</span></label>
+                        <textarea id="pergunta_normal" placeholder="Digite a pergunta" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20" rows="2" required></textarea>
+                    </div>
+
+                    <!-- Tipo de questão para modo normal -->
+                    <div>
+                        <label class="block text-gray-600 text-sm font-semibold mb-2">Tipo de Questão:</label>
+                        <select id="tipo_normal" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20" onchange="mostrarCamposTipo(this.value)">
+                            <option value="multipla_escolha">📝 Múltipla Escolha</option>
+                            <option value="voz">🎤 Resposta por Voz</option>
+                            <option value="voz_multipla">🎤➕ Voz + Múltipla</option>
+                        </select>
+                    </div>
+
+                    <!-- Campos de imagem (sempre visíveis) -->
+                    <div class="bg-blue-50 p-4 rounded-lg border-2 border-blue-200">
+                        <h3 class="font-bold text-blue-800 mb-3">📸 Imagem (opcional)</h3>
+                        <input id="imagem_normal" placeholder="Ex: animais/cat.png (caminho relativo à pasta midia)" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                    </div>
+
+                    <!-- Campos de múltipla escolha -->
+                    <div id="campos_multipla_normal" class="bg-green-50 p-4 rounded-lg border-2 border-green-200">
+                        <h3 class="font-bold text-green-800 mb-3">📋 Opções de múltipla escolha</h3>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-600 text-sm font-semibold mb-2">Opção A:</label>
+                                <input id="a_normal" placeholder="Resposta A" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 text-sm font-semibold mb-2">Opção B:</label>
+                                <input id="b_normal" placeholder="Resposta B" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 text-sm font-semibold mb-2">Opção C:</label>
+                                <input id="c_normal" placeholder="Resposta C" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 text-sm font-semibold mb-2">Opção D:</label>
+                                <input id="d_normal" placeholder="Resposta D" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <label class="block text-gray-600 text-sm font-semibold mb-2">Resposta Correta:</label>
+                            <select id="correta_normal" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                                <option value="a">A</option>
+                                <option value="b">B</option>
+                                <option value="c">C</option>
+                                <option value="d">D</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Campos de voz -->
+                    <div id="campos_voz_normal" class="hidden bg-purple-50 p-4 rounded-lg border-2 border-purple-200">
+                        <h3 class="font-bold text-purple-800 mb-3">🎤 Resposta por Voz</h3>
+                        <label class="block text-gray-600 text-sm font-semibold mb-2">Resposta esperada (palavra-chave):</label>
+                        <input id="resposta_voz_normal" placeholder="Ex: dog, cat, house" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                        <p class="text-xs text-gray-500 mt-1">O aluno deverá falar esta palavra exata para acertar</p>
+                        
+                        <div class="mt-3">
+                            <label class="block text-gray-600 text-sm font-semibold mb-2">Áudio de pronúncia (opcional):</label>
+                            <input id="audio_normal" placeholder="Ex: pronuncias/cat.mp3" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-600 text-sm font-semibold mb-2">Dificuldade:</label>
+                        <select id="dificuldade_normal" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                            <option value="Fácil">Fácil</option>
+                            <option value="Médio" selected>Médio</option>
+                            <option value="Difícil">Difícil</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-600 text-sm font-semibold mb-2">Dica/Explicação:</label>
+                        <textarea id="dica_normal" placeholder="Explicação da resposta correta" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL INGLÊS -->
+            <div id="modalIngles" class="hidden">
+                <div class="grid gap-4">
+                    <div class="bg-purple-50 p-4 rounded-lg border-2 border-purple-200 mb-2">
+                        <p class="text-purple-700 font-semibold">🗽 Configurações especiais para Inglês</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-600 text-sm font-semibold mb-2">Matéria:</label>
+                        <input id="materia_ingles" value="Inglês" class="w-full border border-gray-200 rounded-lg p-2.5 bg-purple-50 outline-none focus:ring-2 focus:ring-[#ed4b82]/20" readonly>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-600 text-sm font-semibold mb-2">Assunto:</label>
+                        <input id="assunto_ingles" placeholder="Ex: Animais, Cores, etc." class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-600 text-sm font-semibold mb-2">Pergunta: <span class="text-red-500">*</span></label>
+                        <textarea id="pergunta_ingles" placeholder="Digite a pergunta" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20" rows="2" required></textarea>
+                    </div>
+
+                    <!-- Tipo de questão para inglês -->
+                    <div>
+                        <label class="block text-gray-600 text-sm font-semibold mb-2">Tipo de Questão:</label>
+                        <select id="tipo_ingles" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20" onchange="mostrarCamposTipoIngles(this.value)">
+                            <option value="voz">🎤 Resposta por Voz</option>
+                            <option value="voz_multipla">🎤➕ Voz + Múltipla</option>
+                            <option value="multipla_escolha">📝 Múltipla Escolha</option>
+                        </select>
+                    </div>
+
+                    <!-- Imagem -->
+                    <div class="bg-blue-50 p-4 rounded-lg border-2 border-blue-200">
+                        <h3 class="font-bold text-blue-800 mb-3">📸 Imagem (opcional)</h3>
+                        <input id="imagem_ingles" placeholder="Ex: animais/cat.png" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                    </div>
+
+                    <!-- Campos de voz para inglês -->
+                    <div id="campos_voz_ingles" class="bg-purple-50 p-4 rounded-lg border-2 border-purple-200">
+                        <h3 class="font-bold text-purple-800 mb-3">🎤 Resposta por Voz</h3>
+                        <label class="block text-gray-600 text-sm font-semibold mb-2">Palavra esperada (em inglês):</label>
+                        <input id="resposta_voz_ingles" placeholder="Ex: dog" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                        <p class="text-xs text-gray-500 mt-1">O aluno deverá falar esta palavra exata para acertar</p>
+                        
+                        <div class="mt-3">
+                            <label class="block text-gray-600 text-sm font-semibold mb-2">Áudio de pronúncia (opcional):</label>
+                            <input id="audio_ingles" placeholder="Ex: pronuncias/cat.mp3" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                        </div>
+                    </div>
+
+                    <!-- Campos de múltipla escolha para inglês -->
+                    <div id="campos_multipla_ingles" class="hidden bg-green-50 p-4 rounded-lg border-2 border-green-200">
+                        <h3 class="font-bold text-green-800 mb-3">📋 Opções de múltipla escolha</h3>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-600 text-sm font-semibold mb-2">Opção A:</label>
+                                <input id="a_ingles" placeholder="Opção A" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 text-sm font-semibold mb-2">Opção B:</label>
+                                <input id="b_ingles" placeholder="Opção B" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 text-sm font-semibold mb-2">Opção C:</label>
+                                <input id="c_ingles" placeholder="Opção C" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 text-sm font-semibold mb-2">Opção D:</label>
+                                <input id="d_ingles" placeholder="Opção D" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <label class="block text-gray-600 text-sm font-semibold mb-2">Resposta Correta:</label>
+                            <select id="correta_ingles" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                                <option value="a">A</option>
+                                <option value="b">B</option>
+                                <option value="c">C</option>
+                                <option value="d">D</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-600 text-sm font-semibold mb-2">Dificuldade:</label>
+                        <select id="dificuldade_ingles" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20">
+                            <option value="Fácil">Fácil</option>
+                            <option value="Médio" selected>Médio</option>
+                            <option value="Difícil">Difícil</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-600 text-sm font-semibold mb-2">Dica/Explicação:</label>
+                        <textarea id="dica_ingles" placeholder="Explicação da resposta" class="w-full border border-gray-200 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#ed4b82]/20" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 mt-8">
+                <button onclick="fecharModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800 font-semibold">Cancelar</button>
+                <button onclick="salvarQuestao()" class="bg-[#ed4b82] hover:bg-[#d43c72] text-white px-6 py-2 rounded-lg font-semibold transition" id="btnSalvar">
+                    Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICAÇÕES -->
+    <div id="toastSuccess" class="toast toast-success">Operação realizada com sucesso!</div>
+    <div id="toastError" class="toast toast-error">Ocorreu um erro. Tente novamente.</div>
+
+    <script>
+    // Variáveis globais
+    let questoes = [];
+    let questaoEditando = null;
+    let materiasFiltro = [];
+    let assuntosFiltro = [];
+    let selecionadas = new Set();
+    let abaAtual = 'normal';
+
+    document.addEventListener('DOMContentLoaded', function() {
+        carregarQuestoes();
+        carregarFiltros();
+        document.getElementById('importFile').addEventListener('change', importarPlanilha);
+    });
+
+    // ============ FUNÇÃO PARA ESCAPAR HTML ============
+    function escapeHtml(text) {
+        if (!text) return '';
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;')
+            .replace(/\n/g, '\\n')
+            .replace(/\r/g, '');
+    }
+
+    // ============ CONTROLE DE ABAS ============
+    function ativarAba(aba) {
+        abaAtual = aba;
+        
+        const tabNormal = document.getElementById('tabNormal');
+        const tabIngles = document.getElementById('tabIngles');
+        const modalNormal = document.getElementById('modalNormal');
+        const modalIngles = document.getElementById('modalIngles');
+        
+        [tabNormal, tabIngles].forEach(tab => {
+            tab.classList.remove('active-tab', 'bg-[#ed4b82]', 'text-white');
+        });
+        
+        if (aba === 'normal') {
+            tabNormal.classList.add('active-tab', 'bg-[#ed4b82]', 'text-white');
+            modalNormal.classList.remove('hidden');
+            modalIngles.classList.add('hidden');
+        } else {
+            tabIngles.classList.add('active-tab', 'bg-[#ed4b82]', 'text-white');
+            modalIngles.classList.remove('hidden');
+            modalNormal.classList.add('hidden');
+        }
+    }
+
+    function mostrarCamposTipo(tipo) {
+        const camposMultipla = document.getElementById('campos_multipla_normal');
+        const camposVoz = document.getElementById('campos_voz_normal');
+        
+        if (tipo === 'multipla_escolha') {
+            camposMultipla.classList.remove('hidden');
+            camposVoz.classList.add('hidden');
+        } else if (tipo === 'voz') {
+            camposMultipla.classList.add('hidden');
+            camposVoz.classList.remove('hidden');
+        } else if (tipo === 'voz_multipla') {
+            camposMultipla.classList.remove('hidden');
+            camposVoz.classList.remove('hidden');
+        }
+    }
+
+    function mostrarCamposTipoIngles(tipo) {
+        const camposMultipla = document.getElementById('campos_multipla_ingles');
+        const camposVoz = document.getElementById('campos_voz_ingles');
+        
+        if (tipo === 'multipla_escolha') {
+            camposMultipla.classList.remove('hidden');
+        } else if (tipo === 'voz') {
+            camposMultipla.classList.add('hidden');
+        } else if (tipo === 'voz_multipla') {
+            camposMultipla.classList.remove('hidden');
+        }
+    }
+
+    // ============ MODAL ============
+    function abrirModalNova() {
+        questaoEditando = null;
+        document.getElementById('modalTitulo').textContent = 'Nova Questão';
+        document.getElementById('btnSalvar').textContent = 'Salvar';
+        
+        limparCamposNormal();
+        limparCamposIngles();
+        
+        ativarAba('normal');
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    function limparCamposNormal() {
+        document.getElementById('materia_normal').value = '';
+        document.getElementById('assunto_normal').value = '';
+        document.getElementById('pergunta_normal').value = '';
+        document.getElementById('tipo_normal').value = 'multipla_escolha';
+        document.getElementById('a_normal').value = '';
+        document.getElementById('b_normal').value = '';
+        document.getElementById('c_normal').value = '';
+        document.getElementById('d_normal').value = '';
+        document.getElementById('correta_normal').value = 'a';
+        document.getElementById('imagem_normal').value = '';
+        document.getElementById('resposta_voz_normal').value = '';
+        document.getElementById('audio_normal').value = '';
+        document.getElementById('dificuldade_normal').value = 'Médio';
+        document.getElementById('dica_normal').value = '';
+        mostrarCamposTipo('multipla_escolha');
+    }
+
+    function limparCamposIngles() {
+        document.getElementById('assunto_ingles').value = '';
+        document.getElementById('pergunta_ingles').value = '';
+        document.getElementById('tipo_ingles').value = 'voz';
+        document.getElementById('a_ingles').value = '';
+        document.getElementById('b_ingles').value = '';
+        document.getElementById('c_ingles').value = '';
+        document.getElementById('d_ingles').value = '';
+        document.getElementById('correta_ingles').value = 'a';
+        document.getElementById('imagem_ingles').value = '';
+        document.getElementById('resposta_voz_ingles').value = '';
+        document.getElementById('audio_ingles').value = '';
+        document.getElementById('dificuldade_ingles').value = 'Médio';
+        document.getElementById('dica_ingles').value = '';
+        mostrarCamposTipoIngles('voz');
+    }
+
+    function abrirModalEditar(questao) {
+        questaoEditando = questao;
+        document.getElementById('modalTitulo').textContent = 'Editar Questão';
+        document.getElementById('btnSalvar').textContent = 'Atualizar';
+        
+        const isIngles = questao.materia === 'Inglês' || questao.resposta_voz;
+        
+        if (isIngles) {
+            ativarAba('ingles');
+            preencherCamposIngles(questao);
+        } else {
+            ativarAba('normal');
+            preencherCamposNormal(questao);
+        }
+        
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    function preencherCamposNormal(questao) {
+        document.getElementById('materia_normal').value = questao.materia || '';
+        document.getElementById('assunto_normal').value = questao.assunto || '';
+        document.getElementById('pergunta_normal').value = questao.pergunta || '';
+        document.getElementById('tipo_normal').value = questao.tipo_questao || 'multipla_escolha';
+        document.getElementById('a_normal').value = questao.a || '';
+        document.getElementById('b_normal').value = questao.b || '';
+        document.getElementById('c_normal').value = questao.c || '';
+        document.getElementById('d_normal').value = questao.d || '';
+        document.getElementById('correta_normal').value = questao.correta || 'a';
+        document.getElementById('imagem_normal').value = questao.imagem_url || questao.imagem_path || '';
+        document.getElementById('resposta_voz_normal').value = questao.resposta_voz || '';
+        document.getElementById('audio_normal').value = questao.audio_url || questao.audio_path || '';
+        document.getElementById('dificuldade_normal').value = questao.dificuldade || 'Médio';
+        document.getElementById('dica_normal').value = questao.explicacao || questao.dica || '';
+        mostrarCamposTipo(questao.tipo_questao || 'multipla_escolha');
+    }
+
+    function preencherCamposIngles(questao) {
+        document.getElementById('assunto_ingles').value = questao.assunto || '';
+        document.getElementById('pergunta_ingles').value = questao.pergunta || '';
+        document.getElementById('tipo_ingles').value = questao.tipo_questao || 'voz';
+        document.getElementById('a_ingles').value = questao.a || '';
+        document.getElementById('b_ingles').value = questao.b || '';
+        document.getElementById('c_ingles').value = questao.c || '';
+        document.getElementById('d_ingles').value = questao.d || '';
+        document.getElementById('correta_ingles').value = questao.correta || 'a';
+        document.getElementById('imagem_ingles').value = questao.imagem_url || questao.imagem_path || '';
+        document.getElementById('resposta_voz_ingles').value = questao.resposta_voz || '';
+        document.getElementById('audio_ingles').value = questao.audio_url || questao.audio_path || '';
+        document.getElementById('dificuldade_ingles').value = questao.dificuldade || 'Médio';
+        document.getElementById('dica_ingles').value = questao.explicacao || questao.dica || '';
+        mostrarCamposTipoIngles(questao.tipo_questao || 'voz');
+    }
+
+    function fecharModal() {
+        document.getElementById('modal').style.display = 'none';
+    }
+
+    // ============ SALVAR QUESTÃO ============
+    async function salvarQuestao() {
+        let questao;
+
+        if (abaAtual === 'normal') {
+            questao = coletarDadosNormal();
+        } else {
+            questao = coletarDadosIngles();
+        }
+
+        if (!questao.materia || !questao.pergunta) {
+            mostrarToast('Matéria e pergunta são obrigatórios', 'error');
+            return;
+        }
+
+        if (questao.tipo_questao === 'multipla_escolha' || questao.tipo_questao === 'voz_multipla') {
+            if (!questao.a || !questao.b || !questao.c || !questao.d) {
+                mostrarToast('Para múltipla escolha, todas as opções A, B, C, D devem ser preenchidas', 'error');
+                return;
+            }
+        } else if (questao.tipo_questao === 'voz' && !questao.resposta_voz) {
+            mostrarToast('Para questões de voz, a resposta esperada é obrigatória', 'error');
+            return;
+        }
+
+        if (questaoEditando) {
+            questao.id = questaoEditando.id;
+        }
+
+        try {
+            const response = await fetch('/api/salvar-questao', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(questao)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || 'Erro ao salvar questão');
+            }
+
+            fecharModal();
+            await carregarQuestoes();
+            mostrarToast(result.message || 'Questão salva com sucesso!', 'success');
+        } catch (error) {
+            console.error('Erro:', error);
+            mostrarToast(error.message || 'Erro ao salvar questão', 'error');
+        }
+    }
+
+    function coletarDadosNormal() {
+        return {
+            materia: document.getElementById('materia_normal').value.trim(),
+            assunto: document.getElementById('assunto_normal').value.trim(),
+            pergunta: document.getElementById('pergunta_normal').value.trim(),
+            tipo_questao: document.getElementById('tipo_normal').value,
+            a: document.getElementById('a_normal').value.trim(),
+            b: document.getElementById('b_normal').value.trim(),
+            c: document.getElementById('c_normal').value.trim(),
+            d: document.getElementById('d_normal').value.trim(),
+            correta: document.getElementById('correta_normal').value,
+            imagem_url: document.getElementById('imagem_normal').value.trim(),
+            audio_url: document.getElementById('audio_normal').value.trim(),
+            resposta_voz: document.getElementById('resposta_voz_normal').value.trim().toLowerCase(),
+            dificuldade: document.getElementById('dificuldade_normal').value,
+            explicacao: document.getElementById('dica_normal').value.trim()
+        };
+    }
+
+    function coletarDadosIngles() {
+        return {
+            materia: 'Inglês',
+            assunto: document.getElementById('assunto_ingles').value.trim(),
+            pergunta: document.getElementById('pergunta_ingles').value.trim(),
+            tipo_questao: document.getElementById('tipo_ingles').value,
+            a: document.getElementById('a_ingles').value.trim(),
+            b: document.getElementById('b_ingles').value.trim(),
+            c: document.getElementById('c_ingles').value.trim(),
+            d: document.getElementById('d_ingles').value.trim(),
+            correta: document.getElementById('correta_ingles').value,
+            imagem_url: document.getElementById('imagem_ingles').value.trim(),
+            audio_url: document.getElementById('audio_ingles').value.trim(),
+            resposta_voz: document.getElementById('resposta_voz_ingles').value.trim().toLowerCase(),
+            dificuldade: document.getElementById('dificuldade_ingles').value,
+            explicacao: document.getElementById('dica_ingles').value.trim()
+        };
+    }
+
+    // ============ CARREGAR DADOS ============
+    async function carregarQuestoes() {
+        try {
+            const response = await fetch('/api/todas-questoes');
+            if (!response.ok) throw new Error('Erro ao carregar questões');
+
+            questoes = await response.json();
+            console.log('Questões carregadas:', questoes);
+            atualizarTabela();
+            atualizarContador();
+        } catch (error) {
+            console.error('Erro:', error);
+            mostrarToast('Erro ao carregar questões', 'error');
+        }
+    }
+
+    async function carregarFiltros() {
+        try {
+            const response = await fetch('/api/materias');
+            if (!response.ok) throw new Error('Erro ao carregar matérias');
+
+            materiasFiltro = await response.json();
+            atualizarFiltroMateria();
+        } catch (error) {
+            console.error('Erro:', error);
+        }
+    }
+
+    async function filtrarPorMateria() {
+        const materia = document.getElementById('materiaFilter').value;
+        const assuntoFilter = document.getElementById('assuntoFilter');
+
+        if (materia === 'todas') {
+            assuntoFilter.innerHTML = '<option value="todos">Todos</option>';
+            assuntoFilter.disabled = true;
+            atualizarTabela();
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/assuntos?materia=${encodeURIComponent(materia)}`);
+            if (response.ok) {
+                const assuntos = await response.json();
+
+                assuntoFilter.innerHTML = '<option value="todos">Todos</option>';
+
+                if (assuntos.length > 0 && typeof assuntos[0] === 'object') {
+                    assuntos.forEach(assunto => {
+                        if (assunto.nome) {
+                            assuntoFilter.innerHTML += `<option value="${assunto.nome}">${assunto.nome}</option>`;
+                        }
+                    });
+                } else {
+                    assuntos.forEach(assunto => {
+                        assuntoFilter.innerHTML += `<option value="${assunto}">${assunto}</option>`;
+                    });
+                }
+
+                assuntoFilter.disabled = false;
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+        }
+
+        atualizarTabela();
+    }
+
+    function filtrarPorAssunto() {
+        atualizarTabela();
+    }
+
+    function atualizarFiltroMateria() {
+        const materiaFilter = document.getElementById('materiaFilter');
+        materiaFilter.innerHTML = '<option value="todas">Todas</option>';
+        materiasFiltro.forEach(materia => {
+            materiaFilter.innerHTML += `<option value="${materia}">${materia}</option>`;
+        });
+    }
+
+    // ============ EXCLUIR QUESTÕES ============
+    async function excluirQuestao(id, excluirSelecionadas = false) {
+        if (!excluirSelecionadas) {
+            if (!confirm('Tem certeza que deseja excluir esta questão?')) return;
+        }
+
+        try {
+            let idsParaExcluir = [];
+
+            if (excluirSelecionadas && selecionadas.size > 0) {
+                idsParaExcluir = Array.from(selecionadas);
+            } else {
+                idsParaExcluir = [id];
+            }
+
+            const response = await fetch('/api/excluir-multiplas-questoes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ids: idsParaExcluir })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || 'Erro ao excluir questão');
+            }
+
+            await carregarQuestoes();
+            limparSelecao();
+            mostrarToast(result.message || 'Questão excluída com sucesso!', 'success');
+        } catch (error) {
+            console.error('Erro:', error);
+            mostrarToast(error.message || 'Erro ao excluir questão', 'error');
+        }
+    }
+
+    // ============ SELEÇÃO ============
+    function toggleSelectAll(checkbox) {
+        const checkboxes = document.querySelectorAll('.questao-checkbox');
+        const questoesFiltradas = getQuestoesFiltradas();
+
+        if (checkbox.checked) {
+            questoesFiltradas.forEach(q => {
+                selecionadas.add(q.id);
+            });
+        } else {
+            selecionadas.clear();
+        }
+
+        checkboxes.forEach(cb => {
+            cb.checked = checkbox.checked;
+        });
+
+        atualizarBarraSelecao();
+    }
+
+    function toggleSelecao(id, checkbox) {
+        if (checkbox.checked) {
+            selecionadas.add(id);
+        } else {
+            selecionadas.delete(id);
+        }
+
+        const selectAll = document.getElementById('selectAll');
+        const questoesFiltradas = getQuestoesFiltradas();
+
+        if (selecionadas.size === questoesFiltradas.length) {
+            selectAll.checked = true;
+            selectAll.indeterminate = false;
+        } else if (selecionadas.size > 0) {
+            selectAll.indeterminate = true;
+        } else {
+            selectAll.checked = false;
+            selectAll.indeterminate = false;
+        }
+
+        atualizarBarraSelecao();
+    }
+
+    function atualizarBarraSelecao() {
+        const bulkActions = document.getElementById('bulkActions');
+        const selectedCount = document.getElementById('selectedCount');
+
+        if (selecionadas.size > 0) {
+            bulkActions.style.display = 'flex';
+            selectedCount.textContent = `${selecionadas.size} questão(ões) selecionada(s)`;
+        } else {
+            bulkActions.style.display = 'none';
+        }
+    }
+
+    function excluirSelecionadas() {
+        if (selecionadas.size === 0) {
+            mostrarToast('Nenhuma questão selecionada', 'error');
+            return;
+        }
+
+        if (confirm(`Tem certeza que deseja excluir ${selecionadas.size} questão(ões)?`)) {
+            const primeiroId = Array.from(selecionadas)[0];
+            excluirQuestao(primeiroId, true);
+        }
+    }
+
+    function limparSelecao() {
+        selecionadas.clear();
+        document.querySelectorAll('.questao-checkbox').forEach(cb => {
+            cb.checked = false;
+        });
+        document.getElementById('selectAll').checked = false;
+        document.getElementById('selectAll').indeterminate = false;
+        atualizarBarraSelecao();
+    }
+
+    // ============ TABELA ============
+    function getQuestoesFiltradas() {
+        const materia = document.getElementById('materiaFilter').value;
+        const assunto = document.getElementById('assuntoFilter').value;
+        const dificuldade = document.getElementById('dificuldadeFilter').value;
+        const tipo = document.getElementById('tipoFilter').value;
+
+        return questoes.filter(q => {
+            const materiaMatch = materia === 'todas' || q.materia === materia;
+            const assuntoMatch = assunto === 'todos' || q.assunto === assunto;
+            const dificuldadeMatch = dificuldade === 'todas' || q.dificuldade === dificuldade;
+            const tipoMatch = tipo === 'todos' || q.tipo_questao === tipo;
+
+            return materiaMatch && assuntoMatch && dificuldadeMatch && tipoMatch;
+        });
+    }
+
+    function atualizarTabela() {
+        const tbody = document.getElementById('tabelaQuestoes');
+        const noResults = document.getElementById('noResults');
+
+        if (questoes.length === 0) {
+            tbody.innerHTML = '';
+            noResults.classList.remove('hidden');
+            return;
+        }
+
+        const questoesFiltradas = getQuestoesFiltradas();
+
+        if (questoesFiltradas.length === 0) {
+            tbody.innerHTML = '';
+            noResults.classList.remove('hidden');
+            atualizarContador(0);
+            return;
+        }
+
+        noResults.classList.add('hidden');
+
+        tbody.innerHTML = questoesFiltradas.map(q => {
+            let tipoIcone = '📝';
+            let tipoTexto = 'Múltipla';
+            
+            if (q.tipo_questao === 'voz') {
+                tipoIcone = '🎤';
+                tipoTexto = 'Voz';
+            } else if (q.tipo_questao === 'voz_multipla') {
+                tipoIcone = '🎤➕';
+                tipoTexto = 'Voz + Múltipla';
+            }
+            
+            let midiaIcones = [];
+            if (q.imagem_url || q.imagem_path) midiaIcones.push('📸');
+            if (q.audio_url || q.audio_path) midiaIcones.push('🔊');
+            if (q.resposta_voz) midiaIcones.push('🎤');
+
+            // 🔥 SOLUÇÃO RADICAL: Usar data attributes para cada campo
+            return `
+                <tr>
+                    <td class="px-6 py-4 checkbox-cell">
+                        <input type="checkbox" class="questao-checkbox" 
+                            onchange="toggleSelecao(${q.id}, this)"
+                            ${selecionadas.has(q.id) ? 'checked' : ''}>
+                    </td>
+                    <td class="px-6 py-4 font-mono text-xs">${q.id}</td>
+                    <td class="px-6 py-4">
+                        <span class="bg-purple-50 text-purple-700 text-xs font-medium px-2.5 py-1 rounded-full">${escapeHtml(q.materia) || 'Não definido'}</span>
+                    </td>
+                    <td class="px-6 py-4">${escapeHtml(q.assunto) || 'Não definido'}</td>
+                    <td class="px-6 py-4 max-w-xs truncate" title="${escapeHtml(q.pergunta)}">${escapeHtml(q.pergunta.substring(0, 60))}${q.pergunta.length > 60 ? '...' : ''}</td>
+                    <td class="px-6 py-4">
+                        <span class="text-xl" title="${tipoTexto}">${tipoIcone}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="text-xl">${midiaIcones.join(' ')}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold ${getDificuldadeClass(q.dificuldade)}">
+                            ${q.dificuldade || 'Médio'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex justify-center gap-2">
+                            <button 
+                                data-id="${q.id}"
+                                data-materia="${escapeHtml(q.materia || '')}"
+                                data-assunto="${escapeHtml(q.assunto || '')}"
+                                data-pergunta="${escapeHtml(q.pergunta || '')}"
+                                data-tipo_questao="${escapeHtml(q.tipo_questao || '')}"
+                                data-a="${escapeHtml(q.a || '')}"
+                                data-b="${escapeHtml(q.b || '')}"
+                                data-c="${escapeHtml(q.c || '')}"
+                                data-d="${escapeHtml(q.d || '')}"
+                                data-correta="${escapeHtml(q.correta || 'a')}"
+                                data-imagem_url="${escapeHtml(q.imagem_url || '')}"
+                                data-imagem_path="${escapeHtml(q.imagem_path || '')}"
+                                data-audio_url="${escapeHtml(q.audio_url || '')}"
+                                data-audio_path="${escapeHtml(q.audio_path || '')}"
+                                data-resposta_voz="${escapeHtml(q.resposta_voz || '')}"
+                                data-dificuldade="${escapeHtml(q.dificuldade || 'Médio')}"
+                                data-explicacao="${escapeHtml(q.explicacao || q.dica || '')}"
+                                onclick="abrirModalEditarPorData(this)"
+                                class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded-lg text-sm font-medium transition">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="excluirQuestao(${q.id})" 
+                                    class="bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1.5 rounded-lg text-sm font-medium transition">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        atualizarContador(questoesFiltradas.length);
+        atualizarBarraSelecao();
+    }
+
+    function getDificuldadeClass(dificuldade) {
+        switch(dificuldade) {
+            case 'Fácil': return 'bg-green-100 text-green-800';
+            case 'Difícil': return 'bg-red-100 text-red-800';
+            default: return 'bg-yellow-100 text-yellow-800';
+        }
+    }
+
+    function atualizarContador(total = null) {
+        document.getElementById('totalQuestoes').textContent = total !== null ? total : questoes.length;
+    }
+
+    // ============ IMPORT/EXPORT ============
+    async function exportarExcel() {
+        try {
+            const response = await fetch('/api/exportar-excel');
+            if (!response.ok) throw new Error('Erro ao exportar');
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'questoes_panda_estudos.xlsx';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            mostrarToast('Exportação realizada com sucesso!', 'success');
+        } catch (error) {
+            console.error('Erro:', error);
+            mostrarToast('Erro ao exportar questões', 'error');
+        }
+    }
+
+    async function importarPlanilha(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (!file.name.match(/\.(xlsx|xls)$/i)) {
+            mostrarToast('Selecione um arquivo Excel (.xlsx ou .xls)', 'error');
+            event.target.value = '';
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await fetch('/api/importar-questoes', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || 'Erro ao importar');
+            }
+
+            await carregarQuestoes();
+            mostrarToast(result.message || 'Importação realizada com sucesso!', 'success');
+        } catch (error) {
+            console.error('Erro ao importar:', error);
+            mostrarToast(error.message || 'Erro ao importar planilha', 'error');
+        }
+
+        event.target.value = '';
+    }
+
+    // ============ TOAST ============
+    function mostrarToast(mensagem, tipo = 'success') {
+        const toast = tipo === 'success' ? 
+            document.getElementById('toastSuccess') : 
+            document.getElementById('toastError');
+
+        toast.textContent = mensagem;
+        toast.style.display = 'block';
+
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+
+    // ============ FUNÇÃO AUXILIAR PARA ABRIR MODAL COM STRING CODIFICADA ============
+    function abrirModalEditarDecodificado(questaoString) {
+        try {
+            console.log('📥 Recebendo string codificada:', questaoString);
+            
+            // ETAPA 1: Decodificar a string (URL decode)
+            const questaoJSON = decodeURIComponent(questaoString);
+            console.log('📥 JSON decodificado (raw):', questaoJSON);
+            
+            // ETAPA 2: Tentar parsear diretamente
+            let questao;
+            try {
+                questao = JSON.parse(questaoJSON);
+            } catch (e) {
+                console.warn('⚠️ Falha no parse direto, tentando limpeza...', e);
+                
+                // ETAPA 3: Limpeza manual de caracteres problemáticos
+                const questaoLimpa = questaoJSON
+                    .replace(/\\'/g, "'")           // Restaurar aspas simples escapadas
+                    .replace(/\\"/g, '"')            // Restaurar aspas duplas escapadas
+                    .replace(/\\\\/g, '\\')          // Restaurar barras invertidas
+                    .replace(/&quot;/g, '"')         // Restaurar &quot; para "
+                    .replace(/&apos;/g, "'");        // Restaurar &apos; para '
+                
+                console.log('📥 JSON limpo:', questaoLimpa);
+                questao = JSON.parse(questaoLimpa);
+            }
+            
+            console.log('📥 Objeto parseado com sucesso:', questao);
+            
+            // ETAPA 4: Validar se o objeto tem os campos mínimos
+            if (!questao || typeof questao !== 'object') {
+                throw new Error('Objeto inválido após parse');
+            }
+            
+            // Chamar a função original
+            abrirModalEditar(questao);
+            
+        } catch (e) {
+            console.error('❌ Erro ao decodificar questão:', e);
+            console.error('❌ String problemática:', questaoString);
+            
+            // Mostrar mensagem amigável
+            mostrarToast('Erro ao abrir questão para edição. Verifique o console (F12).', 'error');
+            
+            // Opcional: tentar abrir mesmo assim com dados mínimos
+            if (confirm('Erro ao abrir questão. Deseja criar uma nova questão em vez disso?')) {
+                abrirModalNova();
+            }
+        }
+    }
+
+    // ============ FUNÇÃO PARA ABRIR MODAL COM DATA ATTRIBUTES ============
+    function abrirModalEditarPorData(botao) {
+        try {
+            console.log('📥 Abrindo edição por data attributes');
+            
+            // Construir objeto questao a partir dos data attributes
+            const questao = {
+                id: botao.dataset.id,
+                materia: botao.dataset.materia,
+                assunto: botao.dataset.assunto,
+                pergunta: botao.dataset.pergunta,
+                tipo_questao: botao.dataset.tipo_questao,
+                a: botao.dataset.a,
+                b: botao.dataset.b,
+                c: botao.dataset.c,
+                d: botao.dataset.d,
+                correta: botao.dataset.correta || 'a',
+                imagem_url: botao.dataset.imagem_url,
+                imagem_path: botao.dataset.imagem_path,
+                audio_url: botao.dataset.audio_url,
+                audio_path: botao.dataset.audio_path,
+                resposta_voz: botao.dataset.resposta_voz,
+                dificuldade: botao.dataset.dificuldade || 'Médio',
+                explicacao: botao.dataset.explicacao,
+                dica: botao.dataset.explicacao
+            };
+            
+            console.log('📥 Questão construída:', questao);
+            
+            // Chamar a função original
+            abrirModalEditar(questao);
+            
+        } catch (e) {
+            console.error('❌ Erro ao abrir edição por data:', e);
+            mostrarToast('Erro ao abrir questão para edição', 'error');
+        }
+    }
+
+    </script>
+</body>
+</html>

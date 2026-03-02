@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+    <title>Assuntos - Panda Estudos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(180deg, #CFE9FA 0%, #FFFFFF 50%, #FFF9D1 100%);
+            min-height: 100vh;
+        }
+        .roadmap-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: #fbcfe8;
+            transform: translateX(-50%);
+            z-index: 0;
+        }
+        .card-etapa {
+            position: relative;
+            z-index: 10;
+            transition: transform 0.2s;
+            min-height: 70px;
+        }
+        .locked {
+            opacity: 0.7;
+            filter: grayscale(0.6);
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="pb-10">
+
+<header class="bg-[#ed4b82] p-4 text-white rounded-b-[25px] shadow-lg mb-6">
+    <div class="max-w-xl mx-auto flex items-center gap-3">
+        <button onclick="voltarParaMaterias()" class="bg-white/20 p-2 rounded-full hover:bg-white/30 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+        <div class="flex items-center gap-2">
+            <div id="materiaIcon" class="text-2xl bg-white p-1.5 rounded-lg shadow-inner">📖</div>
+            <div>
+                <h1 id="materiaTitulo" class="text-xl font-black leading-tight">Matéria</h1>
+                <p class="text-xs opacity-90">Escolha uma etapa</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-md mx-auto px-4 relative">
+    <div class="roadmap-line"></div>
+
+    <div id="loading" class="text-center py-8">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div>
+        <p class="mt-2 text-gray-600 text-sm">Carregando assuntos...</p>
+    </div>
+
+    <div id="containerEtapas" class="space-y-4 hidden"></div>
+
+    <div class="mt-8 flex justify-center">
+        <div class="bg-white/80 backdrop-blur rounded-full shadow-md px-4 py-2 flex items-center gap-2 border border-pink-50">
+            <span class="text-lg">🐼</span>
+            <span class="font-bold text-gray-600 text-sm">Vamos lá!</span>
+        </div>
+    </div>
+</main>
+
+<script>
+    // FUNÇÃO PARA VOLTAR - AGORA FUNCIONA
+    function voltarParaMaterias() {
+        location.href = 'materias.html';
+    }
+
+    async function carregarAssuntos() {
+        const materia = localStorage.getItem('currentMateria');
+        const usuarioId = localStorage.getItem("usuario_id");
+        
+        if (!materia) {
+            alert("Selecione uma matéria primeiro!");
+            location.href = "materias.html";
+            return;
+        }
+
+        // Atualiza cabeçalho
+        document.getElementById("materiaTitulo").textContent = materia;
+        
+        // Escolhe ícone baseado na matéria
+        if (materia === "Inglês") {
+            document.getElementById("materiaIcon").textContent = "🗽";
+        } else if (materia === "Português") {
+            document.getElementById("materiaIcon").textContent = "📚";
+        } else if (materia === "Matemática") {
+            document.getElementById("materiaIcon").textContent = "🔢";
+        } else if (materia === "História") {
+            document.getElementById("materiaIcon").textContent = "🏛️";
+        } else if (materia === "Geografia") {
+            document.getElementById("materiaIcon").textContent = "🌍";
+        } else if (materia === "Ciências") {
+            document.getElementById("materiaIcon").textContent = "🔬";
+        } else {
+            document.getElementById("materiaIcon").textContent = "📖";
+        }
+
+        try {
+            // 🔥 CORREÇÃO: URL relativa (funciona em qualquer ambiente)
+            let url = `/api/assuntos?materia=${encodeURIComponent(materia)}`;
+        
+            if (usuarioId) {
+                url += `&usuario_id=${usuarioId}`;
+            }
+            
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`Erro ${response.status}: ${response.statusText}`);
+            }
+            
+            const assuntos = await response.json();
+            
+            // Esconde loading e mostra assuntos
+            document.getElementById("loading").classList.add("hidden");
+            const container = document.getElementById("containerEtapas");
+            container.classList.remove("hidden");
+            
+            mostrarAssuntos(assuntos);
+            
+        } catch (error) {
+            console.error("Erro ao carregar assuntos:", error);
+            
+            // Fallback sem autenticação
+            try {
+                const response = await fetch(`/api/assuntos?materia=${encodeURIComponent(materia)}`);
+                const assuntos = await response.json();
+                
+                document.getElementById("loading").classList.add("hidden");
+                const container = document.getElementById("containerEtapas");
+                container.classList.remove("hidden");
+                
+                mostrarAssuntos(assuntos);
+                
+            } catch (fallbackError) {
+                console.error("Erro no fallback:", fallbackError);
+                
+                document.getElementById("loading").innerHTML = `
+                    <p class="text-red-500">Erro ao carregar assuntos</p>
+                    <p class="text-sm text-gray-600 mt-2">${error.message}</p>
+                    <button onclick="carregarAssuntos()" class="mt-4 bg-pink-500 text-white px-4 py-2 rounded-lg">
+                        Tentar novamente
+                    </button>
+                `;
+            }
+        }
+    }
+
+    function mostrarAssuntos(assuntos) {
+        // Esconde o loading
+        document.getElementById("loading").classList.add("hidden");
+        
+        // Mostra o container
+        const container = document.getElementById("containerEtapas");
+        container.classList.remove("hidden");
+        
+        // Limpa o container
+        container.innerHTML = "";
+
+        // Verifica se é array de strings ou objetos
+        const isArrayOfObjects = assuntos.length > 0 && typeof assuntos[0] === 'object';
+        
+        // SEPARAR: assuntos desbloqueados e bloqueados
+        let desbloqueados = [];
+        let bloqueados = [];
+        
+        assuntos.forEach((assunto, index) => {
+            let nomeAssunto;
+            let isLocked;
+            
+            if (isArrayOfObjects) {
+                // Se for objeto: {nome: "Acentuação", bloqueado: true}
+                nomeAssunto = assunto.nome;
+                isLocked = assunto.bloqueado === true;
+            } else {
+                // Se for string: "Acentuação"
+                nomeAssunto = assunto;
+                isLocked = index > 2; // Primeiros 3 liberados (fallback)
+            }
+            
+            const assuntoObj = {
+                nome: nomeAssunto,
+                bloqueado: isLocked,
+                originalData: assunto
+            };
+            
+            if (isLocked) {
+                bloqueados.push(assuntoObj);
+            } else {
+                desbloqueados.push(assuntoObj);
+            }
+        });
+        
+        // JUNTAR: primeiro desbloqueados, depois bloqueados
+        const assuntosOrdenados = [...desbloqueados, ...bloqueados];
+        
+        // Cria um card para cada assunto
+        assuntosOrdenados.forEach((assunto) => {
+            const card = document.createElement("div");
+            card.className = `card-etapa bg-white rounded-2xl p-3 shadow-md border-2 border-white flex items-center justify-between ${assunto.bloqueado ? 'locked' : 'active:scale-95 cursor-pointer hover:shadow-lg'}`;
+
+            card.onclick = () => {
+                if (!assunto.bloqueado) {
+                    localStorage.setItem("currentAssunto", assunto.nome);
+                    
+                    // PEGAR A MATÉRIA ATUAL
+                    const materia = localStorage.getItem("currentMateria");
+                    
+                    // SE FOR INGLÊS, VAI PARA A PÁGINA ESPECIAL
+                    if (materia === "Inglês") {
+                        console.log("Redirecionando para Inglês especial:", assunto.nome);
+                        window.location.href = "ingles.html";
+                    } else {
+                        console.log("Redirecionando para questões normais:", assunto.nome);
+                        window.location.href = "questoes.html";
+                    }
+                }
+            };
+
+            card.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="${assunto.bloqueado ? 'bg-gray-100 text-gray-400' : 'bg-pink-100 text-pink-500'} p-2 rounded-xl">
+                        ${assunto.bloqueado ? '🔒' : '▶'}
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-sm leading-tight">${assunto.nome}</h3>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase">
+                            ${assunto.bloqueado ? 'Bloqueado' : 'Clique para iniciar'}
+                        </p>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(card);
+        });
+
+        // Se não tiver assuntos
+        if (assuntosOrdenados.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-8">
+                    <p class="text-gray-500">Nenhum assunto disponível para esta matéria.</p>
+                </div>
+            `;
+        }
+    }
+
+    // Inicia quando a página carrega
+    document.addEventListener("DOMContentLoaded", carregarAssuntos);
+</script>
+
+</body>
+</html>

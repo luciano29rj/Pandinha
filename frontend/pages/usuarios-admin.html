@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Usuários - Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Nunito',sans-serif; }
+        body { background:linear-gradient(135deg,#667eea,#764ba2); min-height:100vh; padding:20px; color:#333; }
+        .container { max-width:1400px; margin:0 auto; background:rgba(255,255,255,0.97); border-radius:24px; padding:25px; box-shadow:0 20px 60px rgba(0,0,0,0.25); }
+        
+        header {
+            background:#ed4b82;
+            color:white;
+            padding:15px 20px;
+            border-radius:16px 16px 0 0;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:15px;
+            margin:-25px -25px 25px -25px;
+            position:relative;
+        }
+        .back-btn {
+            position:absolute;
+            left:20px;
+            background:rgba(255,255,255,0.2);
+            border:none;
+            width:42px;
+            height:42px;
+            border-radius:50%;
+            color:white;
+            font-size:1.4rem;
+            cursor:pointer;
+            transition:0.2s;
+        }
+        .back-btn:hover { background:rgba(255,255,255,0.35); }
+        header h1 { font-size:1.8rem; text-align:center; }
+
+        .card {
+            background:white;
+            border-radius:16px;
+            padding:20px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom:25px;
+        }
+        .card h2 {
+            color:#5e60ce;
+            font-size:1.5rem;
+            margin-bottom:15px;
+            padding-bottom:8px;
+            border-bottom:2px solid #5e60ce;
+        }
+
+        .top-actions {
+            display:flex;
+            justify-content:flex-end;
+            margin-bottom:15px;
+        }
+        .btn {
+            padding:8px 16px;
+            border:none;
+            border-radius:8px;
+            cursor:pointer;
+            font-weight:600;
+            font-size:0.95rem;
+            transition:0.2s;
+        }
+        .btn-success { background:#28a745; color:white; }
+        .btn-warning { background:#ffc107; color:#212529; }
+        .btn-danger { background:#dc3545; color:white; }
+
+        table {
+            width:100%;
+            border-collapse:collapse;
+        }
+        th, td {
+            padding:12px 15px;
+            text-align:left;
+            border-bottom:1px solid #eee;
+        }
+        th {
+            background:#f8f9fa;
+            font-weight:700;
+            color:#495057;
+        }
+        tr:hover { background:#f8f9fa; }
+        .user-avatar { font-size:1.8rem; text-align:center; }
+
+        .action-buttons button {
+            margin:0 4px;
+            padding:6px 12px;
+            font-size:0.9rem;
+            border-radius:6px;
+        }
+
+        .status-cell {
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .status-ativo {
+            color: #28a745;
+        }
+        .status-desativado {
+            color: #dc3545;
+        }
+        .status-cell:hover {
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+
+        .stats-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+            gap:15px;
+            margin-top:15px;
+        }
+        .stat-card {
+            background:#f8f9fa;
+            border-radius:12px;
+            padding:18px;
+            text-align:center;
+            border:1px solid #e9ecef;
+        }
+        .stat-card h3 {
+            color:#6c757d;
+            font-size:0.95rem;
+            margin-bottom:8px;
+        }
+        .stat-card .value {
+            font-size:2rem;
+            font-weight:800;
+            color:#5e60ce;
+        }
+
+        .modal {
+            display:none;
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.5);
+            align-items:center;
+            justify-content:center;
+            z-index:1000;
+        }
+        .modal-content {
+            background:white;
+            width:90%;
+            max-width:480px;
+            border-radius:16px;
+            padding:25px;
+            box-shadow:0 15px 40px rgba(0,0,0,0.3);
+        }
+        .modal-header {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:20px;
+        }
+        .modal-title { color:#5e60ce; font-size:1.4rem; font-weight:800; }
+        .modal-close {
+            background:none;
+            border:none;
+            font-size:2rem;
+            color:#999;
+            cursor:pointer;
+        }
+
+        .form-group {
+            margin-bottom:18px;
+        }
+        .form-group label {
+            display:block;
+            margin-bottom:6px;
+            color:#5e60ce;
+            font-weight:700;
+            font-size:0.95rem;
+        }
+        .form-control {
+            width:100%;
+            padding:10px 40px 10px 14px;
+            border:2px solid #dee2e6;
+            border-radius:8px;
+            font-size:1rem;
+        }
+        .input-senha { position:relative; }
+        .olho {
+            position:absolute;
+            right:12px;
+            top:50%;
+            transform:translateY(-50%);
+            cursor:pointer;
+            font-size:1.1rem;
+            color:#6c757d;
+            background:none;
+            border:none;
+            padding:0;
+        }
+
+        .avatars {
+            display:grid;
+            grid-template-columns:repeat(5,1fr);
+            gap:10px;
+            margin-top:8px;
+        }
+        .avatar {
+            font-size:2.2rem;
+            cursor:pointer;
+            padding:6px;
+            border-radius:10px;
+            text-align:center;
+            transition:0.2s;
+        }
+        .avatar:hover { background:#ffeef4; }
+        .avatar.selected { background:#ffe4ef; border:2px solid #ff69b4; }
+
+        .form-actions {
+            display:flex;
+            gap:12px;
+            margin-top:25px;
+        }
+
+        /* Mensagens */
+        .message {
+            padding:12px;
+            border-radius:8px;
+            margin-bottom:15px;
+            display:none;
+        }
+        .loading {
+            text-align:center;
+            padding:40px;
+            color:#6c757d;
+            font-size:1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <button class="back-btn" onclick="location.href='admin.html'">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+    <h1>Gestão de Usuários</h1>
+</header>
+
+<div class="container">
+    <div class="card">
+        <div class="top-actions">
+            <button class="btn btn-success" onclick="document.getElementById('modalCriar').style.display='flex'">
+                <i class="fas fa-plus"></i> Criar Perfil
+            </button>
+        </div>
+        <div id="message" class="message" style="display:none;"></div>
+        <div id="loading" class="loading">Carregando usuários...</div>
+        <table id="tabela" style="display:none;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Avatar</th>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>Último Login</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="usuariosTable"></tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Estatísticas</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total de Perfis</h3>
+                <div class="value" id="totalPerfis">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Questões (bank.db)</h3>
+                <div class="value" id="totalLaranja">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Questões (principal)</h3>
+                <div class="value" id="totalPrincipal">0</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Criar Perfil -->
+<div id="modalCriar" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">➕ Criar Perfil</h2>
+            <span class="modal-close" onclick="document.getElementById('modalCriar').style.display='none'">×</span>
+        </div>
+        <div class="form-group">
+            <label>Nome</label>
+            <input class="form-control" id="nomeCriar" required>
+        </div>
+        <div class="form-group">
+            <label>E-mail</label>
+            <input type="email" class="form-control" id="emailCriar" required>
+        </div>
+        <div class="form-group input-senha">
+            <label>Senha</label>
+            <input type="password" class="form-control" id="senhaCriar" required minlength="6">
+            <span class="olho" onclick="toggleSenha('senhaCriar')">👁️</span>
+        </div>
+        <div class="form-group input-senha">
+            <label>Confirmar Senha</label>
+            <input type="password" class="form-control" id="confirmaCriar" required>
+            <span class="olho" onclick="toggleSenha('confirmaCriar')">👁️</span>
+        </div>
+        <div class="form-group">
+            <label>Avatar</label>
+            <div id="avatarsCriar" class="avatars"></div>
+            <input type="hidden" id="avatarCriar" value="🐼">
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-warning" onclick="document.getElementById('modalCriar').style.display='none'">Cancelar</button>
+            <button class="btn btn-success" onclick="criarUsuario()">Criar Perfil</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Perfil -->
+<div id="modalEditar" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Editar Perfil</h2>
+            <span class="modal-close" onclick="document.getElementById('modalEditar').style.display='none'">×</span>
+        </div>
+        <input type="hidden" id="editId">
+        <div class="form-group">
+            <label>Nome</label>
+            <input class="form-control" id="editNome" required>
+        </div>
+        <div class="form-group">
+            <label>E-mail</label>
+            <input type="email" class="form-control" id="editEmail" required>
+        </div>
+        <div class="form-group input-senha">
+            <label>Nova Senha</label>
+            <input type="password" class="form-control" id="editNovaSenha" placeholder="Deixe em branco para não alterar">
+            <span class="olho" onclick="toggleSenha('editNovaSenha')">👁️</span>
+        </div>
+        <div class="form-group">
+            <label>Avatar</label>
+            <div id="avatarsEditar" class="avatars"></div>
+            <input type="hidden" id="editAvatar" value="🐼">
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-warning" onclick="document.getElementById('modalEditar').style.display='none'">Cancelar</button>
+            <button class="btn btn-success" onclick="salvarEdicao()">Salvar Alterações</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const avatares = ["🐶","🐼","🐨","🐷","🐺","🦄","🦋","🐵","🦊","🐰","🐲","🐱","🦁","🐻","🐮"];
+
+function toggleSenha(id) {
+    const input = document.getElementById(id);
+    input.type = input.type === "password" ? "text" : "password";
+}
+
+function renderAvatares(id, valorAtual, campo) {
+    const container = document.getElementById(id);
+    container.innerHTML = '';
+    avatares.forEach(emo => {
+        const div = document.createElement('div');
+        div.className = 'avatar' + (emo === valorAtual ? ' selected' : '');
+        div.textContent = emo;
+        div.onclick = () => {
+            container.querySelectorAll('.avatar').forEach(el => el.classList.remove('selected'));
+            div.classList.add('selected');
+            document.getElementById(campo).value = emo;
+        };
+        container.appendChild(div);
+    });
+}
+
+// Função para carregar estatísticas do admin
+async function carregarEstatisticas() {
+    try {
+        // Carregar total de perfis (já vem da função carregarUsuarios)
+        const resUsuarios = await fetch('/api/usuarios');
+        if (resUsuarios.ok) {
+            const resultado = await resUsuarios.json();
+            if (resultado.success) {
+                document.getElementById('totalPerfis').textContent = resultado.usuarios ? resultado.usuarios.length : 0;
+            }
+        }
+
+        // Carregar questões do banco principal
+        try {
+            const resPrincipal = await fetch('/api/estatisticas/questoes-principal');
+            if (resPrincipal.ok) {
+                const dadosPrincipal = await resPrincipal.json();
+                if (dadosPrincipal.success) {
+                    document.getElementById('totalPrincipal').textContent = dadosPrincipal.total || 0;
+                }
+            }
+        } catch (err) {
+            console.log('API de questões principal não disponível:', err);
+            document.getElementById('totalPrincipal').textContent = "0";
+        }
+
+        // Carregar questões do bank.db (banco secundário/laranja)
+        try {
+            const resLaranja = await fetch('/api/estatisticas/questoes-bank');
+            if (resLaranja.ok) {
+                const dadosLaranja = await resLaranja.json();
+                if (dadosLaranja.success) {
+                    document.getElementById('totalLaranja').textContent = dadosLaranja.total || 0;
+                }
+            }
+        } catch (err) {
+            console.log('API de questões bank.db não disponível:', err);
+            document.getElementById('totalLaranja').textContent = "0";
+        }
+
+    } catch (err) {
+        console.error('Erro ao carregar estatísticas:', err);
+        document.getElementById('totalPerfis').textContent = "0";
+        document.getElementById('totalPrincipal').textContent = "0";
+        document.getElementById('totalLaranja').textContent = "0";
+    }
+}
+
+// Função para carregar todos os usuários
+async function carregarUsuarios() {
+    try {
+        const res = await fetch('/api/usuarios');
+        const resultado = await res.json();
+        
+        if (!resultado.success) {
+            throw new Error(resultado.message || 'Erro ao carregar usuários');
+        }
+        
+        const usuarios = resultado.usuarios || [];
+        const tbody = document.getElementById('usuariosTable');
+        tbody.innerHTML = '';
+
+        if (usuarios.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#666;">Nenhum usuário cadastrado ainda.</td></tr>';
+        } else {
+            usuarios.forEach(u => {
+                // VERIFICAR SE TEM COLUNA 'ativo' NO OBJETO
+                const ativo = u.ativo !== undefined ? u.ativo : 1; // Padrão: ativo
+                const statusClass = ativo ? 'status-ativo' : 'status-desativado';
+                const statusText = ativo ? 'Ativo' : 'Desativado';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${u.id}</td>
+                    <td style="font-size:2rem;text-align:center;">${u.avatar || '🐼'}</td>
+                    <td>${u.nome}</td>
+                    <td>${u.email || '(não informado)'}</td>
+                    <td>${u.ultimo_login || 'Nunca'}</td>
+                    <td class="status-cell ${statusClass}" onclick="toggleStatus(${u.id})">
+                        ${statusText}
+                    </td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" onclick="abrirEditar(${u.id})">Editar</button>
+                        <button class="btn btn-danger btn-sm" onclick="excluirUsuario(${u.id})">Excluir</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('tabela').style.display = 'table';
+        
+        // Atualizar contador de perfis
+        document.getElementById('totalPerfis').textContent = usuarios.length;
+        
+    } catch (err) {
+        console.error('Erro ao carregar usuários:', err);
+        document.getElementById('message').textContent = 'Erro ao carregar dados: ' + err.message;
+        document.getElementById('message').style.background = '#f8d7da';
+        document.getElementById('message').style.color = '#721c24';
+        document.getElementById('message').style.display = 'block';
+    }
+}
+
+// Função para carregar tudo
+async function carregarTudo() {
+    await Promise.all([
+        carregarUsuarios(),
+        carregarEstatisticas()
+    ]);
+}
+
+// Função corrigida para abrir edição
+async function abrirEditar(id) {
+    try {
+        const res = await fetch(`/api/usuarios/${id}`);
+        const resultado = await res.json();
+        
+        if (!resultado.success) {
+            throw new Error(resultado.message || 'Usuário não encontrado');
+        }
+        
+        const u = resultado.user;
+        
+        // Preencher os campos do formulário
+        document.getElementById('editId').value = u.id;
+        document.getElementById('editNome').value = u.nome || '';
+        document.getElementById('editEmail').value = u.email || '';
+        document.getElementById('editNovaSenha').value = '';
+
+        const avatarAtual = u.avatar || '🐼';
+        document.getElementById('editAvatar').value = avatarAtual;
+        renderAvatares('avatarsEditar', avatarAtual, 'editAvatar');
+
+        document.getElementById('modalEditar').style.display = 'flex';
+    } catch (err) {
+        console.error('Erro ao carregar perfil:', err);
+        alert('Erro ao carregar perfil: ' + err.message);
+    }
+}
+
+// Função para salvar edição
+async function salvarEdicao() {
+    const id = document.getElementById('editId').value;
+    const nome = document.getElementById('editNome').value.trim();
+    const email = document.getElementById('editEmail').value.trim();
+    const avatar = document.getElementById('editAvatar').value.trim();
+    const novaSenha = document.getElementById('editNovaSenha').value.trim();
+
+    // Validar dados obrigatórios
+    if (!nome || !email) {
+        alert('Nome e e-mail são obrigatórios');
+        return;
+    }
+
+    const data = {
+        nome: nome,
+        email: email,
+        avatar: avatar
+    };
+    
+    // Adicionar nova senha apenas se fornecida
+    if (novaSenha) {
+        if (novaSenha.length < 6) {
+            alert('A nova senha deve ter pelo menos 6 caracteres');
+            return;
+        }
+        data.senha = novaSenha;
+    }
+
+    try {
+        const res = await fetch(`/api/usuarios/${id}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        
+        const resultado = await res.json();
+        
+        if (resultado.success) {
+            alert('Alterações salvas com sucesso!');
+            document.getElementById('modalEditar').style.display = 'none';
+            carregarTudo();
+        } else {
+            alert('Erro ao salvar alterações: ' + (resultado.message || 'Erro desconhecido'));
+        }
+    } catch (err) {
+        console.error('Erro ao salvar:', err);
+        alert('Erro de conexão com o servidor');
+    }
+}
+
+// Toggle status - REMOVIDO pois não há coluna 'ativo' no seu banco
+// Esta função foi removida do onclick das células de status
+
+// Criar Perfil
+async function criarUsuario() {
+    const nome = document.getElementById('nomeCriar').value.trim();
+    const email = document.getElementById('emailCriar').value.trim();
+    const senha = document.getElementById('senhaCriar').value;
+    const confirma = document.getElementById('confirmaCriar').value;
+    const avatar = document.getElementById('avatarCriar').value;
+
+    if (!nome || !email || !senha) return alert('Preencha todos os campos obrigatórios');
+    if (senha !== confirma) return alert('Senhas não coincidem');
+    if (senha.length < 6) return alert('Senha deve ter pelo menos 6 caracteres');
+
+    try {
+        const res = await fetch('/api/usuarios/criar', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({nome, email, senha, avatar})
+        });
+        
+        const resultado = await res.json();
+        
+        if (resultado.success) {
+            alert('Perfil criado com sucesso!');
+            document.getElementById('modalCriar').style.display = 'none';
+            
+            // Limpar formulário
+            document.getElementById('nomeCriar').value = '';
+            document.getElementById('emailCriar').value = '';
+            document.getElementById('senhaCriar').value = '';
+            document.getElementById('confirmaCriar').value = '';
+            
+            carregarTudo();
+        } else {
+            alert('Erro ao criar perfil: ' + (resultado.message || 'Erro desconhecido'));
+        }
+    } catch (err) {
+        console.error('Erro:', err);
+        alert('Erro de conexão com o servidor');
+    }
+}
+
+// Excluir Usuário
+async function excluirUsuario(id) {
+    if (!confirm('Excluir este perfil permanentemente? Esta ação não pode ser desfeita.')) return;
+    
+    try {
+        const res = await fetch(`/api/usuarios/${id}`, { 
+            method: 'DELETE' 
+        });
+        
+        const resultado = await res.json();
+        
+        if (resultado.success) {
+            alert('Perfil excluído com sucesso!');
+            carregarTudo();
+        } else {
+            alert('Erro ao excluir: ' + (resultado.message || 'Erro desconhecido'));
+        }
+    } catch (err) {
+        console.error('Erro:', err);
+        alert('Erro de conexão com o servidor');
+    }
+}
+
+// Função para alternar status ativo/desativado
+async function toggleStatus(usuarioId) {
+    if (!confirm('Tem certeza que deseja alterar o status deste usuário?')) {
+        return;
+    }
+    
+    try {
+        const res = await fetch(`/api/usuarios/${usuarioId}/toggle-ativo`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const resultado = await res.json();
+        
+        if (resultado.success) {
+            alert(resultado.message);
+            carregarUsuarios(); // Recarregar a tabela
+        } else {
+            alert('Erro ao alterar status: ' + resultado.message);
+        }
+    } catch (err) {
+        console.error('Erro ao alternar status:', err);
+        alert('Erro de conexão com o servidor');
+    }
+}
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', function() {
+    renderAvatares('avatarsCriar', '🐼', 'avatarCriar');
+    carregarTudo();
+});
+</script>
+</body>
+</html>

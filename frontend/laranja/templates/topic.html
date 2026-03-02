@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+    <title>Assuntos - Laranja Questões</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            transition: background-color 0.3s ease, color 0.2s ease;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* DARK MODE */
+        body.dark-mode {
+            background-color: #0a0c10 !important;
+            color: #e5e7eb;
+        }
+        
+        body.dark-mode .topic-header,
+        body.dark-mode .border-gray-200,
+        body.dark-mode .border-gray-100,
+        body.dark-mode .bg-gray-50,
+        body.dark-mode .assunto-item,
+        body.dark-mode .search-box-wrapper {
+            background-color: transparent !important;
+        }
+        
+        body.dark-mode .text-gray-900,
+        body.dark-mode .text-gray-800,
+        body.dark-mode .font-semibold,
+        body.dark-mode .assunto-nome,
+        body.dark-mode .subassunto-nome,
+        body.dark-mode .materia-title {
+            color: #f3f4f6 !important;
+        }
+        
+        body.dark-mode .text-gray-600,
+        body.dark-mode .text-gray-500,
+        body.dark-mode .text-gray-400,
+        body.dark-mode .assunto-stats,
+        body.dark-mode .subassunto-stats,
+        body.dark-mode .search-stats {
+            color: #b0b7c2;
+        }
+        
+        body.dark-mode .border-b,
+        body.dark-mode .border-t {
+            border-color: #2d2d35 !important;
+        }
+        
+        body.dark-mode .subassunto-item {
+            border-bottom-color: #2d2d35;
+        }
+        
+        body.dark-mode .expand-icon {
+            color: #94a3b8;
+        }
+        
+        body.dark-mode .search-box {
+            background-color: #25252b;
+            border-color: #3a3a45;
+            color: #e5e7eb;
+        }
+        
+        body.dark-mode .assunto-stats .stat-item {
+            background-color: #25252b;
+        }
+        
+        body.dark-mode .subassunto-stats {
+            background-color: #1e3a5f;
+            color: #93c5fd;
+        }
+        
+        body.dark-mode .float-btn {
+            background: #1a1a20;
+            border-color: #2d2d35;
+            color: #b0b7c2;
+        }
+        
+        body.dark-mode .float-btn:hover {
+            background: #25252b;
+            color: #60a5fa;
+            border-color: #60a5fa;
+        }
+        
+        body.dark-mode .back-button {
+            background-color: #2d2d35;
+            color: #60a5fa;
+        }
+        
+        body.dark-mode .theme-toggle {
+            background: #2d2d35;
+            color: #fbbf24;
+        }
+        
+        body.dark-mode .loading-skeleton {
+            background: linear-gradient(90deg, #25252b 25%, #2d2d35 50%, #25252b 75%);
+        }
+        
+        /* GRAY MODE - #4b4b4b */
+        body.gray-mode {
+            background-color: #4b4b4b !important;
+            color: #ffffff !important;
+        }
+        
+        body.gray-mode .topic-header,
+        body.gray-mode .border-gray-200,
+        body.gray-mode .border-gray-100,
+        body.gray-mode .bg-gray-50,
+        body.gray-mode .assunto-item,
+        body.gray-mode .search-box-wrapper {
+            background-color: transparent !important;
+        }
+        
+        body.gray-mode .text-gray-900,
+        body.gray-mode .text-gray-800,
+        body.gray-mode .font-semibold,
+        body.gray-mode .assunto-nome,
+        body.gray-mode .subassunto-nome,
+        body.gray-mode .materia-title {
+            color: #ffffff !important;
+        }
+        
+        body.gray-mode .text-gray-600,
+        body.gray-mode .text-gray-500,
+        body.gray-mode .text-gray-400,
+        body.gray-mode .search-stats {
+            color: #e5e7eb !important;
+        }
+        
+        body.gray-mode .border-b,
+        body.gray-mode .border-t {
+            border-color: #5a5a5a !important;
+        }
+        
+        body.gray-mode .subassunto-item {
+            border-bottom-color: #5a5a5a;
+        }
+        
+        body.gray-mode .expand-icon {
+            color: #cccccc;
+        }
+        
+        body.gray-mode .search-box {
+            background-color: #4a4a4a;
+            border-color: #6a6a6a;
+            color: #ffffff;
+        }
+        
+        body.gray-mode .search-box::placeholder {
+            color: #cccccc;
+        }
+        
+        body.gray-mode .search-icon {
+            color: #cccccc;
+        }
+        
+        body.gray-mode .assunto-stats .stat-item {
+            background-color: #4a4a4a;
+            color: #ffffff;
+        }
+        
+        body.gray-mode .stat-item i {
+            color: #93c5fd !important;
+        }
+        
+        body.gray-mode .subassunto-stats {
+            background-color: #2d4a6e;
+            color: #bfdbfe;
+        }
+        
+        body.gray-mode .subassunto-arrow {
+            color: #cccccc;
+        }
+        
+        body.gray-mode .float-btn {
+            background: #3a3a3a;
+            border-color: #5a5a5a;
+            color: #ffffff;
+        }
+        
+        body.gray-mode .float-btn:hover {
+            background: #4a4a4a;
+            color: #60a5fa;
+            border-color: #60a5fa;
+        }
+        
+        body.gray-mode .back-button {
+            background-color: #5a5a5a;
+            color: #93c5fd;
+        }
+        
+        body.gray-mode .theme-toggle {
+            background: #5a5a5a;
+            color: #ffd700;
+        }
+        
+        body.gray-mode .loading-skeleton {
+            background: linear-gradient(90deg, #4a4a4a 25%, #5a5a5a 50%, #4a4a4a 75%);
+        }
+        
+        body.gray-mode .empty-message i {
+            color: #cccccc;
+        }
+        
+        body.gray-mode .empty-message h3,
+        body.gray-mode .empty-message p {
+            color: #ffffff !important;
+        }
+        
+        /* Tema toggle */
+        .theme-toggle {
+            background: #e2e8f0;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+        
+        /* Header minimalista */
+        .topic-header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.95);
+            margin-bottom: 24px;
+        }
+        
+        .header-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .back-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #f1f5f9;
+            color: #2563eb;
+            transition: all 0.2s;
+        }
+        
+        .back-button:hover {
+            background-color: #e2e8f0;
+        }
+        
+        .materia-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .materia-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0a0c10;
+            line-height: 1.2;
+        }
+        
+        /* Container principal - sem cards */
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+            padding-bottom: 80px;
+        }
+        
+        /* Search - mais compacto */
+        .search-container {
+            margin-bottom: 20px;
+        }
+        
+        .search-box-wrapper {
+            position: relative;
+            width: 100%;
+            background: transparent !important;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 10px 16px 10px 42px;
+            border: 1px solid #e2e8f0;
+            border-radius: 30px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.2s;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        
+        .search-stats {
+            text-align: right;
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 6px;
+        }
+        
+        /* Lista de assuntos - espaçamento reduzido */
+        .assuntos-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .assunto-item {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 8px 0;
+        }
+        
+        .assunto-item:last-child {
+            border-bottom: none;
+        }
+        
+        .assunto-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+            padding: 2px 0;
+        }
+        
+        .assunto-titulo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+        
+        .expand-icon {
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 11px;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+        
+        .assunto-nome {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0f172a;
+            line-height: 1.4;
+        }
+        
+        /* ============ CORREÇÃO: Estilo do botão "Todas" ============ */
+        .assunto-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            min-width: 90px;
+        }
+        
+        .assunto-stats {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+            color: #475569;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #f1f5f9;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+        
+        .stat-item i {
+            color: #2563eb;
+            font-size: 11px;
+        }
+        
+        .stat-item span {
+            text-align: right;
+        }
+        
+        .btn-todas {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+            display: none;
+        }
+        
+        .btn-todas i {
+            font-size: 10px;
+        }
+        
+        .btn-todas:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(5, 150, 105, 0.25);
+        }
+        
+        .assunto-header.expanded .assunto-stats {
+            display: none;
+        }
+        
+        .assunto-header.expanded .btn-todas {
+            display: flex;
+        }
+        
+        /* Subassuntos - espaçamento reduzido */
+        .subassuntos-container {
+            margin-left: 30px;
+            margin-top: 2px;
+            display: none;
+        }
+        
+        .subassuntos-container.expanded {
+            display: block;
+        }
+        
+        .subassunto-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0 6px 8px;
+            border-bottom: 1px dashed #f1f5f9;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.15s;
+            border-radius: 6px;
+        }
+        
+        .subassunto-item:hover {
+            background-color: rgba(37, 99, 235, 0.08);
+            padding-left: 12px;
+        }
+        
+        body.dark-mode .subassunto-item:hover {
+            background-color: rgba(59, 130, 246, 0.15);
+        }
+        
+        body.gray-mode .subassunto-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .subassunto-item:last-child {
+            border-bottom: none;
+        }
+        
+        .subassunto-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+        
+        /* ============ CORREÇÃO: Bolinha antes do subassunto ============ */
+        .subassunto-bullet {
+            color: #10b981;
+            font-size: 12px;
+            margin-right: 2px;
+        }
+        
+        .subassunto-nome {
+            font-weight: 500;
+            color: #1e293b;
+            font-size: 14px;
+        }
+        
+        .subassunto-stats {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+            color: #2563eb;
+            font-size: 12px;
+            font-weight: 600;
+            background: #eef2ff;
+            padding: 3px 8px;
+            border-radius: 20px;
+            white-space: nowrap;
+            min-width: 60px;
+            text-align: right;
+            margin-left: auto;
+        }
+        
+        .subassunto-stats i {
+            font-size: 10px;
+        }
+        
+        .subassunto-stats span {
+            text-align: right;
+        }
+        
+        .subassunto-arrow {
+            color: #94a3b8;
+            font-size: 10px;
+            opacity: 0;
+            transition: all 0.15s;
+            margin-left: 8px;
+        }
+        
+        .subassunto-item:hover .subassunto-arrow {
+            opacity: 1;
+            color: #2563eb;
+            transform: translateX(3px);
+        }
+        
+        /* Botões flutuantes */
+        .floating-buttons {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+        
+        .float-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .float-btn:hover {
+            background: white;
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+            color: #2563eb;
+            border-color: #2563eb;
+        }
+        
+        /* Empty states */
+        .empty-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+        }
+        
+        .empty-message i {
+            color: #94a3b8;
+            margin-bottom: 12px;
+        }
+        
+        /* Loading skeleton */
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        @media (max-width: 640px) {
+            .assunto-header {
+                flex-wrap: wrap;
+            }
+            .assunto-stats {
+                min-width: 65px;
+            }
+            .subassuntos-container {
+                margin-left: 22px;
+            }
+            .floating-buttons {
+                bottom: 16px;
+                right: 16px;
+                gap: 8px;
+            }
+            .float-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+            .btn-todas {
+                padding: 4px 12px;
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+
+    <div class="topic-header">
+        <div class="header-container">
+            <div class="header-left">
+                <a href="/laranja/" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div class="materia-info">
+                    <h1 class="materia-title" id="materiaNome">Carregando...</h1>
+                </div>
+            </div>
+            
+            <div id="themeToggle" class="theme-toggle" onclick="toggleTheme()">
+                <i id="themeIcon" class="fas fa-moon"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        
+        <div class="search-container">
+            <div class="search-box-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" class="search-box" placeholder="Pesquisar assunto ou subassunto..." autocomplete="off">
+            </div>
+            <div class="search-stats" id="searchStats">
+                <span id="visibleCount">0</span> de <span id="totalCount">0</span> assuntos
+            </div>
+        </div>
+        
+        <div id="assuntosLista" class="assuntos-list">
+            <div class="assunto-item">
+                <div class="assunto-header">
+                    <div class="assunto-titulo">
+                        <div class="loading-skeleton" style="width: 22px; height: 22px;"></div>
+                        <div class="loading-skeleton" style="width: 180px; height: 18px;"></div>
+                    </div>
+                    <div class="loading-skeleton" style="width: 90px; height: 26px;"></div>
+                </div>
+            </div>
+            <div class="assunto-item">
+                <div class="assunto-header">
+                    <div class="assunto-titulo">
+                        <div class="loading-skeleton" style="width: 22px; height: 22px;"></div>
+                        <div class="loading-skeleton" style="width: 150px; height: 18px;"></div>
+                    </div>
+                    <div class="loading-skeleton" style="width: 90px; height: 26px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="emptyState" class="hidden empty-message">
+            <i class="fas fa-folder-open text-4xl"></i>
+            <h3 class="text-lg font-medium text-gray-700 mb-1">Nenhum assunto encontrado</h3>
+            <p class="text-sm text-gray-500">Não há assuntos cadastrados para esta matéria.</p>
+        </div>
+        
+        <div id="emptySearchState" class="hidden empty-message">
+            <i class="fas fa-search text-4xl"></i>
+            <h3 class="text-lg font-medium text-gray-700 mb-1">Nenhum resultado</h3>
+            <p class="text-sm text-gray-500">Tente buscar por outro termo</p>
+        </div>
+    </div>
+    
+    <div class="floating-buttons">
+        <button id="collapseAllBtn" class="float-btn" onclick="contrairTodosAssuntos()" title="Contrair todos">
+            <i class="fas fa-compress-alt"></i>
+        </button>
+        <button id="scrollTopBtn" class="float-btn" onclick="scrollToTop()" title="Voltar ao topo">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const materia = urlParams.get('materia');
+        
+        let assuntosData = [];
+        let termoBuscaAtual = '';
+
+        let themeIndex = 0;
+        const themes = ['light', 'dark', 'gray'];
+        
+        window.toggleTheme = function() {
+            const body = document.body;
+            const icon = document.getElementById('themeIcon');
+            
+            body.classList.remove('dark-mode', 'gray-mode');
+            
+            themeIndex = (themeIndex + 1) % themes.length;
+            const newTheme = themes[themeIndex];
+            
+            if (newTheme === 'dark') {
+                body.classList.add('dark-mode');
+                icon.classList.remove('fa-moon', 'fa-sun', 'fa-cloud');
+                icon.classList.add('fa-moon');
+                localStorage.setItem('laranja-theme', 'dark');
+            } else if (newTheme === 'gray') {
+                body.classList.add('gray-mode');
+                icon.classList.remove('fa-moon', 'fa-sun', 'fa-cloud');
+                icon.classList.add('fa-cloud');
+                localStorage.setItem('laranja-theme', 'gray');
+            } else {
+                icon.classList.remove('fa-moon', 'fa-sun', 'fa-cloud');
+                icon.classList.add('fa-sun');
+                localStorage.setItem('laranja-theme', 'light');
+            }
+        };
+
+        function loadTheme() {
+            const saved = localStorage.getItem('laranja-theme');
+            const body = document.body;
+            const icon = document.getElementById('themeIcon');
+            
+            if (saved === 'dark') {
+                body.classList.add('dark-mode');
+                themeIndex = 1;
+                if (icon) {
+                    icon.classList.remove('fa-moon', 'fa-sun', 'fa-cloud');
+                    icon.classList.add('fa-moon');
+                }
+            } else if (saved === 'gray') {
+                body.classList.add('gray-mode');
+                themeIndex = 2;
+                if (icon) {
+                    icon.classList.remove('fa-moon', 'fa-sun', 'fa-cloud');
+                    icon.classList.add('fa-cloud');
+                }
+            } else {
+                themeIndex = 0;
+                if (icon) {
+                    icon.classList.remove('fa-moon', 'fa-sun', 'fa-cloud');
+                    icon.classList.add('fa-sun');
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            
+            if (materia) {
+                document.getElementById('materiaNome').textContent = decodeURIComponent(materia);
+                carregarAssuntos();
+            } else {
+                window.location.href = '/laranja/';
+            }
+        });
+
+        async function carregarAssuntos() {
+            try {
+                const response = await fetch(`/laranja/api/assuntos?materia=${encodeURIComponent(decodeURIComponent(materia))}`);
+                
+                if (!response.ok) throw new Error(`Erro ${response.status}`);
+                
+                const data = await response.json();
+                
+                const questoesResponse = await fetch(`/laranja/api/questoes-admin`);
+                let todasQuestoes = [];
+                
+                if (questoesResponse.ok) {
+                    todasQuestoes = await questoesResponse.json();
+                }
+                
+                // ============ CORREÇÃO: Mapa de questões por assunto e subassunto com contexto completo ============
+                const questoesPorAssunto = new Map();
+                const questoesPorSubAssunto = new Map();
+                
+                todasQuestoes.forEach(q => {
+                    // Contar questões por assunto
+                    if (q.assunto) {
+                        const assunto = q.assunto;
+                        questoesPorAssunto.set(assunto, (questoesPorAssunto.get(assunto) || 0) + 1);
+                    }
+                    
+                    // Contar questões por subassunto (vinculado ao assunto pai)
+                    if (q.assunto && q.sub_assunto && q.sub_assunto.trim() !== '') {
+                        // Usar uma chave composta para garantir unicidade por assunto pai
+                        const key = `${q.assunto}|||${q.sub_assunto}`;
+                        questoesPorSubAssunto.set(key, (questoesPorSubAssunto.get(key) || 0) + 1);
+                    }
+                });
+                
+                // Processar assuntos com a quantidade REAL de questões
+                assuntosData = data.map(item => ({
+                    nome: item.nome,
+                    questoes: questoesPorAssunto.get(item.nome) || 0,
+                    sub: []
+                }));
+                
+                // ============ CORREÇÃO: Agrupar subassuntos com contexto do assunto pai ============
+                if (todasQuestoes.length > 0) {
+                    assuntosData = assuntosData.map(assunto => {
+                        const subassuntosDoAssunto = [];
+                        const subassuntosMap = new Map(); // Para evitar duplicatas dentro do mesmo assunto
+                        
+                        todasQuestoes.forEach(q => {
+                            if (q.assunto === assunto.nome && q.sub_assunto && q.sub_assunto.trim() !== '') {
+                                const subNome = q.sub_assunto;
+                                const key = `${assunto.nome}|||${subNome}`;
+                                const count = questoesPorSubAssunto.get(key) || 0;
+                                
+                                if (!subassuntosMap.has(subNome)) {
+                                    subassuntosMap.set(subNome, true);
+                                    subassuntosDoAssunto.push({
+                                        nome: subNome,
+                                        questoes: count,
+                                        assuntoPai: assunto.nome // Guardar referência ao assunto pai
+                                    });
+                                }
+                            }
+                        });
+                        
+                        subassuntosDoAssunto.sort((a, b) => a.nome.localeCompare(b.nome));
+                        
+                        return {
+                            ...assunto,
+                            sub: subassuntosDoAssunto,
+                            totalSubAssuntos: subassuntosDoAssunto.length
+                        };
+                    });
+                    
+                    // Filtrar apenas assuntos que têm questões
+                    assuntosData = assuntosData.filter(assunto => assunto.questoes > 0 || assunto.sub.length > 0);
+                }
+                
+                document.getElementById('totalCount').textContent = assuntosData.length;
+                document.getElementById('visibleCount').textContent = assuntosData.length;
+                
+                exibirAssuntos(assuntosData);
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                document.getElementById('assuntosLista').innerHTML = `
+                    <div class="empty-message">
+                        <i class="fas fa-exclamation-triangle text-red-400 text-4xl mb-3"></i>
+                        <h3 class="text-lg font-medium text-gray-700 mb-1">Erro ao carregar</h3>
+                        <p class="text-sm text-gray-500 mb-4">${error.message}</p>
+                        <button onclick="carregarAssuntos()" class="px-5 py-2 bg-blue-600 text-white rounded-full text-sm font-medium hover:bg-blue-700 transition">
+                            <i class="fas fa-redo mr-1"></i>Tentar novamente
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function exibirAssuntos(assuntos) {
+            const lista = document.getElementById('assuntosLista');
+            const emptyState = document.getElementById('emptyState');
+            const emptySearch = document.getElementById('emptySearchState');
+            
+            if (!assuntos || assuntos.length === 0) {
+                lista.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            emptySearch.classList.add('hidden');
+            
+            lista.innerHTML = assuntos.map((assunto, index) => {
+                return `
+                    <div class="assunto-item" data-assunto="${assunto.nome}" data-index="${index}">
+                        <div class="assunto-header" onclick="toggleSubassuntos(event, ${index})">
+                            <div class="assunto-titulo">
+                                <span class="expand-icon" id="expandIcon-${index}">
+                                    <i class="fas fa-plus"></i>
+                                </span>
+                                <span class="assunto-nome">${assunto.nome}</span>
+                            </div>
+                            <div class="assunto-actions">
+                                <div class="assunto-stats" id="stats-${index}">
+                                    <div class="stat-item">
+                                        <i class="fas fa-question-circle"></i>
+                                        <span>${assunto.questoes}</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <i class="fas fa-tags"></i>
+                                        <span>${assunto.totalSubAssuntos || 0}</span>
+                                    </div>
+                                </div>
+                                <button class="btn-todas" onclick="selecionarAssuntoTodas('${assunto.nome.replace(/'/g, "\\'")}', event)">
+                                    <span>Todas</span>
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="subassuntos-${index}" class="subassuntos-container">
+                            ${assunto.sub && assunto.sub.length > 0 
+                                ? assunto.sub.map(sub => `
+                                    <div class="subassunto-item" onclick="selecionarSubassunto('${sub.nome.replace(/'/g, "\\'")}', '${assunto.nome.replace(/'/g, "\\'")}')">
+                                        <div class="subassunto-info">
+                                            <span class="subassunto-bullet">•</span>
+                                            <span class="subassunto-nome">${sub.nome}</span>
+                                        </div>
+                                        <div style="display: flex; align-items: center;">
+                                            <span class="subassunto-stats">
+                                                <i class="fas fa-question-circle"></i>
+                                                <span>${sub.questoes}</span>
+                                            </span>
+                                            <i class="fas fa-chevron-right subassunto-arrow"></i>
+                                        </div>
+                                    </div>
+                                `).join('')
+                                : '<div class="text-sm text-gray-500 py-2 italic">Nenhum subassunto</div>'
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            configurarBusca();
+        }
+
+        function configurarBusca() {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.removeEventListener('input', filtrarBusca);
+                searchInput.addEventListener('input', filtrarBusca);
+            }
+        }
+
+        function filtrarBusca(e) {
+            const termo = e.target.value.toLowerCase().trim();
+            termoBuscaAtual = termo;
+            const assuntos = document.querySelectorAll('.assunto-item');
+            let totalVisiveis = 0;
+            
+            assuntos.forEach(assunto => {
+                const assuntoNome = assunto.dataset.assunto?.toLowerCase() || '';
+                const subassuntos = assunto.querySelectorAll('.subassunto-item');
+                const subassuntosContainer = assunto.querySelector('.subassuntos-container');
+                const expandIcon = assunto.querySelector('.expand-icon i');
+                const header = assunto.querySelector('.assunto-header');
+                
+                let assuntoVisivel = false;
+                let subassuntoVisivel = false;
+                
+                if (termo === '' || assuntoNome.includes(termo)) {
+                    assuntoVisivel = true;
+                }
+                
+                subassuntos.forEach(sub => {
+                    const subNome = sub.querySelector('.subassunto-nome')?.textContent.toLowerCase() || '';
+                    const subVisivel = termo === '' || subNome.includes(termo);
+                    
+                    if (subVisivel) {
+                        sub.style.display = 'flex';
+                        assuntoVisivel = true;
+                        subassuntoVisivel = true;
+                    } else {
+                        sub.style.display = 'none';
+                    }
+                });
+                
+                if (subassuntoVisivel || (termo !== '' && assuntoVisivel)) {
+                    subassuntosContainer?.classList.add('expanded');
+                    header?.classList.add('expanded');
+                    if (expandIcon) {
+                        expandIcon.classList.remove('fa-plus');
+                        expandIcon.classList.add('fa-minus');
+                    }
+                } else {
+                    subassuntosContainer?.classList.remove('expanded');
+                    header?.classList.remove('expanded');
+                    if (expandIcon) {
+                        expandIcon.classList.remove('fa-minus');
+                        expandIcon.classList.add('fa-plus');
+                    }
+                }
+                
+                if (assuntoVisivel) {
+                    assunto.style.display = 'block';
+                    totalVisiveis++;
+                } else {
+                    assunto.style.display = 'none';
+                }
+            });
+            
+            document.getElementById('visibleCount').textContent = totalVisiveis;
+            
+            const emptySearch = document.getElementById('emptySearchState');
+            if (totalVisiveis === 0 && termo !== '') {
+                emptySearch.classList.remove('hidden');
+            } else {
+                emptySearch.classList.add('hidden');
+            }
+        }
+
+        window.toggleSubassuntos = function(event, index) {
+            // Se clicou no botão "Todas", não expandir/contrair
+            if (event.target.closest('.btn-todas')) {
+                event.stopPropagation();
+                return;
+            }
+            
+            event.stopPropagation();
+            const container = document.getElementById(`subassuntos-${index}`);
+            const icon = document.querySelector(`#expandIcon-${index} i`);
+            const header = document.querySelector(`.assunto-item[data-index="${index}"] .assunto-header`);
+            
+            if (container.classList.contains('expanded')) {
+                container.classList.remove('expanded');
+                header.classList.remove('expanded');
+                icon.classList.remove('fa-minus');
+                icon.classList.add('fa-plus');
+            } else {
+                container.classList.add('expanded');
+                header.classList.add('expanded');
+                icon.classList.remove('fa-plus');
+                icon.classList.add('fa-minus');
+            }
+        };
+        
+        window.contrairTodosAssuntos = function() {
+            const containers = document.querySelectorAll('.subassuntos-container');
+            const headers = document.querySelectorAll('.assunto-header');
+            const icons = document.querySelectorAll('.expand-icon i');
+            
+            containers.forEach(container => {
+                container.classList.remove('expanded');
+            });
+            
+            headers.forEach(header => {
+                header.classList.remove('expanded');
+            });
+            
+            icons.forEach(icon => {
+                icon.classList.remove('fa-minus');
+                icon.classList.add('fa-plus');
+            });
+            
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput && searchInput.value.trim() !== '') {
+                searchInput.value = '';
+                const event = new Event('input', { bubbles: true });
+                searchInput.dispatchEvent(event);
+            }
+        };
+        
+        window.scrollToTop = function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        };
+
+        // ============ CORREÇÃO: Função para selecionar TODAS as questões do assunto ============
+        window.selecionarAssuntoTodas = function(nome, event) {
+            event.stopPropagation();
+            localStorage.setItem('laranja-assunto', nome);
+            localStorage.removeItem('laranja-assunto-pai'); // Remover referência a subassunto
+            window.location.href = `/laranja/quest?assunto_nome=${encodeURIComponent(nome)}&materia=${encodeURIComponent(decodeURIComponent(materia))}`;
+        };
+
+        window.selecionarAssunto = function(nome) {
+            // Esta função não será mais chamada diretamente pelo clique no header
+            // Agora o clique no header só expande/contrai
+        };
+
+        window.selecionarSubassunto = function(nome, assuntoPai) {
+            localStorage.setItem('laranja-assunto', nome);
+            localStorage.setItem('laranja-assunto-pai', assuntoPai);
+            localStorage.setItem('laranja-materia', decodeURIComponent(materia));
+            window.location.href = `/laranja/quest?assunto_nome=${encodeURIComponent(nome)}&materia=${encodeURIComponent(decodeURIComponent(materia))}&assunto_pai=${encodeURIComponent(assuntoPai)}`;
+        };
+
+        // Remover o event listener que fazia o assunto ser selecionado ao clicar no header
+        // Agora o header só expande/contrai via toggleSubassuntos
+    </script>
+</body>
+</html>

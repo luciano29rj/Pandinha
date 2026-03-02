@@ -1,0 +1,3302 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Banco de Questões</title>
+
+    <style>
+        :root {
+            --orkut-blue: #3b5998;
+            --orkut-light-blue: #8b9dc3;
+            --orkut-bg: #dfe3ee;
+            --orkut-white: #f7f7f7;
+            --orkut-dark: #1c1e21;
+            --orkut-green: #42b72a;
+            --orkut-red: #ff5a5f;
+            --orkut-yellow: #ffcc00;
+            --orkut-purple: #8a2be2;
+            --report-blue: #2196F3;
+            --report-green: #4CAF50;
+            --report-orange: #FF9800;
+            --report-red: #f44336;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--orkut-bg);
+            color: var(--orkut-dark);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(to right, var(--orkut-blue), var(--orkut-light-blue));
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-bottom: 3px solid var(--orkut-yellow);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.4rem;
+            cursor: pointer;
+            margin-right: 15px;
+            transition: all 0.2s ease;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+            min-width: 140px;
+            height: 44px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn i {
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--orkut-blue);
+            border: 1px solid white;
+        }
+        
+        .btn-primary:hover {
+            background: #f0f2f5;
+            border-color: #e1e8ed;
+        }
+
+        .btn-success {
+            background: var(--orkut-green);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #3aa119;
+        }
+
+        .btn-warning {
+            background: var(--orkut-yellow);
+            color: var(--orkut-dark);
+            border: 1px solid #e6b800;
+        }
+        
+        .btn-warning:hover {
+            background: #e6b800;
+        }
+
+        .btn-danger {
+            background: var(--orkut-red);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #ff4146;
+        }
+
+        .btn-purple {
+            background: var(--orkut-purple);
+            color: white;
+        }
+        
+        .btn-purple:hover {
+            background: #7722c4;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--orkut-blue);
+            text-align: center;
+        }
+
+        .stat-card.duplicates {
+            border-left-color: var(--orkut-red);
+        }
+
+        .stat-card h3 {
+            color: var(--orkut-blue);
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .stat-card.duplicates h3 {
+            color: var(--orkut-red);
+        }
+
+        .stat-card .number {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .selection-toolbar {
+            background: white;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .selection-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .selection-count {
+            background: var(--orkut-blue);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .selection-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-group select, .filter-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .filter-group input {
+            border: 1px solid #ddd;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: var(--orkut-dark);
+            font-weight: 600;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            max-height: 700px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--orkut-blue);
+            position: sticky;
+            top: 0;
+        }
+
+        th {
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        th, th:hover, thead th:hover, thead tr:hover th {
+            background: var(--orkut-blue) !important;
+            color: white !important;
+            transition: none !important;
+        }
+        
+        th *, th:hover * {
+            color: white !important;
+            background: transparent !important;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        tr.duplicate {
+            background-color: #fff5f5;
+            border-left: 4px solid var(--orkut-red);
+        }
+
+        tr.duplicate:hover {
+            background-color: #ffeaea;
+        }
+
+        .duplicate-badge {
+            background: var(--orkut-red);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .action-btn.edit {
+            background: var(--orkut-yellow);
+            color: var(--orkut-dark);
+        }
+
+        .action-btn.delete {
+            background: var(--orkut-red);
+            color: white;
+        }
+
+        .action-btn.view-duplicates {
+            background: var(--orkut-purple);
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: var(--orkut-red);
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--orkut-blue);
+        }
+
+        .modal-header h2 {
+            color: var(--orkut-blue);
+            margin: 0;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-modal:hover {
+            background: #f5f5f5;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--orkut-dark);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--orkut-blue);
+            box-shadow: 0 0 0 2px rgba(59, 89, 152, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .btn-cancel {
+            background: #e1e8ed;
+            color: #666;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            height: 44px;
+            min-width: 120px;
+        }
+
+        .btn-cancel:hover {
+            background: #d1d8dd;
+        }
+
+        .btn-save {
+            background: var(--orkut-green);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            height: 44px;
+            min-width: 120px;
+        }
+
+        .btn-save:hover {
+            background: #3aa119;
+        }
+
+        .required::after {
+            content: " *";
+            color: var(--orkut-red);
+        }
+        
+        .report-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            max-width: 400px;
+            width: 100%;
+            z-index: 2000;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .report-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            border-left: 6px solid var(--report-blue);
+        }
+        
+        .report-header {
+            background: linear-gradient(135deg, var(--report-blue), #1976D2);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .report-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .report-header i {
+            font-size: 20px;
+        }
+        
+        .report-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .report-close:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+        
+        .report-body {
+            padding: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .report-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .report-summary-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .report-summary-item.total {
+            border-bottom-color: var(--report-blue);
+        }
+        
+        .report-summary-item.success {
+            border-bottom-color: var(--report-green);
+        }
+        
+        .report-summary-item.warning {
+            border-bottom-color: var(--report-orange);
+        }
+        
+        .report-summary-item.error {
+            border-bottom-color: var(--report-red);
+        }
+        
+        .report-summary-value {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        .report-summary-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .report-section {
+            margin-bottom: 20px;
+        }
+        
+        .report-section-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .report-section-title i {
+            color: var(--report-orange);
+        }
+        
+        .report-questions-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .report-question-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+        
+        .report-question-item:last-child {
+            border-bottom: none;
+        }
+        
+        .report-question-id {
+            background: var(--orkut-blue);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .report-question-preview {
+            flex: 1;
+            margin-left: 10px;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .report-question-error {
+            color: var(--report-red);
+            font-size: 11px;
+        }
+        
+        .report-footer {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+            text-align: right;
+        }
+        
+        .report-footer button {
+            background: var(--orkut-blue);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .report-footer button:hover {
+            background: #2d4a8a;
+            transform: translateY(-2px);
+        }
+        
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1001;
+            max-width: 400px;
+        }
+        
+        .toast-success { 
+            background-color: var(--orkut-green); 
+        }
+        
+        .toast-error { 
+            background-color: var(--orkut-red); 
+        }
+
+        .toast-warning {
+            background-color: var(--orkut-yellow);
+            color: var(--orkut-dark);
+        }
+
+        .select-all-checkbox {
+            margin-right: 10px;
+        }
+
+        .question-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .opcao-extra {
+            display: none;
+        }
+
+        .opcao-extra.visible {
+            display: block;
+        }
+
+        .duplicates-modal .modal-content {
+            max-width: 800px;
+        }
+
+        .duplicate-group {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--orkut-purple);
+        }
+
+        .duplicate-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .duplicate-group-title {
+            font-weight: 600;
+            color: var(--orkut-purple);
+        }
+
+        .duplicate-group-count {
+            background: var(--orkut-purple);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .duplicate-item {
+            background: white;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .duplicate-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .duplicate-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .duplicate-id {
+            font-weight: 600;
+            color: var(--orkut-blue);
+        }
+
+        .duplicate-preview {
+            color: #666;
+            font-size: 13px;
+            max-width: 500px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .duplicates-actions {
+            margin-top: 20px;
+            text-align: right;
+        }
+        
+        @media (max-width: 768px) {
+            .header-buttons {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            .btn {
+                min-width: 120px;
+                height: 40px;
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .report-container {
+                max-width: 350px;
+                top: 10px;
+                right: 10px;
+            }
+        }
+
+        .image-upload-area {
+            background: #f8f9fa;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .image-upload-area:hover {
+            border-color: var(--orkut-blue);
+            background: #eef2ff;
+        }
+
+        .image-upload-area i {
+            font-size: 32px;
+            color: var(--orkut-blue);
+            margin-bottom: 10px;
+        }
+
+        .image-preview-container {
+            position: relative;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .image-preview {
+            max-width: 200px;
+            max-height: 150px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+
+        .image-remove-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--orkut-red);
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-remove-btn:hover {
+            background: #d32f2f;
+        }
+
+        .image-url-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+
+        .image-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .image-tab {
+            padding: 8px 16px;
+            background: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .image-tab.active {
+            background: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+            font-weight: 600;
+            color: var(--orkut-blue);
+        }
+
+        .image-tab-content {
+            display: none;
+            padding: 15px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 0 5px 5px 5px;
+        }
+
+        .image-tab-content.active {
+            display: block;
+        }
+
+        .table-image-preview {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .image-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 14px;
+        }
+
+        .image-indicator i {
+            font-size: 14px;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <!-- Modal para Nova/Editar Questão -->
+    <div id="modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitulo">Nova Questão</h2>
+                <button onclick="fecharModal()" class="close-modal">×</button>
+            </div>
+            
+            <form id="formQuestao">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tipo" class="required">Tipo:</label>
+                        <select id="tipo" onchange="atualizarCamposPorTipo()" required>
+                            <option value="Múltipla Escolha" selected>Múltipla Escolha</option>
+                            <option value="Certo/Errado">Certo/Errado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dificuldade">Dificuldade:</label>
+                        <select id="dificuldade">
+                            <option value="Muito Fácil">Muito Fácil</option>
+                            <option value="Fácil">Fácil</option>
+                            <option value="Média" selected>Média</option>
+                            <option value="Difícil">Difícil</option>
+                            <option value="Muito Difícil">Muito Difícil</option>
+                            <option value="Expert">Expert</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="materia" class="required">Matéria:</label>
+                        <input type="text" id="materia" placeholder="Ex: Português" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="assunto">Assunto:</label>
+                        <input type="text" id="assunto" placeholder="Ex: Sílabas e Letras">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sub_assunto">Sub Assunto:</label>
+                        <input type="text" id="sub_assunto" placeholder="Ex: Separação de Sílabas">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="banca">Banca:</label>
+                        <input type="text" id="banca" placeholder="Ex: CESPE">
+                    </div>
+                    <div class="form-group">
+                        <label for="orgao">Órgão:</label>
+                        <input type="text" id="orgao" placeholder="Ex: Ministério da Educação">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ano">Ano:</label>
+                        <input type="number" id="ano" placeholder="Ex: 2024" min="1900" max="2100">
+                    </div>
+                    <div class="form-group">
+                        <label for="nivel">Nível:</label>
+                        <select id="nivel">
+                            <option value="Fundamental">Fundamental</option>
+                            <option value="Médio" selected>Médio</option>
+                            <option value="Superior">Superior</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pergunta" class="required">Pergunta:</label>
+                    <textarea id="pergunta" placeholder="Digite a pergunta" rows="3" required></textarea>
+                </div>
+
+                <!-- ============ SEÇÃO DE IMAGEM DA PERGUNTA - VERSÃO MELHORADA ============ -->
+                <div class="form-group" style="border-top: 2px solid #eee; padding-top: 15px; margin-top: 15px;">
+                    <label style="font-size: 16px; color: var(--orkut-blue);">
+                        <i class="fas fa-image"></i> Imagem da Pergunta (opcional)
+                    </label>
+                    
+                    <div class="image-tabs">
+                        <div class="image-tab active" onclick="ativarAbaImagem('upload', 'pergunta')">📤 Upload</div>
+                        <div class="image-tab" onclick="ativarAbaImagem('url', 'pergunta')">🔗 URL</div>
+                    </div>
+                    
+                    <!-- Aba Upload com Drag & Drop + Input de texto + Botão Procurar -->
+                    <div id="abaUploadPergunta" class="image-tab-content active">
+                        <!-- Área de Drag & Drop -->
+                        <div id="dropAreaPergunta" class="image-upload-area" 
+                            ondragover="event.preventDefault(); this.style.background='#eef2ff'; this.style.borderColor='var(--orkut-blue)'"
+                            ondragleave="this.style.background='#f8f9fa'; this.style.borderColor='#ccc'"
+                            ondrop="handleImageDrop(event, 'pergunta')">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Arraste uma imagem aqui</p>
+                            <p style="font-size: 11px; color: #666; margin-top: 5px;">ou use as opções abaixo</p>
+                        </div>
+                        
+                        <!-- Input para nome do arquivo + Botões -->
+                        <div style="display: flex; gap: 10px; align-items: center; margin-top: 15px;">
+                            <input type="text" id="imagem_pergunta_nome" class="image-url-input" 
+                                placeholder="Ex: animais/cachorro.jpg (nome do arquivo na pasta img)" 
+                                style="flex: 1;" 
+                                onchange="previewImagemNome(this.value, 'previewPergunta')">
+                            <button type="button" class="btn btn-primary" onclick="procurarImagemNaPasta()" style="padding: 10px 15px; min-width: auto;">
+                                <i class="fas fa-search"></i> Procurar
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="atualizarImagemPorNome()" style="padding: 10px 15px; min-width: auto;" title="Atualizar imagem">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                        
+                        <p style="font-size: 12px; color: #666; margin-top: 5px;">
+                            <i class="fas fa-info-circle"></i> Digite o nome do arquivo e clique em <strong>Atualizar</strong> para carregar da pasta img, ou clique em <strong>Procurar</strong> para selecionar um arquivo do computador.
+                        </p>
+                        
+                        <!-- Preview da imagem -->
+                        <div id="previewContainerPergunta" class="image-preview-container" style="display: none; margin-top: 15px;">
+                            <img id="previewPergunta" class="image-preview" src="#" alt="Preview">
+                            <button type="button" class="image-remove-btn" onclick="removerImagem('pergunta')">✕</button>
+                        </div>
+                        
+                        <!-- Campo hidden para armazenar o caminho da imagem -->
+                        <input type="hidden" id="imagem_pergunta">
+                    </div>
+                    
+                    <!-- Aba URL -->
+                    <div id="abaUrlPergunta" class="image-tab-content">
+                        <input type="text" id="imagem_pergunta_url" class="image-url-input" 
+                            placeholder="https://exemplo.com/imagem.jpg" 
+                            onchange="previewImagemUrl(this.value, 'previewPerguntaUrl')">
+                        <div id="previewContainerPerguntaUrl" class="image-preview-container" style="display: none; margin-top: 10px;">
+                            <img id="previewPerguntaUrl" class="image-preview" src="#" alt="Preview">
+                            <button type="button" class="image-remove-btn" onclick="removerImagemUrl('pergunta')">✕</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opções para Múltipla Escolha -->
+                <div id="opcoesMultipla" class="opcao-extra visible">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="a" class="required">Opção A:</label>
+                            <input type="text" id="a" placeholder="Resposta A" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="b" class="required">Opção B:</label>
+                            <input type="text" id="b" placeholder="Resposta B" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="c" class="required">Opção C:</label>
+                            <input type="text" id="c" placeholder="Resposta C" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="d" class="required">Opção D:</label>
+                            <input type="text" id="d" placeholder="Resposta D" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="e">Opção E:</label>
+                            <input type="text" id="e" placeholder="Resposta E (opcional)">
+                        </div>
+                        <div class="form-group">
+                            <label for="correta" class="required">Resposta Correta:</label>
+                            <select id="correta" required>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="D">D</option>
+                                <option value="E">E</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opções para Certo/Errado -->
+                <div id="opcoesCertoErrado" class="opcao-extra">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ce_a" class="required">Opção A (Certo):</label>
+                            <input type="text" id="ce_a" placeholder="Certo" value="Certo">
+                        </div>
+                        <div class="form-group">
+                            <label for="ce_b" class="required">Opção B (Errado):</label>
+                            <input type="text" id="ce_b" placeholder="Errado" value="Errado">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ce_correta" class="required">Resposta Correta:</label>
+                        <select id="ce_correta" required>
+                            <option value="A">Certo</option>
+                            <option value="B">Errado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="explicacao">Dica/Explicação:</label>
+                    <textarea id="explicacao" placeholder="Explicação da resposta correta" rows="2"></textarea>
+                </div>
+
+                <!-- Cargo (oculto, mas mantido para compatibilidade) -->
+                <div class="form-row" style="display: none;">
+                    <div class="form-group">
+                        <label for="cargo">Cargo:</label>
+                        <input type="text" id="cargo" placeholder="Ex: Analista Administrativo">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+                    <button type="submit" class="btn-save" id="btnSalvar">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Visualizar Duplicatas -->
+    <div id="modalDuplicatas" class="modal-overlay duplicates-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalDuplicatasTitulo">Questões Duplicadas</h2>
+                <button onclick="fecharModalDuplicatas()" class="close-modal">×</button>
+            </div>
+            
+            <div id="duplicatasConteudo">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Carregando questões duplicadas...
+                </div>
+            </div>
+            
+            <div class="duplicates-actions">
+                <button class="btn btn-purple" onclick="exportarDuplicatas()">
+                    <i class="fas fa-file-excel"></i> Exportar Duplicatas
+                </button>
+                <button class="btn btn-cancel" onclick="fecharModalDuplicatas()">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notificações -->
+    <div id="toastSuccess" class="toast-notification toast-success"></div>
+    <div id="toastError" class="toast-notification toast-error"></div>
+    <div id="toastWarning" class="toast-notification toast-warning"></div>
+    
+    <!-- Relatório de Importação -->
+    <div id="importReport" class="report-container">
+        <div class="report-card">
+            <div class="report-header">
+                <h3>
+                    <i class="fas fa-file-import"></i>
+                    Relatório de Importação
+                </h3>
+                <button class="report-close" onclick="fecharRelatorio()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="report-body" id="reportBody">
+                <!-- Conteúdo será preenchido dinamicamente -->
+            </div>
+            <div class="report-footer">
+                <button onclick="fecharRelatorio()">Entendi</button>
+            </div>
+        </div>
+    </div>
+    
+    <header class="header">
+        <div class="header-container">
+            <div style="display: flex; align-items: center;">
+                <button class="back-btn" onclick="location.href='/admin.html'">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1>Painel Administrativo</h1>
+            </div>
+            <div class="header-buttons">
+                <button class="btn btn-primary" onclick="exportarExcel()">
+                    <i class="fas fa-file-excel"></i> Exportar Excel
+                </button>
+                <label class="btn btn-warning" style="cursor: pointer;">
+                    <i class="fas fa-file-import"></i> Importar Excel
+                    <input type="file" id="importFile" hidden accept=".xlsx,.xls,.csv">
+                </label>
+                <button class="btn btn-success" onclick="abrirModalNova()">
+                    <i class="fas fa-plus"></i> Nova Questão
+                </button>
+                <button class="btn btn-purple" onclick="verificarDuplicatas()">
+                    <i class="fas fa-clone"></i> Ver Duplicatas
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <h3>Total de Questões</h3>
+                <div class="number" id="totalQuestions">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Matérias</h3>
+                <div class="number" id="totalSubjects">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Assuntos</h3>
+                <div class="number" id="totalTopics">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Bancas</h3>
+                <div class="number" id="totalBancas">0</div>
+            </div>
+            <div class="stat-card duplicates">
+                <h3>Questões Duplicadas</h3>
+                <div class="number" id="totalDuplicatas">0</div>
+            </div>
+        </div>
+
+        <!-- Selection Toolbar -->
+        <div id="selectionToolbar" class="selection-toolbar">
+            <div class="selection-info">
+                <div class="selection-count" id="selectedCount">0 selecionadas</div>
+                <div id="selectionInfoText">Selecione questões para realizar ações em massa</div>
+            </div>
+            <div class="selection-actions">
+                <button class="btn btn-purple" onclick="selecionarDuplicadas()">
+                    <i class="fas fa-clone"></i> Selecionar Duplicatas
+                </button>
+                <button class="btn btn-danger" onclick="deletarSelecionadas()">
+                    <i class="fas fa-trash"></i> Excluir Selecionadas
+                </button>
+                <button class="btn btn-cancel" onclick="limparSelecao()">
+                    <i class="fas fa-times"></i> Limpar Seleção
+                </button>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-section">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label for="filterMateria">Matéria:</label>
+                    <select id="filterMateria" onchange="atualizarFiltrosDinamicos(); filtrarQuestoes()">
+                        <option value="">Todas as Matérias</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterAssunto">Assunto:</label>
+                    <select id="filterAssunto" onchange="atualizarSubAssuntosFiltro(); filtrarQuestoes()">
+                        <option value="">Todos os Assuntos</option>
+                    </select>
+                </div>
+                <!-- NOVO: Filtro Sub Assunto -->
+                <div class="filter-group">
+                    <label for="filterSubAssunto">Sub Assunto:</label>
+                    <select id="filterSubAssunto" onchange="filtrarQuestoes()">
+                        <option value="">Todos os Sub Assuntos</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterBanca">Banca:</label>
+                    <select id="filterBanca" onchange="filtrarQuestoes()">
+                        <option value="">Todas as Bancas</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterTipo">Tipo:</label>
+                    <select id="filterTipo" onchange="filtrarQuestoes()">
+                        <option value="">Todos os Tipos</option>
+                        <option value="Múltipla Escolha">Múltipla Escolha</option>
+                        <option value="Certo/Errado">Certo/Errado</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterNivel">Nível:</label>
+                    <select id="filterNivel" onchange="filtrarQuestoes()">
+                        <option value="">Todos os Níveis</option>
+                        <option value="Fundamental">Fundamental</option>
+                        <option value="Médio">Médio</option>
+                        <option value="Superior">Superior</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterDificuldade">Dificuldade:</label>
+                    <select id="filterDificuldade" onchange="filtrarQuestoes()">
+                        <option value="">Todas</option>
+                        <option value="Muito Fácil">Muito Fácil</option>
+                        <option value="Fácil">Fácil</option>
+                        <option value="Média">Média</option>
+                        <option value="Difícil">Difícil</option>
+                        <option value="Muito Difícil">Muito Difícil</option>
+                        <option value="Expert">Expert</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterAno">Ano:</label>
+                    <select id="filterAno" onchange="filtrarQuestoes()">
+                        <option value="">Todos os Anos</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterOrgao">Órgão:</label>
+                    <select id="filterOrgao" onchange="filtrarQuestoes()">
+                        <option value="">Todos os Órgãos</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="searchText">Buscar texto:</label>
+                    <input type="text" id="searchText" placeholder="Digite para buscar..." onkeyup="filtrarQuestoes()">
+                </div>
+                <div>
+                    <button class="btn" onclick="limparFiltros()" style="background: #e1e8ed; color: #666; width: 100%; height: 38px; margin-top: 22px;">
+                        <i class="fas fa-times"></i> Limpar Filtros
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Questions Table -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">
+                            <input type="checkbox" id="selectAll" class="select-all-checkbox" onchange="selecionarTodas()">
+                        </th>
+                        <th>ID</th>
+                        <th>Tipo</th>
+                        <th>Matéria</th>
+                        <th>Assunto</th>
+                        <th>Sub Assunto</th>
+                        <th>Banca</th>
+                        <th style="display: none;">Órgão</th> <!-- COLUNA ÓRGÃO OCULTADA -->
+                        <th style="display: none;">Cargo</th>
+                        <th>Ano</th>
+                        <th style="min-width: 250px;">Pergunta</th>
+                        <th>Resposta</th>
+                        <th>Imagem</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="questoesTable">
+                    <tr>
+                        <td colspan="14" class="loading">
+                            <i class="fas fa-spinner fa-spin"></i> Carregando questões...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // ============ CONFIGURAÇÃO ============
+        const API_BASE = '/laranja/api';
+        let todasQuestoes = [];
+        let questaoEditando = null;
+        let questoesSelecionadas = new Set();
+        let questaoDuplicatas = new Map();
+        let todasDuplicatas = [];
+
+        // ============ INICIALIZAÇÃO ============
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Inicializando sistema administrativo...');
+            carregarQuestoes();
+            configurarFormulario();
+            
+            document.getElementById('importFile').addEventListener('change', importarPlanilha);
+        });
+
+        function configurarFormulario() {
+            const form = document.getElementById('formQuestao');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                salvarQuestao();
+            });
+        }
+
+        // ============ FUNÇÕES DE UPLOAD DE IMAGEM ============
+
+        function ativarAbaImagem(aba, tipo) {
+            const tabUpload = document.querySelector(`.image-tab[onclick*="upload"][onclick*="${tipo}"]`);
+            const tabUrl = document.querySelector(`.image-tab[onclick*="url"][onclick*="${tipo}"]`);
+            const contentUpload = document.getElementById(`abaUpload${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`);
+            const contentUrl = document.getElementById(`abaUrl${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`);
+            
+            if (tabUpload) tabUpload.classList.remove('active');
+            if (tabUrl) tabUrl.classList.remove('active');
+            if (contentUpload) contentUpload.classList.remove('active');
+            if (contentUrl) contentUrl.classList.remove('active');
+            
+            if (aba === 'upload') {
+                if (tabUpload) tabUpload.classList.add('active');
+                if (contentUpload) contentUpload.classList.add('active');
+            } else if (aba === 'url') {
+                if (tabUrl) tabUrl.classList.add('active');
+                if (contentUrl) contentUrl.classList.add('active');
+            }
+        }
+
+        function handleImageDrop(event, tipo) {
+            event.preventDefault();
+            
+            const dropArea = document.getElementById(`dropArea${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`);
+            dropArea.style.background = '#f8f9fa';
+            dropArea.style.borderColor = '#ccc';
+            
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    // Fazer upload do arquivo arrastado
+                    uploadImagemArrastada(file, tipo);
+                } else {
+                    mostrarToast('Por favor, arraste apenas arquivos de imagem', 'error');
+                }
+            }
+        }
+
+        async function uploadImagemArrastada(file, tipo) {
+            const formData = new FormData();
+            formData.append('imagem', file);
+            
+            try {
+                mostrarToast('Enviando imagem...', 'success');
+                
+                const response = await fetch(`${API_BASE}/upload-imagem`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Salvar o caminho no campo hidden
+                    document.getElementById('imagem_pergunta').value = data.caminho;
+                    
+                    // Mostrar preview
+                    const preview = document.getElementById(`preview${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`);
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        document.getElementById(`previewContainer${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`).style.display = 'inline-block';
+                    };
+                    reader.readAsDataURL(file);
+                    
+                    // Limpar o campo de nome
+                    document.getElementById(`imagem_${tipo}_nome`).value = '';
+                    
+                    mostrarToast('Imagem enviada com sucesso!', 'success');
+                } else {
+                    mostrarToast('Erro ao enviar imagem', 'error');
+                }
+            } catch (error) {
+                console.error('Erro no upload:', error);
+                mostrarToast('Erro ao enviar imagem', 'error');
+            }
+        }
+
+        function previewImagemNome(nomeArquivo, previewId) {
+            // Esta função agora só atualiza quando clica no botão, não automaticamente
+            // Por isso não faz nada aqui, apenas armazena o valor
+            if (nomeArquivo) {
+                // Não fazer preview automático
+            }
+        }
+
+        function atualizarImagemPorNome() {
+            const nomeArquivo = document.getElementById('imagem_pergunta_nome').value.trim();
+            const previewId = 'previewPergunta';
+            const preview = document.getElementById(previewId);
+            const container = document.getElementById(`previewContainer${previewId.replace('preview', '')}`);
+            
+            if (nomeArquivo) {
+                // Construir caminho completo
+                let caminhoCompleto = nomeArquivo;
+                if (!nomeArquivo.startsWith('http') && !nomeArquivo.startsWith('/')) {
+                    caminhoCompleto = '/laranja/img/' + nomeArquivo;
+                }
+                
+                preview.src = caminhoCompleto;
+                container.style.display = 'inline-block';
+                
+                // Salvar no campo hidden
+                document.getElementById('imagem_pergunta').value = nomeArquivo;
+                
+                // Verificar se a imagem existe
+                preview.onload = function() {
+                    this.style.opacity = '1';
+                    mostrarToast('Imagem carregada da pasta img!', 'success');
+                };
+                
+                preview.onerror = function() {
+                    this.style.opacity = '0.5';
+                    this.title = 'Imagem não encontrada na pasta img';
+                    mostrarToast('Imagem não encontrada na pasta img', 'warning');
+                    
+                    // Não remover do hidden, mas avisar
+                    setTimeout(() => {
+                        if (confirm('Imagem não encontrada. Deseja fazer upload?')) {
+                            document.getElementById('uploadImagemPergunta').click();
+                        }
+                    }, 500);
+                };
+            } else {
+                mostrarToast('Digite o nome do arquivo', 'warning');
+            }
+        }
+
+        function procurarImagemNaPasta() {
+            // Criar input file temporário
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function(e) {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    
+                    // Preview local
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const preview = document.getElementById('previewPergunta');
+                        preview.src = e.target.result;
+                        document.getElementById('previewContainerPergunta').style.display = 'inline-block';
+                    };
+                    reader.readAsDataURL(file);
+                    
+                    // Upload para o servidor
+                    uploadImagemArrastada(file, 'pergunta');
+                }
+            };
+            input.click();
+        }
+
+        function removerImagem(tipo) {
+            document.getElementById('imagem_pergunta').value = '';
+            document.getElementById(`imagem_${tipo}_nome`).value = '';
+            document.getElementById(`previewContainer${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`).style.display = 'none';
+        }
+
+        function previewImagemUrl(url, previewId) {
+            const preview = document.getElementById(previewId);
+            const container = document.getElementById(`previewContainer${previewId.replace('preview', '')}`);
+            
+            if (url) {
+                preview.src = url;
+                container.style.display = 'inline-block';
+                
+                // Salvar a URL no campo hidden
+                document.getElementById('imagem_pergunta').value = url;
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        function removerImagemUrl(tipo) {
+            document.getElementById(`imagem_${tipo}_url`).value = '';
+            document.getElementById(`previewContainer${tipo.charAt(0).toUpperCase() + tipo.slice(1)}Url`).style.display = 'none';
+            document.getElementById('imagem_pergunta').value = '';
+        }
+
+        // ============ FUNÇÕES DO MODAL ============
+        function abrirModalNova() {
+            questaoEditando = null;
+            document.getElementById('modalTitulo').textContent = 'Nova Questão';
+            document.getElementById('btnSalvar').textContent = 'Salvar';
+            
+            const campos = ['materia', 'assunto', 'sub_assunto', 'banca', 'orgao', 'ano', 'nivel', 
+                        'pergunta', 'a', 'b', 'c', 'd', 'e', 'explicacao', 'cargo',
+                        'ce_a', 'ce_b', 'imagem_pergunta', 'imagem_pergunta_url', 'imagem_pergunta_nome'];
+            
+            campos.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.value = '';
+            });
+            
+            document.querySelectorAll('.image-preview-container').forEach(container => {
+                container.style.display = 'none';
+            });
+            
+            document.getElementById('tipo').value = 'Múltipla Escolha';
+            document.getElementById('dificuldade').value = 'Média';
+            document.getElementById('nivel').value = 'Médio';
+            document.getElementById('ano').value = new Date().getFullYear();
+            document.getElementById('correta').value = 'A';
+            document.getElementById('ce_correta').value = 'A';
+            document.getElementById('ce_a').value = 'Certo';
+            document.getElementById('ce_b').value = 'Errado';
+            
+            ativarAbaImagem('upload', 'pergunta');
+            atualizarCamposPorTipo();
+            
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function abrirModalEditar(questao) {
+            questaoEditando = questao;
+            document.getElementById('modalTitulo').textContent = 'Editar Questão';
+            document.getElementById('btnSalvar').textContent = 'Atualizar';
+            
+            document.getElementById('materia').value = questao.materia || '';
+            document.getElementById('assunto').value = questao.assunto || '';
+            document.getElementById('sub_assunto').value = questao.sub_assunto || '';
+            document.getElementById('banca').value = questao.banca || '';
+            document.getElementById('orgao').value = questao.orgao || '';
+            document.getElementById('ano').value = questao.ano || '';
+            document.getElementById('nivel').value = questao.nivel || 'Médio';
+            document.getElementById('pergunta').value = questao.pergunta || '';
+            document.getElementById('explicacao').value = questao.dica || '';
+            document.getElementById('cargo').value = questao.cargo || '';
+            
+            // Carregar imagem da pergunta
+            const imagemPergunta = questao.imagem || '';
+            if (imagemPergunta) {
+                document.getElementById('imagem_pergunta').value = imagemPergunta;
+                
+                if (imagemPergunta.startsWith('http')) {
+                    // URL
+                    document.getElementById('imagem_pergunta_url').value = imagemPergunta;
+                    document.getElementById('previewPerguntaUrl').src = imagemPergunta;
+                    document.getElementById('previewContainerPerguntaUrl').style.display = 'inline-block';
+                    ativarAbaImagem('url', 'pergunta');
+                } else {
+                    // Arquivo local (na pasta img)
+                    document.getElementById('imagem_pergunta_nome').value = imagemPergunta;
+                    document.getElementById('previewPergunta').src = '/laranja/img/' + imagemPergunta;
+                    document.getElementById('previewContainerPergunta').style.display = 'inline-block';
+                    ativarAbaImagem('upload', 'pergunta');
+                }
+            }
+            
+            const tipo = questao.tipo || 'Múltipla Escolha';
+            document.getElementById('tipo').value = tipo;
+            
+            const dificuldade = questao.dificuldade || 'Média';
+            document.getElementById('dificuldade').value = dificuldade;
+            
+            if (tipo === 'Certo/Errado') {
+                document.getElementById('ce_a').value = questao.opcao_1 || 'Certo';
+                document.getElementById('ce_b').value = questao.opcao_2 || 'Errado';
+                document.getElementById('ce_correta').value = (questao.gabarito || 'A').toUpperCase();
+            } else {
+                document.getElementById('a').value = questao.opcao_1 || '';
+                document.getElementById('b').value = questao.opcao_2 || '';
+                document.getElementById('c').value = questao.opcao_3 || '';
+                document.getElementById('d').value = questao.opcao_4 || '';
+                document.getElementById('e').value = questao.opcao_5 || '';
+                document.getElementById('correta').value = (questao.gabarito || 'A').toUpperCase();
+            }
+            
+            atualizarCamposPorTipo();
+            
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function fecharModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function atualizarCamposPorTipo() {
+            const tipo = document.getElementById('tipo').value;
+            
+            if (tipo === 'Certo/Errado') {
+                document.getElementById('opcoesMultipla').classList.remove('visible');
+                document.getElementById('opcoesCertoErrado').classList.add('visible');
+                
+                ['a', 'b', 'c', 'd', 'e', 'correta'].forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.required = false;
+                    }
+                });
+            } else {
+                document.getElementById('opcoesMultipla').classList.add('visible');
+                document.getElementById('opcoesCertoErrado').classList.remove('visible');
+                
+                ['a', 'b', 'c', 'd', 'correta'].forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.required = true;
+                    }
+                });
+                
+                const elementE = document.getElementById('e');
+                if (elementE) {
+                    elementE.required = false;
+                    elementE.placeholder = 'Resposta E (opcional)';
+                }
+            }
+        }
+
+        // ============ FUNÇÃO SALVAR QUESTÃO ============
+        async function salvarQuestao() {
+            const tipo = document.getElementById('tipo').value;
+            const materia = document.getElementById('materia').value.trim();
+            const pergunta = document.getElementById('pergunta').value.trim();
+            
+            if (!materia || !pergunta) {
+                mostrarToast('Preencha Matéria e Pergunta', 'error');
+                return;
+            }
+
+            let imagem = document.getElementById('imagem_pergunta').value.trim() || 
+                        document.getElementById('imagem_pergunta_url').value.trim() || '';
+                        
+            let questao = {
+                materia: materia,
+                assunto: document.getElementById('assunto').value.trim() || '',
+                sub_assunto: document.getElementById('sub_assunto').value.trim() || '',
+                banca: document.getElementById('banca').value.trim() || '',
+                orgao: document.getElementById('orgao').value.trim() || '',
+                cargo: document.getElementById('cargo').value.trim() || '',
+                ano: document.getElementById('ano').value || new Date().getFullYear(),
+                nivel: document.getElementById('nivel').value || 'Médio',
+                pergunta: pergunta,
+                dificuldade: document.getElementById('dificuldade').value || 'Média',
+                dica: document.getElementById('explicacao').value.trim() || '',
+                tipo: tipo,
+                imagem: imagem
+            };
+
+            if (tipo === 'Certo/Errado') {
+                questao.opcao_1 = document.getElementById('ce_a').value.trim() || 'Certo';
+                questao.opcao_2 = document.getElementById('ce_b').value.trim() || 'Errado';
+                questao.opcao_3 = '';
+                questao.opcao_4 = '';
+                questao.opcao_5 = '';
+                questao.gabarito = document.getElementById('ce_correta').value === 'A' ? 'A' : 'B';
+            } else {
+                const a = document.getElementById('a').value.trim();
+                const b = document.getElementById('b').value.trim();
+                const c = document.getElementById('c').value.trim();
+                const d = document.getElementById('d').value.trim();
+                
+                if (!a || !b || !c || !d) {
+                    mostrarToast('Preencha as opções A, B, C e D', 'error');
+                    return;
+                }
+                
+                questao.opcao_1 = a;
+                questao.opcao_2 = b;
+                questao.opcao_3 = c;
+                questao.opcao_4 = d;
+                questao.opcao_5 = document.getElementById('e').value.trim() || '';
+                questao.gabarito = document.getElementById('correta').value;
+            }
+
+            if (questaoEditando) {
+                questao.id = questaoEditando.id;
+            }
+
+            try {
+                const url = questaoEditando ? 
+                    `${API_BASE}/atualizar-questao/${questao.id}` : 
+                    `${API_BASE}/criar-questao`;
+                
+                const method = questaoEditando ? 'PUT' : 'POST';
+                
+                const questaoParaEnviar = {
+                    materia: questao.materia,
+                    assunto: questao.assunto,
+                    sub_assunto: questao.sub_assunto,
+                    banca: questao.banca,
+                    orgao: questao.orgao,
+                    cargo: questao.cargo,
+                    ano: questao.ano,
+                    nivel: questao.nivel,
+                    pergunta: questao.pergunta,
+                    dificuldade: questao.dificuldade,
+                    dica: questao.dica,
+                    tipo: questao.tipo,
+                    opcao_1: questao.opcao_1,
+                    opcao_2: questao.opcao_2,
+                    opcao_3: questao.opcao_3,
+                    opcao_4: questao.opcao_4,
+                    opcao_5: questao.opcao_5,
+                    gabarito: questao.gabarito,
+                    imagem: questao.imagem
+                };
+                
+                if (questaoEditando) {
+                    questaoParaEnviar.id = questao.id;
+                }
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(questaoParaEnviar)
+                });
+
+                const result = await response.json();
+                
+                if (!response.ok || !result.success) {
+                    throw new Error(result.error || 'Erro ao salvar questão');
+                }
+
+                fecharModal();
+                
+                await carregarQuestoes();
+                
+                // ============ NOVO: Reaplicar filtros após salvar ============
+                // Manter os valores atuais dos filtros
+                const materiaFiltro = document.getElementById('filterMateria').value;
+                const assuntoFiltro = document.getElementById('filterAssunto').value;
+                const subAssuntoFiltro = document.getElementById('filterSubAssunto').value;
+                
+                // Reaplicar filtros se houver valores
+                if (materiaFiltro || assuntoFiltro || subAssuntoFiltro) {
+                    // Atualizar assuntos baseado na matéria
+                    if (materiaFiltro) {
+                        // Atualizar select de assuntos
+                        const assuntosFiltrados = [...new Set(todasQuestoes
+                            .filter(q => q.materia === materiaFiltro)
+                            .map(q => q.assunto)
+                            .filter(a => a))].sort();
+                        
+                        const selectAssunto = document.getElementById('filterAssunto');
+                        selectAssunto.innerHTML = '<option value="">Todos os Assuntos</option>';
+                        assuntosFiltrados.forEach(assunto => {
+                            selectAssunto.innerHTML += `<option value="${assunto}">${assunto}</option>`;
+                        });
+                        
+                        document.getElementById('filterMateria').value = materiaFiltro;
+                    }
+                    
+                    // Atualizar sub-assuntos baseado no assunto
+                    if (assuntoFiltro) {
+                        document.getElementById('filterAssunto').value = assuntoFiltro;
+                        
+                        // Atualizar sub-assuntos
+                        const materiaParaSub = materiaFiltro || '';
+                        const assuntoParaSub = assuntoFiltro || '';
+                        
+                        const selectSubAssunto = document.getElementById('filterSubAssunto');
+                        selectSubAssunto.innerHTML = '<option value="">Todos os Sub Assuntos</option>';
+                        
+                        if (materiaParaSub && assuntoParaSub) {
+                            const subAssuntos = [...new Set(todasQuestoes
+                                .filter(q => q.materia === materiaParaSub && q.assunto === assuntoParaSub)
+                                .map(q => q.sub_assunto)
+                                .filter(sa => sa && sa.trim() !== ''))].sort();
+                            
+                            subAssuntos.forEach(sub => {
+                                selectSubAssunto.innerHTML += `<option value="${sub}">${sub}</option>`;
+                            });
+                            selectSubAssunto.disabled = false;
+                        } else if (materiaParaSub) {
+                            const subAssuntos = [...new Set(todasQuestoes
+                                .filter(q => q.materia === materiaParaSub)
+                                .map(q => q.sub_assunto)
+                                .filter(sa => sa && sa.trim() !== ''))].sort();
+                            
+                            subAssuntos.forEach(sub => {
+                                selectSubAssunto.innerHTML += `<option value="${sub}">${sub}</option>`;
+                            });
+                            selectSubAssunto.disabled = false;
+                        } else {
+                            selectSubAssunto.disabled = true;
+                        }
+                        
+                        if (subAssuntoFiltro) {
+                            document.getElementById('filterSubAssunto').value = subAssuntoFiltro;
+                        }
+                    }
+                    
+                    // Aplicar todos os filtros
+                    filtrarQuestoes();
+                }
+                
+                mostrarToast('Questão salva com sucesso!', 'success');
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                mostrarToast(error.message || 'Erro ao salvar questão', 'error');
+            }
+        }
+
+        // ============ FUNÇÕES DE FILTROS ============
+        
+        // ============ NOVO: Função atualizarSubAssuntosFiltro melhorada ============
+        function atualizarSubAssuntosFiltro() {
+            const materiaSelecionada = document.getElementById('filterMateria').value;
+            const assuntoSelecionado = document.getElementById('filterAssunto').value;
+            const selectSubAssunto = document.getElementById('filterSubAssunto');
+            
+            // Limpar select
+            selectSubAssunto.innerHTML = '<option value="">Todos os Sub Assuntos</option>';
+            
+            // Se não tiver matéria selecionada, desabilitar e sair
+            if (!materiaSelecionada) {
+                selectSubAssunto.disabled = true;
+                return;
+            }
+            
+            // Se tiver matéria mas não tiver assunto, mostrar todos sub-assuntos da matéria
+            if (!assuntoSelecionado) {
+                selectSubAssunto.disabled = false;
+                
+                // Filtrar sub-assuntos por matéria (independente do assunto)
+                const subAssuntos = [...new Set(todasQuestoes
+                    .filter(q => q.materia === materiaSelecionada)
+                    .map(q => q.sub_assunto)
+                    .filter(sa => sa && sa.trim() !== ''))].sort();
+                
+                subAssuntos.forEach(subAssunto => {
+                    selectSubAssunto.innerHTML += `<option value="${subAssunto}">${subAssunto}</option>`;
+                });
+                
+                return;
+            }
+            
+            // Se tiver matéria E assunto, mostrar sub-assuntos específicos do assunto
+            selectSubAssunto.disabled = false;
+            
+            const subAssuntos = [...new Set(todasQuestoes
+                .filter(q => q.materia === materiaSelecionada && q.assunto === assuntoSelecionado)
+                .map(q => q.sub_assunto)
+                .filter(sa => sa && sa.trim() !== ''))].sort();
+            
+            subAssuntos.forEach(subAssunto => {
+                selectSubAssunto.innerHTML += `<option value="${subAssunto}">${subAssunto}</option>`;
+            });
+        }
+
+        function atualizarFiltrosDinamicos() {
+            atualizarAssuntosFiltro(todasQuestoes);
+            atualizarSubAssuntosFiltro();
+        }
+
+        function filtrarQuestoes() {
+            const materia = document.getElementById('filterMateria').value;
+            const assunto = document.getElementById('filterAssunto').value;
+            const subAssunto = document.getElementById('filterSubAssunto').value;
+            const banca = document.getElementById('filterBanca').value;
+            const tipo = document.getElementById('filterTipo').value;
+            const nivel = document.getElementById('filterNivel').value;
+            const dificuldade = document.getElementById('filterDificuldade').value;
+            const ano = document.getElementById('filterAno').value;
+            const orgao = document.getElementById('filterOrgao').value;
+            const texto = document.getElementById('searchText').value.toLowerCase();
+            
+            let filtradas = todasQuestoes;
+            
+            if (materia) {
+                filtradas = filtradas.filter(q => q.materia === materia);
+            }
+            
+            if (assunto) {
+                filtradas = filtradas.filter(q => q.assunto === assunto);
+            }
+            
+            if (subAssunto) {
+                filtradas = filtradas.filter(q => q.sub_assunto === subAssunto);
+            }
+            
+            if (banca) {
+                filtradas = filtradas.filter(q => q.banca === banca);
+            }
+            
+            if (tipo) {
+                filtradas = filtradas.filter(q => q.tipo === tipo);
+            }
+            
+            if (nivel) {
+                filtradas = filtradas.filter(q => q.nivel === nivel);
+            }
+            
+            if (dificuldade) {
+                filtradas = filtradas.filter(q => q.dificuldade === dificuldade);
+            }
+            
+            if (ano) {
+                filtradas = filtradas.filter(q => q.ano == ano);
+            }
+            
+            if (orgao) {
+                filtradas = filtradas.filter(q => q.orgao === orgao);
+            }
+            
+            if (texto) {
+                filtradas = filtradas.filter(q => 
+                    (q.pergunta && q.pergunta.toLowerCase().includes(texto)) ||
+                    (q.assunto && q.assunto.toLowerCase().includes(texto)) ||
+                    (q.sub_assunto && q.sub_assunto.toLowerCase().includes(texto)) ||
+                    (q.materia && q.materia.toLowerCase().includes(texto)) ||
+                    (q.banca && q.banca.toLowerCase().includes(texto)) ||
+                    (q.explicacao && q.explicacao.toLowerCase().includes(texto)) ||
+                    (q.dica && q.dica.toLowerCase().includes(texto))
+                );
+            }
+            
+            mostrarQuestoes(filtradas);
+            atualizarEstatisticas(filtradas);
+            
+            if (materia || assunto || subAssunto || banca || tipo || nivel || dificuldade || ano || orgao || texto) {
+                let mensagem = `${filtradas.length} questões encontradas`;
+                mostrarToast(mensagem, 'success');
+            }
+        }
+
+        function limparFiltros() {
+            document.getElementById('filterMateria').value = '';
+            document.getElementById('filterAssunto').value = '';
+            document.getElementById('filterSubAssunto').value = '';
+            document.getElementById('filterBanca').value = '';
+            document.getElementById('filterTipo').value = '';
+            document.getElementById('filterNivel').value = '';
+            document.getElementById('filterDificuldade').value = '';
+            document.getElementById('filterAno').value = '';
+            document.getElementById('filterOrgao').value = '';
+            document.getElementById('searchText').value = '';
+            
+            document.getElementById('filterSubAssunto').disabled = true;
+            
+            atualizarAssuntosFiltro(todasQuestoes);
+            mostrarQuestoes(todasQuestoes);
+            atualizarEstatisticas(todasQuestoes);
+            
+            mostrarToast('Filtros limpos', 'success');
+        }
+
+        // ============ FUNÇÕES DE DETECÇÃO DE DUPLICATAS ============
+        function detectarDuplicatas(questoes) {
+            questaoDuplicatas.clear();
+            todasDuplicatas = [];
+            
+            const mapaAssinaturas = new Map();
+            
+            questoes.forEach(questao => {
+                const assinatura = criarAssinatura(questao);
+                
+                if (!mapaAssinaturas.has(assinatura)) {
+                    mapaAssinaturas.set(assinatura, []);
+                }
+                
+                mapaAssinaturas.get(assinatura).push(questao);
+            });
+            
+            mapaAssinaturas.forEach((questoesGrupo, assinatura) => {
+                if (questoesGrupo.length > 1) {
+                    questoesGrupo.forEach(questao => {
+                        questaoDuplicatas.set(questao.id, questoesGrupo);
+                        todasDuplicatas.push(questao);
+                    });
+                }
+            });
+            
+            const totalDuplicatas = todasDuplicatas.length;
+            document.getElementById('totalDuplicatas').textContent = totalDuplicatas;
+            
+            if (totalDuplicatas > 0) {
+                mostrarToast(`Encontradas ${totalDuplicatas} questões duplicadas`, 'warning');
+            }
+            
+            return questaoDuplicatas;
+        }
+
+        function criarAssinatura(questao) {
+            const campos = [
+                questao.materia || '',
+                questao.assunto || '',
+                questao.sub_assunto || '',
+                questao.pergunta || '',
+                questao.banca || '',
+                questao.orgao || '',
+                questao.cargo || '',
+                questao.ano || '',
+                questao.nivel || '',
+                questao.tipo || '',
+                questao.gabarito || '',
+                questao.dificuldade || ''
+            ];
+            
+            if (questao.tipo === 'Múltipla Escolha') {
+                campos.push(questao.opcao_1 || '');
+                campos.push(questao.opcao_2 || '');
+                campos.push(questao.opcao_3 || '');
+                campos.push(questao.opcao_4 || '');
+                campos.push(questao.opcao_5 || '');
+            } else if (questao.tipo === 'Certo/Errado') {
+                campos.push(questao.opcao_1 || '');
+                campos.push(questao.opcao_2 || '');
+            }
+            
+            return campos.map(campo => 
+                campo.toString()
+                    .toLowerCase()
+                    .trim()
+                    .replace(/\s+/g, ' ')
+                    .replace(/[.,!?;:]/g, '')
+            ).join('|');
+        }
+
+        function verificarDuplicatas() {
+            if (todasDuplicatas.length === 0) {
+                mostrarToast('Nenhuma questão duplicada encontrada', 'success');
+                return;
+            }
+            
+            abrirModalDuplicatas();
+        }
+
+        function abrirModalDuplicatas() {
+            const modal = document.getElementById('modalDuplicatas');
+            const conteudo = document.getElementById('duplicatasConteudo');
+            
+            document.getElementById('modalDuplicatasTitulo').textContent = 
+                `Questões Duplicadas (${todasDuplicatas.length})`;
+            
+            const grupos = new Map();
+            
+            questaoDuplicatas.forEach((questoesGrupo, id) => {
+                const assinatura = criarAssinatura(todasQuestoes.find(q => q.id === id));
+                
+                if (!grupos.has(assinatura)) {
+                    grupos.set(assinatura, {
+                        questoes: [...new Set(questoesGrupo.map(q => q.id))].map(id => 
+                            todasQuestoes.find(q => q.id === id)
+                        ).filter(q => q),
+                        assinatura: assinatura
+                    });
+                }
+            });
+            
+            let html = '';
+            
+            grupos.forEach((grupo, index) => {
+                if (grupo.questoes.length < 2) return;
+                
+                html += `
+                    <div class="duplicate-group">
+                        <div class="duplicate-group-header">
+                            <div class="duplicate-group-title">
+                                Grupo ${index + 1}
+                                <span class="duplicate-group-count">${grupo.questoes.length} questões</span>
+                            </div>
+                        </div>
+                `;
+                
+                const primeira = grupo.questoes[0];
+                html += `
+                    <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 5px;">
+                        <div><strong>Matéria:</strong> ${primeira.materia || 'N/A'}</div>
+                        <div><strong>Assunto:</strong> ${primeira.assunto || 'N/A'}</div>
+                        <div><strong>Sub Assunto:</strong> ${primeira.sub_assunto || 'N/A'}</div>
+                        <div><strong>Banca:</strong> ${primeira.banca || 'N/A'}</div>
+                        <div><strong>Pergunta:</strong> ${(primeira.pergunta || '').substring(0, 150)}${(primeira.pergunta || '').length > 150 ? '...' : ''}</div>
+                    </div>
+                `;
+                
+                grupo.questoes.forEach((questao, idx) => {
+                    html += `
+                        <div class="duplicate-item">
+                            <div class="duplicate-info">
+                                <div>
+                                    <span class="duplicate-id">ID: ${questao.id}</span>
+                                    <span class="duplicate-preview" title="${questao.pergunta || ''}">
+                                        ${(questao.pergunta || '').substring(0, 80)}${(questao.pergunta || '').length > 80 ? '...' : ''}
+                                    </span>
+                                </div>
+                                <div>
+                                    <button class="action-btn edit" onclick="abrirModalEditar(${JSON.stringify(questao).replace(/"/g, '&quot;')}); fecharModalDuplicatas()" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn delete" onclick="deletarQuestao(${questao.id}); setTimeout(() => abrirModalDuplicatas(), 1000)" title="Excluir">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            });
+            
+            conteudo.innerHTML = html || '<div class="empty">Nenhuma duplicata encontrada</div>';
+            modal.style.display = 'flex';
+        }
+
+        function fecharModalDuplicatas() {
+            document.getElementById('modalDuplicatas').style.display = 'none';
+        }
+
+        function exportarDuplicatas() {
+            if (todasDuplicatas.length === 0) {
+                mostrarToast('Nenhuma duplicata para exportar', 'error');
+                return;
+            }
+            
+            const dados = todasDuplicatas.map(questao => ({
+                'ID': questao.id,
+                'Tipo': questao.tipo || 'N/A',
+                'Matéria': questao.materia || 'N/A',
+                'Assunto': questao.assunto || 'N/A',
+                'Sub Assunto': questao.sub_assunto || 'N/A',
+                'Banca': questao.banca || 'N/A',
+                'Órgão': questao.orgao || 'N/A',
+                'Cargo': questao.cargo || 'N/A',
+                'Ano': questao.ano || 'N/A',
+                'Nível': questao.nivel || 'N/A',
+                'Dificuldade': questao.dificuldade || 'N/A',
+                'Pergunta': questao.pergunta || 'N/A',
+                'Resposta Correta': questao.gabarito || 'N/A',
+                'Grupo Duplicata': 'Sim'
+            }));
+            
+            const cabecalho = Object.keys(dados[0]).join(',');
+            const linhas = dados.map(obj => 
+                Object.values(obj).map(val => 
+                    `"${(val || '').toString().replace(/"/g, '""')}"`
+                ).join(',')
+            );
+            
+            const csv = [cabecalho, ...linhas].join('\n');
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `duplicatas_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            mostrarToast(`${dados.length} duplicatas exportadas para CSV`, 'success');
+        }
+
+        function selecionarDuplicadas() {
+            if (todasDuplicatas.length === 0) {
+                mostrarToast('Nenhuma duplicata para selecionar', 'error');
+                return;
+            }
+            
+            todasDuplicatas.forEach(questao => {
+                if (questao.id) {
+                    questoesSelecionadas.add(questao.id);
+                }
+            });
+            
+            document.querySelectorAll('.question-checkbox').forEach(cb => {
+                const id = parseInt(cb.closest('tr').getAttribute('data-id'));
+                if (questoesSelecionadas.has(id)) {
+                    cb.checked = true;
+                }
+            });
+            
+            atualizarSelecaoToolbar();
+            atualizarSelectAllCheckbox();
+            
+            mostrarToast(`${todasDuplicatas.length} questões duplicadas selecionadas`, 'success');
+        }
+
+        // ============ FUNÇÕES DE SELEÇÃO ============
+        function selecionarQuestao(id, checkbox) {
+            if (checkbox.checked) {
+                questoesSelecionadas.add(id);
+            } else {
+                questoesSelecionadas.delete(id);
+            }
+            
+            atualizarSelecaoToolbar();
+            atualizarSelectAllCheckbox();
+        }
+
+        function selecionarTodas() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.question-checkbox');
+            
+            if (selectAll.checked) {
+                const questoesVisiveis = Array.from(document.querySelectorAll('#questoesTable tr[data-id]'))
+                    .filter(row => row.style.display !== 'none');
+                
+                questoesSelecionadas.clear();
+                questoesVisiveis.forEach(row => {
+                    const id = parseInt(row.getAttribute('data-id'));
+                    questoesSelecionadas.add(id);
+                    row.querySelector('.question-checkbox').checked = true;
+                });
+            } else {
+                questoesSelecionadas.clear();
+                checkboxes.forEach(cb => cb.checked = false);
+            }
+            
+            atualizarSelecaoToolbar();
+        }
+
+        function atualizarSelectAllCheckbox() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxesVisiveis = Array.from(document.querySelectorAll('.question-checkbox'))
+                .filter(cb => cb.closest('tr').style.display !== 'none');
+            
+            if (checkboxesVisiveis.length === 0) {
+                selectAll.checked = false;
+                selectAll.indeterminate = false;
+                return;
+            }
+            
+            const selecionadasVisiveis = Array.from(checkboxesVisiveis)
+                .filter(cb => cb.checked).length;
+            
+            if (selecionadasVisiveis === 0) {
+                selectAll.checked = false;
+                selectAll.indeterminate = false;
+            } else if (selecionadasVisiveis === checkboxesVisiveis.length) {
+                selectAll.checked = true;
+                selectAll.indeterminate = false;
+            } else {
+                selectAll.checked = false;
+                selectAll.indeterminate = true;
+            }
+        }
+
+        function atualizarSelecaoToolbar() {
+            const toolbar = document.getElementById('selectionToolbar');
+            const countElement = document.getElementById('selectedCount');
+            const infoElement = document.getElementById('selectionInfoText');
+            
+            if (questoesSelecionadas.size > 0) {
+                toolbar.style.display = 'flex';
+                countElement.textContent = `${questoesSelecionadas.size} selecionada(s)`;
+                
+                const duplicatasSelecionadas = Array.from(questoesSelecionadas).filter(id => 
+                    questaoDuplicatas.has(id)
+                ).length;
+                
+                if (duplicatasSelecionadas > 0) {
+                    infoElement.textContent = `${questoesSelecionadas.size} questões selecionadas (${duplicatasSelecionadas} duplicatas)`;
+                } else {
+                    infoElement.textContent = `${questoesSelecionadas.size} questões selecionadas`;
+                }
+            } else {
+                toolbar.style.display = 'none';
+            }
+        }
+
+        function limparSelecao() {
+            questoesSelecionadas.clear();
+            document.querySelectorAll('.question-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('selectAll').checked = false;
+            document.getElementById('selectAll').indeterminate = false;
+            atualizarSelecaoToolbar();
+        }
+
+        // ============ FUNÇÃO DELETAR SELECIONADAS ============
+        async function deletarSelecionadas() {
+            if (questoesSelecionadas.size === 0) {
+                mostrarToast('Nenhuma questão selecionada', 'error');
+                return;
+            }
+            
+            const idsDuplicatas = Array.from(questoesSelecionadas).filter(id => 
+                questaoDuplicatas.has(id)
+            );
+            
+            let mensagemConfirmacao = `Tem certeza que deseja excluir ${questoesSelecionadas.size} questão(ões)?`;
+            
+            if (idsDuplicatas.length > 0) {
+                mensagemConfirmacao += `\n\n⚠️ ${idsDuplicatas.length} delas são duplicatas.`;
+            }
+            
+            mensagemConfirmacao += `\n\nEsta ação não pode ser desfeita.`;
+            
+            if (!confirm(mensagemConfirmacao)) {
+                return;
+            }
+            
+            try {
+                mostrarToast(`Excluindo ${questoesSelecionadas.size} questão(ões)...`, 'success');
+                
+                const ids = Array.from(questoesSelecionadas);
+                
+                const promises = ids.map(async (id) => {
+                    try {
+                        const response = await fetch(`${API_BASE}/deletar-questao/${id}`, {
+                            method: 'DELETE'
+                        });
+                        const data = await response.json();
+                        return { id, success: data.success, error: data.error };
+                    } catch (error) {
+                        return { id, success: false, error: error.message };
+                    }
+                });
+                
+                const resultados = await Promise.all(promises);
+                
+                let sucesso = resultados.filter(r => r.success).length;
+                let falhas = resultados.filter(r => !r.success).length;
+                
+                limparSelecao();
+                
+                await carregarQuestoes();
+                
+                let mensagem = `${sucesso} questão(ões) excluída(s) com sucesso!`;
+                if (falhas > 0) {
+                    mensagem += ` ${falhas} falha(s).`;
+                }
+                
+                mostrarToast(mensagem, sucesso > 0 ? 'success' : 'error');
+                
+            } catch (error) {
+                console.error('Erro ao excluir questões selecionadas:', error);
+                mostrarToast('Erro ao excluir questões: ' + error.message, 'error');
+            }
+        }
+
+        // ============ FUNÇÃO EXPORTAR EXCEL ============
+        async function exportarExcel() {
+            try {
+                console.log('📤 Iniciando exportação...');
+                
+                mostrarToast('Exportando questões para Excel...', 'success');
+                
+                const verificarResponse = await fetch(`${API_BASE}/verificar-banco`);
+                const verificarData = await verificarResponse.json();
+                
+                if (!verificarData.success) {
+                    throw new Error(`Erro ao verificar banco: ${verificarData.error}`);
+                }
+                
+                if (verificarData.total_questoes === 0) {
+                    mostrarToast('Nenhuma questão encontrada no banco de dados', 'error');
+                    return;
+                }
+                
+                const link = document.createElement('a');
+                link.href = `${API_BASE}/exportar-excel`;
+                link.target = '_blank';
+                link.download = `banco_questoes_${new Date().toISOString().split('T')[0]}.xlsx`;
+                
+                document.body.appendChild(link);
+                link.click();
+                
+                setTimeout(() => {
+                    if (document.body.contains(link)) {
+                        document.body.removeChild(link);
+                    }
+                }, 1000);
+                
+                setTimeout(() => {
+                    mostrarToast(`Exportação concluída! ${verificarData.total_questoes} questões exportadas.`, 'success');
+                }, 1000);
+                
+                setTimeout(async () => {
+                    await carregarQuestoes();
+                }, 2000);
+                
+            } catch (error) {
+                console.error('❌ Erro ao exportar:', error);
+                mostrarToast('Erro ao exportar: ' + error.message, 'error');
+            }
+        }
+
+        // ============ FUNÇÃO: Mostrar Relatório de Importação ============
+        function mostrarRelatorioImportacao(dados) {
+            const reportContainer = document.getElementById('importReport');
+            const reportBody = document.getElementById('reportBody');
+            
+            const inseridas = dados.inseridas || 0;
+            const duplicadas = dados.duplicadas || 0;
+            const erros = dados.erros || 0;
+            const total = dados.total_processado || 0;
+            
+            const idsErro = dados.ids_erro || [];
+            const idsDuplicadas = dados.ids_duplicadas || [];
+            
+            let html = `
+                <div class="report-summary">
+                    <div class="report-summary-item total">
+                        <div class="report-summary-value">${total}</div>
+                        <div class="report-summary-label">Total na planilha</div>
+                    </div>
+                    <div class="report-summary-item success">
+                        <div class="report-summary-value">${inseridas}</div>
+                        <div class="report-summary-label">Importadas</div>
+                    </div>
+                    <div class="report-summary-item warning">
+                        <div class="report-summary-value">${duplicadas}</div>
+                        <div class="report-summary-label">Duplicadas</div>
+                    </div>
+                    <div class="report-summary-item error">
+                        <div class="report-summary-value">${erros}</div>
+                        <div class="report-summary-label">Com erro</div>
+                    </div>
+                </div>
+            `;
+            
+            if (erros > 0) {
+                html += `
+                    <div class="report-section">
+                        <div class="report-section-title">
+                            <i class="fas fa-exclamation-triangle" style="color: #f44336;"></i>
+                            Questões com erro (${erros})
+                        </div>
+                        <div class="report-questions-list">
+                            ${idsErro.map(id => `
+                                <div class="report-question-item">
+                                    <span class="report-question-id">ID: ${id}</span>
+                                    <span class="report-question-preview">Não foi possível importar</span>
+                                    <span class="report-question-error">Erro</span>
+                                </div>
+                            `).join('')}
+                            ${idsErro.length === 0 ? '<div class="report-question-item">IDs não disponíveis</div>' : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (duplicadas > 0) {
+                html += `
+                    <div class="report-section">
+                        <div class="report-section-title">
+                            <i class="fas fa-clone" style="color: #FF9800;"></i>
+                            Questões duplicadas ignoradas (${duplicadas})
+                        </div>
+                        <div class="report-questions-list">
+                            ${idsDuplicadas.map(id => `
+                                <div class="report-question-item">
+                                    <span class="report-question-id">ID: ${id}</span>
+                                    <span class="report-question-preview">Já existente no banco</span>
+                                </div>
+                            `).join('')}
+                            ${idsDuplicadas.length === 0 ? '<div class="report-question-item">IDs não disponíveis</div>' : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (inseridas > 0) {
+                html += `
+                    <div class="report-section">
+                        <div class="report-section-title">
+                            <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
+                            Questões importadas com sucesso (${inseridas})
+                        </div>
+                        <div class="report-questions-list" style="color: #4CAF50;">
+                            Todas as ${inseridas} questões foram adicionadas ao banco de dados.
+                        </div>
+                    </div>
+                `;
+            }
+            
+            reportBody.innerHTML = html;
+            reportContainer.style.display = 'block';
+        }
+        
+        function fecharRelatorio() {
+            document.getElementById('importReport').style.display = 'none';
+        }
+
+        // ============ FUNÇÃO DE IMPORTAÇÃO ============
+        async function importarPlanilha(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!file.name.match(/\.(xlsx|xls|csv)$/i)) {
+                mostrarToast('Selecione um arquivo Excel (.xlsx, .xls ou .csv)', 'error');
+                event.target.value = '';
+                return;
+            }
+            
+            try {
+                const tbody = document.getElementById('questoesTable');
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="14" class="loading">
+                            <i class="fas fa-spinner fa-spin"></i> Processando importação...
+                        </td>
+                    </tr>
+                `;
+                
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        
+                        if (workbook.SheetNames.length === 0) {
+                            throw new Error('O arquivo Excel não contém planilhas');
+                        }
+                        
+                        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                        
+                        console.log(`📊 ${jsonData.length} linhas encontradas no Excel`);
+                        
+                        if (jsonData.length === 0) {
+                            mostrarToast('Nenhuma questão encontrada no arquivo', 'error');
+                            carregarQuestoes();
+                            return;
+                        }
+                        
+                        const anoAtual = new Date().getFullYear();
+                        
+                        // CORREÇÃO: Função getValue agora recebe o item como parâmetro
+                        function getValue(item, possiveisNomes) {
+                            for (const nome of possiveisNomes) {
+                                if (item[nome] !== undefined && item[nome] !== null && item[nome] !== '') {
+                                    return String(item[nome]).trim();
+                                }
+                            }
+                            return '';
+                        }
+                        
+                        const questoesParaImportar = jsonData.map((item, index) => {
+                            if (index === 0) {
+                                console.log('🔍 Colunas encontradas no Excel:', Object.keys(item));
+                            }
+                            
+                            const materia = getValue(item, ['Matéria', 'MATÉRIA', 'materia', 'Materia', 'Disciplina', 'DISCIPLINA']);
+                            const assunto = getValue(item, ['Assunto', 'ASSUNTO', 'assunto']);
+                            const subAssunto = getValue(item, ['Sub Assunto', 'SUB ASSUNTO', 'sub_assunto', 'SubAssunto', 'Sub_Assunto', 'Sub', 'SUB']);
+                            const banca = getValue(item, ['Banca', 'BANCA', 'banca']);
+                            const orgao = getValue(item, ['Órgão', 'ORGAO', 'orgao', 'Orgao', 'ÓRGÃO']);
+                            const cargo = getValue(item, ['Cargo', 'CARGO', 'cargo']);
+                            const ano = getValue(item, ['Ano', 'ANO', 'ano']) || anoAtual;
+                            const nivel = getValue(item, ['Nível', 'NIVEL', 'nivel', 'Nivel']) || 'Médio';
+                            const dificuldade = getValue(item, ['Dificuldade', 'DIFICULDADE', 'dificuldade']) || 'Média';
+                            const pergunta = getValue(item, ['Pergunta', 'PERGUNTA', 'pergunta', 'Questão', 'QUESTAO', 'questao']);
+                            
+                            const opcao1 = getValue(item, ['Opção 1', 'OPCAO 1', 'opcao_1', 'Opção A', 'OPCAO A', 'opcao_a', 'A', 'a']);
+                            const opcao2 = getValue(item, ['Opção 2', 'OPCAO 2', 'opcao_2', 'Opção B', 'OPCAO B', 'opcao_b', 'B', 'b']);
+                            const opcao3 = getValue(item, ['Opção 3', 'OPCAO 3', 'opcao_3', 'Opção C', 'OPCAO C', 'opcao_c', 'C', 'c']);
+                            const opcao4 = getValue(item, ['Opção 4', 'OPCAO 4', 'opcao_4', 'Opção D', 'OPCAO D', 'opcao_d', 'D', 'd']);
+                            const opcao5 = getValue(item, ['Opção 5', 'OPCAO 5', 'opcao_5', 'Opção E', 'OPCAO E', 'opcao_e', 'E', 'e']);
+                            
+                            const gabarito = getValue(item, ['Gabarito', 'GABARITO', 'gabarito', 'Resposta', 'RESPOSTA', 'resposta']) || 'A';
+                            const dica = getValue(item, ['Dica', 'DICA', 'dica', 'Explicação', 'EXPLICACAO', 'explicacao', 'Dica/Explicação']);
+                            const imagem = getValue(item, ['Imagem', 'IMAGEM', 'imagem', 'Image', 'IMAGE', 'image', 'URL Imagem', 'URL_IMAGEM']);
+                            
+                            let tipo = getValue(item, ['Tipo', 'TIPO', 'tipo']) || 'Múltipla Escolha';
+                            
+                            const tipoLower = tipo.toLowerCase();
+                            if (tipoLower.includes('certo') || tipoLower.includes('errado') || 
+                                tipoLower.includes('c/e') || tipoLower.includes('c e') ||
+                                tipoLower.includes('certo/errado') || tipoLower.includes('certo errado')) {
+                                tipo = 'Certo/Errado';
+                            } else {
+                                tipo = 'Múltipla Escolha';
+                            }
+                            
+                            // Para questões Certo/Errado, garantir opções padrão
+                            let opcao1Final = opcao1;
+                            let opcao2Final = opcao2;
+                            
+                            if (tipo === 'Certo/Errado') {
+                                if (!opcao1Final) opcao1Final = 'Certo';
+                                if (!opcao2Final) opcao2Final = 'Errado';
+                            }
+                            
+                            return {
+                                'Matéria': materia,
+                                'Assunto': assunto,
+                                'Sub Assunto': subAssunto,
+                                'Banca': banca,
+                                'Órgão': orgao,
+                                'Cargo': cargo,
+                                'Ano': ano,
+                                'Nível': nivel,
+                                'Dificuldade': dificuldade,
+                                'Pergunta': pergunta,
+                                'Opção 1': opcao1Final,
+                                'Opção 2': opcao2Final,
+                                'Opção 3': opcao3,
+                                'Opção 4': opcao4,
+                                'Opção 5': opcao5,
+                                'Gabarito': gabarito,
+                                'Dica': dica,
+                                'Tipo': tipo,
+                                'Imagem': imagem
+                            };
+                        }).filter(q => q['Matéria'] && q['Pergunta']);
+                        
+                        const tipos = {};
+                        questoesParaImportar.forEach(q => {
+                            tipos[q['Tipo']] = (tipos[q['Tipo']] || 0) + 1;
+                        });
+                        
+                        console.log(`✅ ${questoesParaImportar.length} questões válidas para importar`);
+                        console.log('📊 Tipos detectados:', tipos);
+                        
+                        if (questoesParaImportar.length === 0) {
+                            mostrarToast('Nenhuma questão válida encontrada no arquivo', 'error');
+                            carregarQuestoes();
+                            return;
+                        }
+                        
+                        mostrarToast(`Enviando ${questoesParaImportar.length} questões para importação...`, 'success');
+                        
+                        const response = await fetch(`${API_BASE}/importar-excel`, {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify(questoesParaImportar)
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            mostrarRelatorioImportacao(result);
+                            
+                            let mensagem = `✅ Importação concluída!<br>`;
+                            mensagem += `✓ ${result.inseridas} novas questões adicionadas<br>`;
+                            mensagem += `⚠️ ${result.duplicadas} duplicadas ignoradas<br>`;
+                            mensagem += `✗ ${result.erros} com erro`;
+                            
+                            mostrarToastHTML(mensagem, 'success');
+                            
+                            await carregarQuestoes();
+                        } else {
+                            mostrarToast('Erro na importação: ' + (result.error || 'Desconhecido'), 'error');
+                            carregarQuestoes();
+                        }
+                        
+                    } catch (error) {
+                        console.error('❌ Erro ao importar:', error);
+                        mostrarToast('Erro ao processar arquivo: ' + error.message, 'error');
+                        carregarQuestoes();
+                    }
+                };
+                
+                reader.onerror = function() {
+                    mostrarToast('Erro ao ler o arquivo', 'error');
+                    carregarQuestoes();
+                };
+                
+                reader.readAsArrayBuffer(file);
+                
+            } catch (error) {
+                console.error('❌ Erro ao importar:', error);
+                mostrarToast('Erro ao importar: ' + error.message, 'error');
+                carregarQuestoes();
+            }
+            
+            event.target.value = '';
+        }
+
+        // ============ FUNÇÕES DE CARREGAMENTO E EXIBIÇÃO ============
+        async function carregarQuestoes() {
+            try {
+                console.log('📥 Buscando questões da API...');
+                
+                const response = await fetch(`${API_BASE}/questoes-admin`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data) {
+                    throw new Error('API retornou dados vazios');
+                }
+                
+                if (Array.isArray(data)) {
+                    todasQuestoes = data;
+                } else {
+                    console.warn('⚠️ Formato de dados não reconhecido');
+                    todasQuestoes = [];
+                }
+                
+                if (todasQuestoes.length === 0) {
+                    mostrarMensagemVazia();
+                    return;
+                }
+                
+                console.log(`✅ ${todasQuestoes.length} questões carregadas`);
+                
+                let contadorCertoErrado = 0;
+                let contadorMultipla = 0;
+                let contadorComImagem = 0;
+                
+                todasQuestoes = todasQuestoes.map(q => {
+                    if (q.tipo) {
+                        q.tipo = String(q.tipo).trim();
+                        if (q.tipo === 'Certo/Errado') {
+                            contadorCertoErrado++;
+                        } else {
+                            contadorMultipla++;
+                        }
+                    } else {
+                        q.tipo = 'Múltipla Escolha';
+                        contadorMultipla++;
+                    }
+                    
+                    if (q.imagem) {
+                        contadorComImagem++;
+                    }
+                    
+                    return q;
+                });
+                
+                console.log(`📊 Questões: ${contadorMultipla} Múltipla Escolha, ${contadorCertoErrado} Certo/Errado, ${contadorComImagem} com imagem`);
+                
+                detectarDuplicatas(todasQuestoes);
+                
+                mostrarQuestoes(todasQuestoes);
+                atualizarEstatisticas(todasQuestoes);
+                atualizarFiltros(todasQuestoes);
+                
+                mostrarToast(`${todasQuestoes.length} questões carregadas com sucesso! (${contadorCertoErrado} Certo/Errado, ${contadorComImagem} com imagem)`, 'success');
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar questões:', error);
+                mostrarErro('Erro ao carregar questões: ' + error.message);
+            }
+        }
+
+        function mostrarErro(mensagem) {
+            document.getElementById('questoesTable').innerHTML = `
+                <tr>
+                    <td colspan="14" class="error">
+                        <i class="fas fa-exclamation-triangle"></i> ${mensagem}
+                        <br><br>
+                        <button onclick="carregarQuestoes()" style="padding: 8px 15px; background: var(--orkut-blue); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            <i class="fas fa-redo"></i> Tentar novamente
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function mostrarMensagemVazia() {
+            document.getElementById('questoesTable').innerHTML = `
+                <tr>
+                    <td colspan="14" class="empty">
+                        <i class="fas fa-database"></i> Nenhuma questão encontrada
+                        <p style="margin-top: 10px;">Use os botões acima para adicionar questões</p>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function mostrarQuestoes(questoes) {
+            const tbody = document.getElementById('questoesTable');
+            
+            if (!questoes || questoes.length === 0) {
+                mostrarMensagemVazia();
+                return;
+            }
+            
+            let html = '';
+            
+            questoes.forEach(questao => {
+                const id = questao.id || 'N/A';
+                const tipo = questao.tipo || 'Múltipla Escolha';
+                const materia = questao.materia || 'Não especificada';
+                const assunto = questao.assunto || 'Não especificado';
+                const sub_assunto = questao.sub_assunto || '-';
+                const banca = questao.banca || 'N/A';
+                const orgao = questao.orgao || 'N/A';
+                const ano = questao.ano || 'N/A';
+                const pergunta = questao.pergunta || 'Sem pergunta';
+                const resposta = questao.gabarito || 'N/A';
+                const imagem = questao.imagem || '';
+                
+                const perguntaResumida = pergunta.length > 100 
+                    ? pergunta.substring(0, 100) + '...' 
+                    : pergunta;
+                
+                const isSelected = questoesSelecionadas.has(id);
+                const isDuplicate = questaoDuplicatas.has(id);
+                
+                let classeLinha = '';
+                if (isDuplicate) {
+                    classeLinha = 'duplicate';
+                }
+                
+                const imagemHtml = imagem ? 
+                    '<span class="image-indicator" title="Possui imagem"><i class="fas fa-camera" style="color: #3b5998;"></i> 📷</span>' : 
+                    '<span class="image-indicator" title="Sem imagem"><i class="far fa-file-alt" style="color: #95a5a6;"></i> 📝</span>';
+                
+                html += `
+                    <tr data-id="${id}" class="${classeLinha}">
+                        <td>
+                            <input type="checkbox" class="question-checkbox" 
+                                ${isSelected ? 'checked' : ''}
+                                onchange="selecionarQuestao(${id}, this)">
+                        </td>
+                        <td>${id}</td>
+                        <td>${tipo}</td>
+                        <td>${materia}</td>
+                        <td>${assunto}</td>
+                        <td>${sub_assunto}</td>
+                        <td>${banca}</td>
+                        <td style="display: none;">${orgao}</td> <!-- COLUNA ÓRGÃO OCULTADA -->
+                        <td style="display: none;">-</td>
+                        <td>${ano}</td>
+                        <td title="${pergunta.replace(/"/g, '&quot;')}">
+                            ${perguntaResumida}
+                            ${isDuplicate ? '<span class="duplicate-badge">DUPLICATA</span>' : ''}
+                        </td>
+                        <td><strong>${resposta}</strong></td>
+                        <td>${imagemHtml}</td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn edit" onclick="abrirModalEditar(${JSON.stringify(questao).replace(/"/g, '&quot;')})" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete" onclick="deletarQuestao(${id})" title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                ${isDuplicate ? `
+                                <button class="action-btn view-duplicates" onclick="mostrarDuplicatasDaQuestao(${id})" title="Ver Duplicatas">
+                                    <i class="fas fa-clone"></i>
+                                </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+            atualizarSelectAllCheckbox();
+        }
+
+        function mostrarDuplicatasDaQuestao(id) {
+            if (!questaoDuplicatas.has(id)) {
+                mostrarToast('Esta questão não possui duplicatas', 'error');
+                return;
+            }
+            
+            const duplicatas = questaoDuplicatas.get(id);
+            const questaoAtual = todasQuestoes.find(q => q.id === id);
+            
+            let html = `
+                <div class="duplicate-group">
+                    <div class="duplicate-group-header">
+                        <div class="duplicate-group-title">
+                            Questões Duplicadas
+                            <span class="duplicate-group-count">${duplicatas.length} questões</span>
+                        </div>
+                    </div>
+            `;
+            
+            html += `
+                <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 5px;">
+                    <div><strong>Matéria:</strong> ${questaoAtual.materia || 'N/A'}</div>
+                    <div><strong>Assunto:</strong> ${questaoAtual.assunto || 'N/A'}</div>
+                    <div><strong>Sub Assunto:</strong> ${questaoAtual.sub_assunto || 'N/A'}</div>
+                    <div><strong>Pergunta:</strong> ${(questaoAtual.pergunta || '').substring(0, 200)}${(questaoAtual.pergunta || '').length > 200 ? '...' : ''}</div>
+                </div>
+            `;
+            
+            duplicatas.forEach(questao => {
+                if (questao.id === id) return;
+                
+                html += `
+                    <div class="duplicate-item">
+                        <div class="duplicate-info">
+                            <div>
+                                <span class="duplicate-id">ID: ${questao.id}</span>
+                                <span class="duplicate-preview" title="${questao.pergunta || ''}">
+                                    ${(questao.pergunta || '').substring(0, 100)}${(questao.pergunta || '').length > 100 ? '...' : ''}
+                                </span>
+                            </div>
+                            <div>
+                                <button class="action-btn edit" onclick="abrirModalEditar(${JSON.stringify(questao).replace(/"/g, '&quot;')})" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete" onclick="deletarQuestao(${questao.id})" title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 700px;">
+                    <div class="modal-header">
+                        <h2>Questões Duplicadas</h2>
+                        <button class="close-modal" onclick="this.closest('.modal-overlay').remove()">×</button>
+                    </div>
+                    ${html}
+                    <div class="form-actions">
+                        <button class="btn-cancel" onclick="this.closest('.modal-overlay').remove()">Fechar</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            modal.style.display = 'flex';
+        }
+
+        // ============ FUNÇÃO DELETAR QUESTÃO ============
+        async function deletarQuestao(id) {
+            if (!confirm(`Tem certeza que deseja excluir a questão ID: ${id}?\n\nEsta ação não pode ser desfeita.`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/deletar-questao/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    questoesSelecionadas.delete(id);
+                    atualizarSelecaoToolbar();
+                    
+                    await carregarQuestoes();
+                    mostrarToast('Questão excluída com sucesso!', 'success');
+                } else {
+                    mostrarToast('Erro ao excluir questão: ' + (data.error || 'Desconhecido'), 'error');
+                }
+            } catch (error) {
+                mostrarToast('Erro ao excluir questão: ' + error.message, 'error');
+            }
+        }
+
+        // ============ FUNÇÕES AUXILIARES ============
+        function mostrarToast(mensagem, tipo = 'success') {
+            const toast = tipo === 'success' ? 
+                document.getElementById('toastSuccess') : 
+                tipo === 'error' ? 
+                document.getElementById('toastError') : 
+                document.getElementById('toastWarning');
+            
+            toast.textContent = mensagem;
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        function mostrarToastHTML(mensagem, tipo = 'success') {
+            const toast = tipo === 'success' ? 
+                document.getElementById('toastSuccess') : 
+                tipo === 'error' ? 
+                document.getElementById('toastError') : 
+                document.getElementById('toastWarning');
+            
+            toast.innerHTML = mensagem;
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 5000);
+        }
+
+        function atualizarEstatisticas(questoes) {
+            document.getElementById('totalQuestions').textContent = questoes.length;
+            
+            const materias = [...new Set(questoes.map(q => q.materia).filter(m => m))];
+            document.getElementById('totalSubjects').textContent = materias.length;
+            
+            const assuntos = [...new Set(questoes.map(q => q.assunto).filter(a => a))];
+            document.getElementById('totalTopics').textContent = assuntos.length;
+            
+            const bancas = [...new Set(questoes.map(q => q.banca).filter(b => b))];
+            document.getElementById('totalBancas').textContent = bancas.length;
+        }
+
+        function atualizarFiltros(questoes) {
+            const materias = [...new Set(questoes.map(q => q.materia).filter(m => m))].sort();
+            const selectMateria = document.getElementById('filterMateria');
+            selectMateria.innerHTML = '<option value="">Todas as Matérias</option>';
+            materias.forEach(materia => {
+                selectMateria.innerHTML += `<option value="${materia}">${materia}</option>`;
+            });
+            
+            atualizarAssuntosFiltro(questoes);
+            
+            const bancas = [...new Set(questoes.map(q => q.banca).filter(b => b))].sort();
+            const selectBanca = document.getElementById('filterBanca');
+            selectBanca.innerHTML = '<option value="">Todas as Bancas</option>';
+            bancas.forEach(banca => {
+                selectBanca.innerHTML += `<option value="${banca}">${banca}</option>`;
+            });
+            
+            const tipos = [...new Set(questoes.map(q => q.tipo).filter(t => t))].sort();
+            const selectTipo = document.getElementById('filterTipo');
+            selectTipo.innerHTML = '<option value="">Todos os Tipos</option>';
+            tipos.forEach(tipo => {
+                selectTipo.innerHTML += `<option value="${tipo}">${tipo}</option>`;
+            });
+            
+            const anos = [...new Set(questoes.map(q => q.ano).filter(a => a))].sort((a,b) => b-a);
+            const selectAno = document.getElementById('filterAno');
+            selectAno.innerHTML = '<option value="">Todos os Anos</option>';
+            anos.forEach(ano => {
+                selectAno.innerHTML += `<option value="${ano}">${ano}</option>`;
+            });
+            
+            const orgaos = [...new Set(questoes.map(q => q.orgao).filter(o => o))].sort();
+            const selectOrgao = document.getElementById('filterOrgao');
+            selectOrgao.innerHTML = '<option value="">Todos os Órgãos</option>';
+            orgaos.forEach(orgao => {
+                selectOrgao.innerHTML += `<option value="${orgao}">${orgao}</option>`;
+            });
+            
+            const selectDificuldade = document.getElementById('filterDificuldade');
+            selectDificuldade.innerHTML = '<option value="">Todas</option>';
+            const niveisDificuldade = ['Muito Fácil', 'Fácil', 'Média', 'Difícil', 'Muito Difícil', 'Expert'];
+            niveisDificuldade.forEach(nivel => {
+                selectDificuldade.innerHTML += `<option value="${nivel}">${nivel}</option>`;
+            });
+            
+            document.getElementById('filterSubAssunto').disabled = true;
+        }
+
+        function atualizarAssuntosFiltro(questoes) {
+            const materiaSelecionada = document.getElementById('filterMateria').value;
+            const selectAssunto = document.getElementById('filterAssunto');
+            
+            // Guardar valor atual do assunto para tentar manter
+            const assuntoAtual = selectAssunto.value;
+            
+            // Filtrar assuntos baseado na matéria selecionada
+            let assuntosFiltrados;
+            
+            if (materiaSelecionada) {
+                assuntosFiltrados = [...new Set(questoes
+                    .filter(q => q.materia === materiaSelecionada)
+                    .map(q => q.assunto)
+                    .filter(a => a && a.trim() !== ''))].sort();
+            } else {
+                assuntosFiltrados = [...new Set(questoes
+                    .map(q => q.assunto)
+                    .filter(a => a && a.trim() !== ''))].sort();
+            }
+            
+            // Recriar o select de assuntos
+            selectAssunto.innerHTML = '<option value="">Todos os Assuntos</option>';
+            assuntosFiltrados.forEach(assunto => {
+                selectAssunto.innerHTML += `<option value="${assunto}">${assunto}</option>`;
+            });
+            
+            // Tentar restaurar o assunto anterior se ele ainda existir na lista
+            if (assuntoAtual && assuntosFiltrados.includes(assuntoAtual)) {
+                selectAssunto.value = assuntoAtual;
+            }
+            
+            // Atualizar sub-assuntos baseado na nova seleção
+            atualizarSubAssuntosFiltro();
+        }
+
+        // Fechar modal com ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('modal');
+                if (modal.style.display === 'flex') {
+                    fecharModal();
+                }
+                
+                const modalDuplicatas = document.getElementById('modalDuplicatas');
+                if (modalDuplicatas.style.display === 'flex') {
+                    fecharModalDuplicatas();
+                }
+                
+                const modaisDinamicos = document.querySelectorAll('.modal-overlay:not(#modal):not(#modalDuplicatas)');
+                modaisDinamicos.forEach(modal => {
+                    if (modal.style.display === 'flex') {
+                        modal.remove();
+                    }
+                });
+                
+                const relatorio = document.getElementById('importReport');
+                if (relatorio.style.display === 'block') {
+                    fecharRelatorio();
+                }
+            }
+        });
+
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                fecharModal();
+            }
+        });
+        
+        document.getElementById('modalDuplicatas').addEventListener('click', function(e) {
+            if (e.target === this) {
+                fecharModalDuplicatas();
+            }
+        });
+    </script>
+
+    <!-- Adicionar SheetJS para importação Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</body>
+</html>

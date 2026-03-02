@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Disciplinas - Laranja Questões</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html, body {
+            overflow-x: hidden;
+            overflow-y: hidden;
+            height: 100%;
+        }
+        
+        main {
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: 20px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        main::-webkit-scrollbar {
+            display: none;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            transition: background-color 0.3s ease, color 0.2s ease;
+        }
+        
+        /* DARK MODE */
+        body.dark-mode {
+            background-color: #0a0c10 !important;
+            color: #e5e7eb;
+        }
+        
+        body.dark-mode .bg-white,
+        body.dark-mode .disciplina-item,
+        body.dark-mode .search-box,
+        body.dark-mode .bg-gray-50,
+        body.dark-mode .bg-blue-50 {
+            background-color: #1e1e24 !important;
+            border-color: #2d2d35 !important;
+            color: #e5e7eb;
+        }
+        
+        body.dark-mode .text-gray-800,
+        body.dark-mode .disciplina-nome,
+        body.dark-mode .text-gray-700 {
+            color: #f3f4f6;
+        }
+        
+        body.dark-mode .text-gray-500,
+        body.dark-mode .disciplina-stats {
+            color: #9ca3af;
+        }
+        
+        body.dark-mode .letra-btn {
+            background: #1e1e24;
+            border-color: #3a3a45;
+            color: #ccc;
+        }
+        
+        body.dark-mode .letra-btn.active {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        /* GRAY MODE - #4b4b4b */
+        body.gray-mode {
+            background-color: #4b4b4b !important;
+            color: #ffffff !important;
+        }
+        
+        body.gray-mode .bg-white,
+        body.gray-mode .disciplina-item,
+        body.gray-mode .search-box,
+        body.gray-mode .bg-gray-50,
+        body.gray-mode .bg-blue-50 {
+            background-color: #3a3a3a !important;
+            border-color: #5a5a5a !important;
+            color: #ffffff !important;
+        }
+        
+        body.gray-mode .text-gray-800,
+        body.gray-mode .disciplina-nome,
+        body.gray-mode .text-gray-700,
+        body.gray-mode .disciplina-stats,
+        body.gray-mode .stat-item i,
+        body.gray-mode .text-gray-500 {
+            color: #ffffff !important;
+        }
+        
+        body.gray-mode .letra-btn {
+            background: #3a3a3a;
+            border-color: #5a5a5a;
+            color: #ffffff;
+        }
+        
+        body.gray-mode .letra-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        body.gray-mode .theme-toggle {
+            background: #5a5a5a;
+            color: #ffd700;
+        }
+        
+        .disciplina-item {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+            border: 1px solid #edf2f7;
+            cursor: pointer;
+        }
+        
+        .disciplina-item:active {
+            background-color: #f8fafc;
+            transform: scale(0.98);
+        }
+        
+        .disciplina-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-width: 0;
+            gap: 16px;
+        }
+        
+        .disciplina-nome {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-shrink: 1;
+            min-width: 50px;
+        }
+        
+        .disciplina-stats {
+            display: flex;
+            gap: 20px;
+            color: #64748b;
+            font-size: 13px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        
+        .stat-item i {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        
+        .letra-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #475569;
+            transition: all 0.2s;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .letra-btn.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+        
+        .search-box {
+            background: white;
+            border-radius: 30px;
+            padding: 12px 20px;
+            border: 1px solid #e2e8f0;
+            width: 100%;
+            font-size: 15px;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .theme-toggle {
+            background: #e2e8f0; 
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+
+        body.dark-mode .theme-toggle {
+            background: #2d2d35;
+            color: #fbbf24;
+        }
+        
+        .chevron-icon {
+            flex-shrink: 0;
+            margin-left: 12px;
+        }
+        
+        .alphabet-container {
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 20px;
+            padding-bottom: 1px;
+        }
+        
+        @media (min-width: 769px) {
+            .alphabet-container {
+                -ms-overflow-style: auto;
+                scrollbar-width: thin;
+            }
+            .alphabet-container::-webkit-scrollbar {
+                display: block;
+                height: 6px;
+            }
+            .alphabet-container::-webkit-scrollbar-track {
+                background: #e2e8f0;
+                border-radius: 10px;
+            }
+            .alphabet-container::-webkit-scrollbar-thumb {
+                background: #94a3b8;
+                border-radius: 10px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .alphabet-container {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .alphabet-container::-webkit-scrollbar {
+                display: none;
+            }
+        }
+        
+        .alphabet-filter {
+            display: inline-flex;
+            gap: 6px;
+            min-width: min-content;
+            padding-bottom: 2px;
+        }
+        
+        @media (max-width: 640px) {
+            .disciplina-item {
+                padding: 14px;
+            }
+            .disciplina-info {
+                gap: 12px;
+            }
+            .disciplina-nome {
+                font-size: 15px;
+                max-width: none;
+                flex: 1;
+            }
+            .disciplina-stats {
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    
+    <main class="max-w-2xl mx-auto px-4 py-5">
+        
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Disciplinas</h1>
+                <p class="text-sm text-gray-500 mt-1">Resolva questões por assunto</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <div id="themeToggle" class="theme-toggle" onclick="toggleTheme()">
+                    <i id="themeIcon" class="fas fa-moon"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mb-5">
+            <input type="text" id="searchInput" class="search-box" placeholder="🔍 Buscar disciplina..." autocomplete="off">
+        </div>
+        
+        <div class="alphabet-container">
+            <div class="alphabet-filter">
+                <div class="letra-btn active" onclick="filtrarPorLetra('todas')">♾️</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('A')">A</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('B')">B</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('C')">C</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('D')">D</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('E')">E</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('F')">F</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('G')">G</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('H')">H</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('I')">I</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('J')">J</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('K')">K</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('L')">L</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('M')">M</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('N')">N</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('O')">O</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('P')">P</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('Q')">Q</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('R')">R</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('S')">S</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('T')">T</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('U')">U</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('V')">V</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('W')">W</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('X')">X</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('Y')">Y</div>
+                <div class="letra-btn" onclick="filtrarPorLetra('Z')">Z</div>
+            </div>
+        </div>
+        
+        <div class="flex justify-between items-center mb-3">
+            <h2 class="font-semibold text-gray-700">Todas as disciplinas</h2>
+            <span class="text-xs text-gray-500" id="disciplinasFiltradas">0</span>
+        </div>
+        
+        <div id="disciplinasLista" class="space-y-2">
+            <div class="text-center py-10">
+                <div class="w-10 h-10 border-3 border-gray-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-3"></div>
+                <p class="text-sm text-gray-500">Carregando...</p>
+            </div>
+        </div>
+        
+        <div id="emptyState" class="hidden text-center py-12">
+            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-book-open text-gray-400 text-xl"></i>
+            </div>
+            <h3 class="font-medium text-gray-700 mb-1">Nenhuma disciplina</h3>
+            <p class="text-sm text-gray-500 mb-5">Tente buscar por outro termo</p>
+            <button onclick="filtrarPorLetra('todas')" class="px-5 py-2.5 bg-blue-600 text-white rounded-full text-sm font-medium">
+                Mostrar todas
+            </button>
+        </div>
+        
+        <div class="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
+            <div class="flex items-start gap-3">
+                <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+                <p class="text-xs text-blue-700">Toque em qualquer disciplina para ver os assuntos disponíveis</p>
+            </div>
+        </div>
+        
+    </main>
+
+    <script>
+        let materias = [];
+        let letraFiltro = 'todas';
+        let todasQuestoes = [];
+        
+        // ============ TEMA - 3 MODOS ============
+        let themeIndex = 0;
+        const themes = ['light', 'dark', 'gray'];
+        
+        window.toggleTheme = function() {
+            const body = document.body;
+            const icon = document.getElementById('themeIcon');
+            
+            body.classList.remove('dark-mode', 'gray-mode');
+            
+            themeIndex = (themeIndex + 1) % themes.length;
+            const newTheme = themes[themeIndex];
+            
+            if (newTheme === 'dark') {
+                body.classList.add('dark-mode');
+                icon.classList.remove('fa-moon', 'fa-sun', 'fa-cloud');
+                icon.classList.add('fa-moon');
+                localStorage.setItem('laranja-theme', 'dark');
+            } else if (newTheme === 'gray') {
+                body.classList.add('gray-mode');
+                icon.classList.remove('fa-moon', 'fa-sun', 'fa-cloud');
+                icon.classList.add('fa-cloud');
+                localStorage.setItem('laranja-theme', 'gray');
+            } else {
+                icon.classList.remove('fa-moon', 'fa-sun', 'fa-cloud');
+                icon.classList.add('fa-sun');
+                localStorage.setItem('laranja-theme', 'light');
+            }
+        };
+
+        function loadTheme() {
+            const saved = localStorage.getItem('laranja-theme');
+            const body = document.body;
+            const icon = document.getElementById('themeIcon');
+            
+            if (saved === 'dark') {
+                body.classList.add('dark-mode');
+                themeIndex = 1;
+                if (icon) {
+                    icon.classList.remove('fa-moon', 'fa-sun', 'fa-cloud');
+                    icon.classList.add('fa-moon');
+                }
+            } else if (saved === 'gray') {
+                body.classList.add('gray-mode');
+                themeIndex = 2;
+                if (icon) {
+                    icon.classList.remove('fa-moon', 'fa-sun', 'fa-cloud');
+                    icon.classList.add('fa-cloud');
+                }
+            } else {
+                themeIndex = 0;
+                if (icon) {
+                    icon.classList.remove('fa-moon', 'fa-sun', 'fa-cloud');
+                    icon.classList.add('fa-sun');
+                }
+            }
+        }
+        
+        async function carregarMaterias() {
+            try {
+                const listaEl = document.getElementById('disciplinasLista');
+                
+                listaEl.innerHTML = `<div class="text-center py-10"><div class="w-10 h-10 border-3 border-gray-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-3"></div><p class="text-sm text-gray-500">Carregando disciplinas...</p></div>`;
+                
+                const response = await fetch('/laranja/api/materias');
+                if (!response.ok) throw new Error(`Erro ${response.status}`);
+                
+                let materiasData = await response.json();
+                
+                const responseQuestoes = await fetch('/laranja/api/questoes-admin');
+                let questoes = [];
+                if (responseQuestoes.ok) {
+                    questoes = await responseQuestoes.json();
+                    todasQuestoes = questoes;
+                }
+                
+                materias = materiasData.map(materia => {
+                    const questoesDaMateria = questoes.filter(q => 
+                        q.materia && q.materia.toLowerCase() === materia.nome.toLowerCase()
+                    );
+                    
+                    const assuntosUnicos = new Set();
+                    questoesDaMateria.forEach(q => {
+                        if (q.assunto && q.assunto.trim() !== '') {
+                            assuntosUnicos.add(q.assunto.trim());
+                        }
+                    });
+                    
+                    return {
+                        nome: materia.nome,
+                        quantidade: materia.quantidade || questoesDaMateria.length || 0,
+                        assuntos: assuntosUnicos.size || 0
+                    };
+                });
+                
+                materias.sort((a, b) => a.nome.localeCompare(b.nome));
+                
+                exibirMaterias(materias);
+                document.getElementById('emptyState').classList.add('hidden');
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                document.getElementById('disciplinasLista').innerHTML = `<div class="text-center py-10"><div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-exclamation-triangle text-red-400 text-xl"></i></div><p class="text-gray-600 mb-3">Falha ao carregar</p><button onclick="carregarMaterias()" class="px-5 py-2 bg-blue-600 text-white rounded-full text-sm">Tentar novamente</button></div>`;
+            }
+        }
+        
+        function exibirMaterias(lista) {
+            const listaEl = document.getElementById('disciplinasLista');
+            const emptyState = document.getElementById('emptyState');
+            const contadorEl = document.getElementById('disciplinasFiltradas');
+            
+            contadorEl.textContent = `${lista.length} resultados`;
+            
+            if (!lista || lista.length === 0) {
+                listaEl.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            
+            listaEl.innerHTML = lista.map(materia => {
+                return `<div class="disciplina-item" onclick="selecionarMateria('${materia.nome.replace(/'/g, "\\'")}')">
+                    <div class="disciplina-info">
+                        <div class="disciplina-nome"><span>${materia.nome}</span></div>
+                        <div class="disciplina-stats">
+                            <span class="stat-item"><i class="fas fa-question-circle"></i> ${materia.quantidade || 0}</span>
+                            <span class="stat-item"><i class="fas fa-tags"></i> ${materia.assuntos || 0}</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400 text-sm chevron-icon"></i>
+                </div>`;
+            }).join('');
+        }
+        
+        function selecionarMateria(nome) {
+            localStorage.setItem('laranja-materia', nome);
+            localStorage.setItem('laranja-assunto', nome);
+            window.location.href = `/laranja/topic?materia=${encodeURIComponent(nome)}`;
+        }
+        
+        function filtrarPorLetra(letra) {
+            document.querySelectorAll('.letra-btn').forEach(btn => btn.classList.remove('active'));
+            
+            const botoes = document.querySelectorAll('.letra-btn');
+            for (let btn of botoes) {
+                if (btn.textContent === letra || (letra === 'todas' && btn.textContent === '♾️')) {
+                    btn.classList.add('active');
+                    break;
+                }
+            }
+            
+            letraFiltro = letra;
+            
+            if (letra === 'todas') {
+                exibirMaterias(materias);
+                return;
+            }
+            
+            const filtradas = materias.filter(m => m.nome && m.nome.charAt(0).toUpperCase() === letra);
+            exibirMaterias(filtradas);
+        }
+        
+        let buscaTimeout;
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            clearTimeout(buscaTimeout);
+            const termo = e.target.value.toLowerCase().trim();
+            
+            buscaTimeout = setTimeout(() => {
+                if (!termo) {
+                    if (letraFiltro === 'todas') exibirMaterias(materias);
+                    else filtrarPorLetra(letraFiltro);
+                    return;
+                }
+                const filtradas = materias.filter(m => m.nome && m.nome.toLowerCase().includes(termo));
+                exibirMaterias(filtradas);
+            }, 300);
+        });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTheme();
+            carregarMaterias();
+        });
+    </script>
+</body>
+</html>

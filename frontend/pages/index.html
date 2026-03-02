@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Panda</title>
+<link rel="manifest" href="/manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js');
+    });
+  }
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Adicionar meta tags para evitar cache -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;font-family:'Baloo 2', cursive;}
+
+body{
+    margin:0;
+    height:100vh;
+    overflow:hidden;
+    background:linear-gradient(180deg,#cfeeff,#fff1d6);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+/* EMOJIS */
+.emoji{
+    position:fixed;
+    bottom:-40px;
+    font-size:26px;
+    animation:subir linear forwards;
+    pointer-events:none;
+    opacity:.9;
+    z-index:1;
+}
+@keyframes subir{
+    from{transform:translateY(0);opacity:0}
+    15%{opacity:1}
+    to{transform:translateY(-120vh);opacity:0}
+}
+
+/* APP */
+.app{
+    position:relative;
+    width:92%;
+    max-width:420px;
+    text-align:center;
+    z-index:5;
+}
+
+/* Estilo para a imagem Aztec no canto superior esquerdo - AGORA 1.5x MAIOR */
+.top-left{
+    position:absolute;
+    top:-60px; /* Ajustei a posição para compensar o aumento */
+    left:0;
+    width: 55px; /* 1.5x maior que 42px */
+    height: 55px; /* 1.5x maior que 42px */
+    display: block;
+}
+.top-left img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Garante que a imagem se ajuste sem distorcer */
+}
+
+.top-right{
+    position:absolute;
+    top:-60px;
+    right:0;
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#ff4d6d;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+}
+
+.panda{
+    width:150px;
+    animation:float 2s ease-in-out infinite;
+}
+@keyframes float{
+    0%{transform:translateY(0)}
+    50%{transform:translateY(-15px)}
+    100%{transform:translateY(0)}
+}
+
+h1{margin:10px 0 4px;font-size:45px;color:#a855f7}
+.sub{font-size:18px;color:#444;margin-bottom:18px}
+
+.card{
+    background:#fff;
+    border-radius:28px;
+    padding:26px 20px;
+    box-shadow:0 20px 40px rgba(0,0,0,.15);
+    /* Adicionando o contorno azul bebê */
+    border: 3px solid #b3e0ff;
+}
+
+.btn{
+    width:100%;
+    border:none;
+    border-radius:18px;
+    padding:18px;
+    font-size:18px;
+    cursor:pointer;
+    margin-top:12px;
+}
+
+.btn-criar{background:#ff4d6d;color:#fff}
+.btn-continuar{background:#00b4ff;color:#fff}
+
+/* Estilo para a nova linha divisória e frase */
+.divider {
+    border: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #b3e0ff, transparent); /* Azul bebê no centro */
+    margin: 20px 0 15px 0; /* Ajuste o espaçamento */
+}
+
+.frase-motivacional {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.4;
+    padding: 0 5px;
+}
+.frase-motivacional span {
+    display: inline-block; /* Para o emoji ficar ao lado do texto */
+}
+
+/* MODAIS */
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:20;
+}
+
+.modal-content{
+    background:#fff;
+    width:90%;
+    max-width:340px;
+    border-radius:22px;
+    padding:22px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin-top:12px;
+    border-radius:14px;
+    border:1px solid #ddd;
+    font-size:16px;
+}
+
+.input-senha{position:relative;}
+.olho{
+    position:absolute;
+    right:14px;
+    top:50%;
+    transform:translateY(-50%);
+    cursor:pointer;
+    font-size:18px;
+}
+
+/* AVATARES */
+.avatars{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:10px;
+    margin-top:14px;
+}
+.avatar{
+    font-size:26px;
+    cursor:pointer;
+    padding:6px;
+    border-radius:12px;
+}
+.avatar.selected{
+    background:#ffe4ef;
+}
+</style>
+</head>
+
+<body>
+
+<!-- EMOJIS -->
+<script>
+const emojis=["⭐","✨","🎈","🎉","🐼","🎮"];
+setInterval(()=>{
+    const e=document.createElement("div");
+    e.className="emoji";
+    e.innerText=emojis[Math.floor(Math.random()*emojis.length)];
+    e.style.left=(35+Math.random()*30)+"%";
+    e.style.animationDuration=(6+Math.random()*4)+"s";
+    document.body.appendChild(e);
+    setTimeout(()=>e.remove(),10000);
+},600);
+</script>
+
+<div class="app">
+    <!-- Link com a imagem aztec.png - CAMINHO CORRIGIDO E TAMANHO AUMENTADO -->
+    <a href="laranja/subject.html" class="top-left">
+        <img src="../imagens/aztec.png" alt="Aztec Logo">
+    </a>
+    <div class="top-right" onclick="abrirAdmin()">⚙️</div>
+
+    <img src="../imagens/panda.png" class="panda">
+    <h1>Pandinha</h1>
+    <div class="sub">Vamos aprender brincando? ✨</div>
+
+    <div class="card">
+        <button class="btn btn-criar" onclick="abrirCriar()">➕ Criar Perfil</button>
+        <button class="btn btn-continuar" onclick="abrirEntrar()">▶ Continuar Estudando</button>
+        
+        <!-- Linha divisória e frase motivacional (substitui o contador) -->
+        <hr class="divider">
+        <div class="frase-motivacional" id="fraseMotivacional"></div>
+    </div>
+</div>
+
+<!-- MODAL CRIAR -->
+<div class="modal" id="modalCriar">
+  <div class="modal-content">
+    <h2>Criar Perfil</h2>
+
+    <input id="nome" placeholder="Nome">
+    <input id="email" placeholder="E-mail">
+
+    <div class="input-senha">
+        <input id="senha" type="password" placeholder="Senha">
+        <span class="olho" onclick="toggleSenha('senha')">👁️</span>
+    </div>
+
+    <div class="input-senha">
+        <input id="confirma" type="password" placeholder="Confirmar senha">
+        <span class="olho" onclick="toggleSenha('confirma')">👁️</span>
+    </div>
+
+    <div class="avatars" id="avatars"></div>
+
+    <button class="btn btn-criar" onclick="criar()">Criar Conta</button>
+  </div>
+</div>
+
+<!-- MODAL ENTRAR (escolher perfil) -->
+<div class="modal" id="modalEntrar">
+  <div class="modal-content">
+    <h2>Escolha seu perfil</h2>
+    <div id="listaPerfis"></div>
+  </div>
+</div>
+
+<!-- MODAL LOGIN (digitar senha) -->
+<div class="modal" id="modalLogin">
+  <div class="modal-content">
+    <h2>Entrar no Perfil</h2>
+
+    <input id="loginIdentificador" placeholder="Nome ou E-mail" readonly>
+
+    <div class="input-senha">
+        <input id="loginSenha" type="password" placeholder="Senha">
+        <span class="olho" onclick="toggleSenha('loginSenha')">👁️</span>
+    </div>
+
+    <div class="checkbox-fix" style="display: flex; align-items: center; gap: 8px; margin-top: 12px; text-align: left;">
+      <input type="checkbox" id="lembrarLogin" checked style="margin: 0; width: 18px; height: 18px;">
+      <label for="lembrarLogin" style="margin: 0; white-space: nowrap; cursor: pointer;">Lembrar Login</label>
+    </div>
+
+    <button class="btn btn-continuar" onclick="fazerLogin()">Entrar</button>
+  </div>
+</div>
+
+<!-- MODAL ADMIN -->
+<div class="modal" id="modalAdmin">
+  <div class="modal-content">
+    <h3>Senha Admin</h3>
+    <input id="senhaAdmin" type="password">
+    <button class="btn btn-continuar" onclick="entrarAdmin()">Entrar</button>
+  </div>
+</div>
+
+<script>
+// ========== VERIFICAÇÃO IMEDIATA AO CARREGAR ==========
+(function verificarLoginImediato() {
+    console.log("Verificando login imediato...");
+    
+    // ⭐⭐ BUSCA TOKEN EM QUALQUER NOME (COMPATIBILIDADE TOTAL) ⭐⭐
+    const token = localStorage.getItem("token") || 
+                   localStorage.getItem("auth_token") || 
+                   localStorage.getItem("user_token");
+    
+    const lembrar = localStorage.getItem("lembrar_login");
+    
+    // Se tem token E usuário marcou "lembrar login"
+    if (token && lembrar === "true") {
+        console.log("✅ Token e 'lembrar login' encontrados, verificando sessão...");
+        
+        // Verificar sessão no servidor
+        fetch("/api/auth/check", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token: token })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                console.log("✅ Sessão válida, redirecionando para materias.html");
+                
+                // ⭐⭐ SALVAR COM PADRÃO + COMPATIBILIDADE ⭐⭐
+                localStorage.setItem("token", data.token);           // Padrão
+                localStorage.setItem("auth_token", data.token);      // Compatibilidade
+                localStorage.setItem("usuario_id", data.user.id);
+                localStorage.setItem("usuario_nome", data.user.nome);
+                localStorage.setItem("usuario_avatar", data.user.avatar);
+                localStorage.setItem("usuario_email", data.user.email);
+                localStorage.setItem("lembrar_login", "true");       // Mantém "lembrar"
+                
+                // Redirecionar IMEDIATAMENTE para materias.html
+                setTimeout(() => {
+                    window.location.href = "materias.html";
+                }, 50);
+            } else {
+                console.log("❌ Sessão expirada ou token inválido");
+                // Limpar TUDO para segurança
+                localStorage.removeItem("token");
+                localStorage.removeItem("auth_token");
+                localStorage.removeItem("lembrar_login");
+            }
+        })
+        .catch(error => {
+            console.error("Erro ao verificar sessão imediata:", error);
+        });
+    } else if (token) {
+        console.log("Token encontrado mas 'lembrar login' não está marcado");
+        // Não redireciona automaticamente, mostra tela de login normal
+    }
+    
+    console.log("=== ESTADO DO LOGIN ===");
+    console.log("Token (padrão):", localStorage.getItem("token") ? "SIM" : "NÃO");
+    console.log("Token (auth_token):", localStorage.getItem("auth_token") ? "SIM" : "NÃO");
+    console.log("Lembrar login:", localStorage.getItem("lembrar_login"));
+    console.log("Usuario ID:", localStorage.getItem("usuario_id"));
+    console.log("=======================");
+})();
+
+let usuarioSelecionado = null;
+let avatarSelecionado = "🐼";
+
+/* AVATARES para criar perfil */
+["🐶","🐼","🐨","🐷","🐺","🦄","🦋","🐵","🦊","🐰","🐲","🐱","🦁","🐻","🐮"]
+.forEach(a=>{
+    const d = document.createElement("div");
+    d.className = "avatar";
+    d.innerText = a;
+    d.onclick = ()=>{
+        document.querySelectorAll(".avatar").forEach(x=>x.classList.remove("selected"));
+        d.classList.add("selected");
+        avatarSelecionado = a;
+    };
+    avatars.appendChild(d);
+});
+
+/* OLHO para mostrar/esconder senha */
+function toggleSenha(id){
+    const i = document.getElementById(id);
+    i.type = i.type==="password" ? "text" : "password";
+}
+
+/* ADMIN */
+function abrirAdmin(){ 
+    modalAdmin.style.display = "flex"; 
+}
+function entrarAdmin(){
+    if(senhaAdmin.value === "2107R852!") {
+        location.href = "admin.html";
+    } else {
+        alert("Senha incorreta");
+    }
+}
+
+/* MODAIS */
+function abrirCriar(){ modalCriar.style.display = "flex"; }
+function abrirEntrar(){ 
+    modalEntrar.style.display = "flex"; 
+    forcarRecargaPerfis(); 
+}
+
+document.querySelectorAll(".modal").forEach(m=>{
+    m.addEventListener("click",e=>{
+        if(e.target===m) m.style.display = "none";
+    });
+});
+
+/* VERIFICAÇÃO AUTOMÁTICA DE SESSÃO AO CARREGAR */
+async function verificarSessao() {
+    const token = localStorage.getItem("auth_token");
+    
+    if (!token) {
+        console.log("Nenhum token encontrado, usuário precisa fazer login");
+        return false;
+    }
+    
+    try {
+        const res = await fetch("/api/auth/check", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token: token })
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+            console.log("Sessão válida, redirecionando para materias.html");
+            
+            // Salvar dados do usuário no localStorage
+            localStorage.setItem("usuario_id", data.user.id);
+            localStorage.setItem("usuario_nome", data.user.nome);
+            localStorage.setItem("usuario_avatar", data.user.avatar);
+            localStorage.setItem("usuario_email", data.user.email);
+            
+            // Redirecionar direto para materias.html
+            setTimeout(() => {
+                window.location.href = "materias.html";
+            }, 100);
+            
+            return true;
+        } else {
+            // Token inválido, limpar e pedir login
+            console.log("Sessão expirada:", data.message);
+            localStorage.removeItem("auth_token");
+            localStorage.removeItem("usuario_id");
+            localStorage.removeItem("usuario_nome");
+            localStorage.removeItem("usuario_avatar");
+            localStorage.removeItem("usuario_email");
+            return false;
+        }
+    } catch (error) {
+        console.error("Erro ao verificar sessão:", error);
+        return false;
+    }
+}
+
+/* Forçar recarga limpa de perfis */
+function forcarRecargaPerfis() {
+    // Limpar cache de localStorage para todos os usuários
+    const chaves = Object.keys(localStorage);
+    chaves.forEach(chave => {
+        if (chave.startsWith('ident_') || chave.startsWith('lembrar_')) {
+            localStorage.removeItem(chave);
+        }
+    });
+    // Recarregar perfis do servidor
+    carregarPerfis();
+}
+
+/* CRIAR PERFIL */
+async function criar(){
+    if(senha.value !== confirma.value) {
+        alert("Senhas diferentes!");
+        return;
+    }
+
+    if(!nome.value.trim() || !email.value.trim() || !senha.value) {
+        alert("Preencha todos os campos!");
+        return;
+    }
+
+    try {
+        const res = await fetch("/api/usuarios/criar",{
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body:JSON.stringify({
+                nome:nome.value.trim(),
+                email:email.value.trim(),
+                senha:senha.value,
+                avatar:avatarSelecionado
+            })
+        });
+
+        const r = await res.json();
+        if(!r.success) {
+            alert(r.message || "Erro ao criar perfil");
+            return;
+        }
+
+        alert("Perfil criado com sucesso! 🎉");
+        modalCriar.style.display = "none";
+        nome.value = "";
+        email.value = "";
+        senha.value = "";
+        confirma.value = "";
+        
+        // Recarregar a lista de perfis e contador
+        carregarPerfis();
+        // A função atualizarContador foi removida, mas mantemos a chamada para carregarPerfis
+        // e a lógica de contador não é mais necessária na interface, apenas para o sistema.
+        // Como a div foi removida, não precisamos mais chamar atualizarContador.
+        // A função carregarPerfis ainda é necessária para o modal de entrada.
+        
+    } catch(error) {
+        console.error("Erro ao criar perfil:", error);
+        alert("Erro de conexão com o servidor");
+    }
+}
+
+/* CARREGAR PERFIS (só ativos) - CORRIGIDO PARA NOVO FORMATO */
+async function carregarPerfis(){
+    listaPerfis.innerHTML = "Carregando perfis...";
+
+    try {
+        // Use a rota /api/contar-perfis que retorna o formato correto para o index.html
+        const res = await fetch("/api/contar-perfis", {cache:"no-store"});
+        
+        // Verificar se a resposta é válida
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        
+        // Obter os usuários ativos da rota de usuários
+        const usuariosRes = await fetch("/api/usuarios?ativos=1", {cache:"no-store"});
+        const usuariosData = await usuariosRes.json();
+        
+        let usuarios = [];
+        
+        // Verificar se a resposta é o novo formato {success, usuarios}
+        if (usuariosData.success && Array.isArray(usuariosData.usuarios)) {
+            usuarios = usuariosData.usuarios;
+        } else if (Array.isArray(usuariosData)) {
+            // Para compatibilidade com versão anterior
+            usuarios = usuariosData;
+        } else {
+            console.error("Formato de resposta inesperado:", usuariosData);
+            throw new Error("Formato de dados inválido");
+        }
+
+        listaPerfis.innerHTML = "";
+        
+        if(!usuarios || usuarios.length === 0){
+            listaPerfis.innerHTML = "<p style='text-align:center;color:#666;'>Nenhum perfil ativo ainda...</p>";
+            return;
+        }
+
+        usuarios.forEach(u => {
+            const b = document.createElement("button");
+            b.className = "btn btn-continuar";
+            b.style.marginBottom = "10px";
+            b.innerHTML = `<span style="font-size: 1.2em; margin-right: 8px;">${u.avatar || '🐼'}</span> ${u.nome}`;
+            b.onclick = () => {
+                usuarioSelecionado = u;
+                modalEntrar.style.display = "none";
+                modalLogin.style.display = "flex";
+
+                // Preencher identificador
+                loginIdentificador.value = u.nome;
+                loginSenha.value = "";
+                lembrarLogin.checked = true;
+            };
+            listaPerfis.appendChild(b);
+        });
+    } catch(err){
+        console.error("Erro ao carregar perfis:", err);
+        listaPerfis.innerHTML = `
+            <div style="text-align:center; color:#666; padding:20px;">
+                <p style="margin-bottom:10px;">😿 Erro ao carregar perfis</p>
+                <button onclick="carregarPerfis()" style="background:#4CAF50; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer;">
+                    Tentar novamente
+                </button>
+            </div>
+        `;
+    }
+}
+
+/* LOGIN COM TOKEN DE SESSÃO */
+async function fazerLogin(){
+    if(!usuarioSelecionado){
+        alert("Selecione um perfil primeiro!");
+        return;
+    }
+
+    const identificador = usuarioSelecionado.nome;
+    const senhaDigitada = loginSenha.value.trim();
+    const lembrar = lembrarLogin.checked;
+
+    if(!senhaDigitada){
+        alert("Digite a senha!");
+        return;
+    }
+
+    try {
+        const res = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                identificador: identificador,
+                senha: senhaDigitada,
+                lembrar: lembrar,
+                dispositivo: "web"
+            })
+        });
+
+        const r = await res.json();
+
+        if(!r.success){
+            alert(r.message || "Senha incorreta ou conta desativada!");
+            return;
+        }
+
+        // Sucesso → salvar token e dados do usuário
+        localStorage.setItem("auth_token", r.token);
+        localStorage.setItem("usuario_id", r.user.id);
+        localStorage.setItem("usuario_nome", r.user.nome);
+        localStorage.setItem("usuario_avatar", r.user.avatar);
+        localStorage.setItem("usuario_email", r.user.email);
+        
+        if (lembrar) {
+            localStorage.setItem("lembrar_login", "true");
+        } else {
+            localStorage.removeItem("lembrar_login");
+        }
+
+        // Fechar modal e redirecionar
+        modalLogin.style.display = "none";
+        alert(`Bem-vindo de volta, ${r.user.nome}! 🎉`);
+        
+        // Redirecionar para materias.html
+        setTimeout(() => {
+            window.location.href = "materias.html";
+        }, 500);
+
+    } catch(err){
+        alert("Erro ao conectar com o servidor. Tente novamente.");
+        console.error("Erro no login:", err);
+    }
+}
+
+/* FUNÇÃO DE LOGOUT (pode ser usada em outras páginas) */
+function fazerLogout() {
+    const token = localStorage.getItem("auth_token");
+    
+    if (token) {
+        // Tentar invalidar token no servidor
+        fetch("/api/auth/logout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token: token })
+        }).catch(console.error);
+    }
+    
+    // Limpar tudo do localStorage
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("usuario_id");
+    localStorage.removeItem("usuario_nome");
+    localStorage.removeItem("usuario_avatar");
+    localStorage.removeItem("usuario_email");
+    localStorage.removeItem("lembrar_login");
+    
+    // Redirecionar para index
+    window.location.href = "index.html";
+}
+
+// Array com as frases motivacionais
+const frasesMotivacionais = [
+    { texto: "Seu esforço hoje será o seu sucesso de amanhã.", emoji: "💪" },
+    { texto: "A infância é o tempo de maior criatividade na vida de um ser humano.", emoji: "🧠" },
+    { texto: "A verdadeira educação é aquela que vai ao encontro da criança para realizar a sua libertação.", emoji: "⛓️‍💥" },
+    { texto: "A educação não é uma fórmula, mas sim uma obra de vida!", emoji: "🌈" },
+    { texto: "Educar é mostrar a vida a quem ainda não a viu.", emoji: "🤗" },
+    { texto: "Por trás da mão que pega o lápis, dos olhos que olham, dos ouvidos que escutam, há uma criança que pensa.", emoji: "🧠" },
+    { texto: "A educação é um processo social, é desenvolvimento. Não é a preparação para a vida, é a própria vida.", emoji: "⭐" },
+    { texto: "Educar é semear com sabedoria e colher com paciência.", emoji: "🌱" },
+    { texto: "A educação deve possibilitar ao corpo e à alma toda a perfeição e a beleza que podem ter.", emoji: "🤗" },
+    { texto: "A curiosidade é um impulso para aprender.", emoji: "🤓" },
+    { texto: "Ensinar não é transferir conhecimento, mas criar as possibilidades para a sua própria produção ou a sua construção.", emoji: "💡" },
+    { texto: "Só é possível ensinar uma criança a amar, amando-a.", emoji: "❤️" },
+    { texto: "Educar dá trabalho. Mas é um trabalho que dá bons frutos.", emoji: "🌳" },
+    { texto: "As crianças devem ser ensinadas a pensar e não o que pensar.", emoji: "🧠" },
+    { texto: "A criança aprende mais quando ensinamos com amor do que quando ensinamos com violência.", emoji: "🫶" },
+    { texto: "O objetivo da educação inclusiva não é tornar todas as crianças iguais, e sim respeitar e valorizar as diferenças.", emoji: "🧩" },
+    { texto: "Acredite no seu potencial.", emoji: "💪" },
+    { texto: "Errar faz parte do aprendizado.", emoji: "📈" },
+    { texto: "Você é capaz de superar desafios!", emoji: "🫵" },
+    { texto: "Você tem motivo de sobra para se orgulhar!", emoji: "😌" },
+    { texto: "Observe seus erros e tente de novo. Tenho certeza de que agora será mais fácil!", emoji: "⚡" },
+    { texto: "Errar é normal e é assim que aprendemos a fazer melhor!", emoji: "⛰️" },
+    { texto: "Se você seguir se esforçando, conseguirá bons resultados.", emoji: "📈" },
+    { texto: "Tente novamente, não tenha medo de errar.", emoji: "💪" },
+    { texto: "Acredite em si mesmo!", emoji: "🫵" },
+    { texto: "Não tenha medo de tentar algo novo.", emoji: "🍀" },
+    { texto: "Dê o seu melhor!", emoji: "💪" },
+    { texto: "Cada conquista, por menor que seja, é um grande passo.", emoji: "🏆" },
+    { texto: "Coragem é a resistência ao medo!", emoji: "💪" },
+    { texto: "Você é muito mais capaz do que imagina.", emoji: "❤️" },
+    { texto: "Tente quantas vezes for necessário, nunca desista!", emoji: "🙏" },
+    { texto: "A cada dia você aprende mais e cresce.", emoji: "🧠" },
+    { texto: "Você está no controle da sua felicidade.", emoji: "😊" },
+    { texto: "Não tenha medo de ser você mesmo.", emoji: "❤️" },
+    { texto: "Cada dia de estudo é uma nova aventura.", emoji: "⛰️" }
+];
+
+// Função para escolher uma frase aleatória e exibi-la
+function exibirFraseMotivacional() {
+    const indice = Math.floor(Math.random() * frasesMotivacionais.length);
+    const fraseEscolhida = frasesMotivacionais[indice];
+    const elementoFrase = document.getElementById('fraseMotivacional');
+    if (elementoFrase) {
+        elementoFrase.innerHTML = `"${fraseEscolhida.texto}" ${fraseEscolhida.emoji}`;
+    }
+}
+
+// INICIALIZAÇÃO
+document.addEventListener("DOMContentLoaded", async () => {
+    console.log("DOM completamente carregado, inicializando...");
+    
+    // Configurar avatar padrão como selecionado
+    const primeiroAvatar = document.querySelector(".avatar");
+    if (primeiroAvatar) {
+        primeiroAvatar.classList.add("selected");
+    }
+    
+    // Exibir a frase motivacional
+    exibirFraseMotivacional();
+    
+    // ========== DETECTAR QUANDO USUÁRIO VOLTA COM BOTÃO "VOLTAR" ==========
+    // Detectar quando a página fica visível novamente (usuário clicou "Voltar")
+    document.addEventListener("visibilitychange", async function() {
+        if (document.visibilityState === 'visible') {
+            console.log("Página ficou visível novamente (usuário voltou com botão 'Voltar')");
+            const token = localStorage.getItem("auth_token");
+            const lembrar = localStorage.getItem("lembrar_login");
+            
+            if (token && lembrar === "true") {
+                console.log("Verificando sessão após voltar...");
+                await verificarSessao();
+            }
+        }
+    });
+
+    // Detectar quando a janela ganha foco (usuário voltou de outra aba)
+    window.addEventListener("focus", async function() {
+        console.log("Janela ganhou foco");
+        const token = localStorage.getItem("auth_token");
+        const lembrar = localStorage.getItem("lembrar_login");
+        
+        if (token && lembrar === "true") {
+            console.log("Verificando sessão após ganhar foco...");
+            await verificarSessao();
+        }
+    });
+    
+    // Tentar login automático se houver token (para casos onde o redirecionamento imediato não funcionou)
+    const token = localStorage.getItem("auth_token");
+    const lembrar = localStorage.getItem("lembrar_login");
+    
+    if (token && lembrar === "true") {
+        console.log("Tentando login automático no DOMContentLoaded...");
+        await verificarSessao();
+    } else if (token) {
+        console.log("Token encontrado mas 'lembrar login' não está marcado");
+        // Apenas verificar se a sessão ainda é válida
+        setTimeout(async () => {
+            try {
+                const res = await fetch("/api/auth/check", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token: token })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    console.log("Sessão ainda válida, mantendo token");
+                } else {
+                    console.log("Sessão expirada, limpando token");
+                    localStorage.removeItem("auth_token");
+                }
+            } catch (error) {
+                console.error("Erro ao verificar sessão:", error);
+            }
+        }, 1000);
+    }
+});
+</script>
+</body>
+</html>

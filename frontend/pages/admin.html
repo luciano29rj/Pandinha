@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - Panda Estudos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background-color: #D9E6F7;
+            min-height: 100vh;
+            color: #2d3748;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-card {
+            transition: all 0.3s ease;
+            border: 2px solid #dbeafe;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+        }
+        
+        .stat-card:hover {
+            border-color: #93c5fd;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(147, 197, 253, 0.3);
+        }
+
+        /* Estilo para o ícone personalizado do Aztec */
+        .aztec-icon {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+
+        /* Estilo do botão voltar igual ao import.html */
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.4rem;
+            cursor: pointer;
+            margin-right: 15px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <nav class="bg-[#1E4A7F] shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                
+                <!-- Botão Voltar estilo import.html -->
+                <div class="flex items-center">
+                    <button 
+                        onclick="window.location.href='index.html'" 
+                        class="back-btn"
+                    >
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <span class="text-white font-semibold ml-2">Voltar ao App</span>
+                </div>
+
+                <!-- Ícone da Laranja REMOVIDO -->
+
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="glass-card p-8 mb-8 text-center">
+            <h1 class="text-4xl font-bold text-[#2B5E9B] mb-2">
+                <i class="fas fa-user-shield mr-3"></i>
+                Painel Administrativo
+            </h1>
+            <p class="text-gray-600 text-lg">Gerencie todo o sistema educacional em um só lugar</p>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Gestão de Estudantes -->
+            <a href="usuarios-admin.html" class="stat-card glass-card p-6 rounded-xl hover:shadow-xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-r from-pink-500 to-red-500 flex items-center justify-center text-white text-2xl">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <span class="px-3 py-1 bg-red-100 text-red-600 text-xs font-semibold rounded-full">
+                        <i class="fas fa-users mr-1"></i> Contas
+                    </span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Usuários / Perfil</h3>
+                <p class="text-gray-600 text-sm mb-4">Visualize e gerencie todas as contas criadas no sistema.</p>
+            </a>
+
+            <!-- Banco de Questões -->
+            <a href="dbquestoes.html" class="stat-card glass-card p-6 rounded-xl hover:shadow-xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-600 text-xs font-semibold rounded-full">
+                        <i class="fas fa-question-circle mr-1"></i> Questões
+                    </span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Banco de Questões</h3>
+                <p class="text-gray-600 text-sm mb-4">Gerencie todas as questões do sistema. Adicione, edite ou remova.</p>
+            </a>
+
+            <!-- Matérias -->
+            <a href="admat.html" class="stat-card glass-card p-6 rounded-xl hover:shadow-xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 flex items-center justify-center text-white text-2xl">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <span class="px-3 py-1 bg-teal-100 text-teal-600 text-xs font-semibold rounded-full">
+                        <i class="fas fa-book mr-1"></i> Matérias
+                    </span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Gerenciar Matérias</h3>
+                <p class="text-gray-600 text-sm mb-4">Configure e organize as matérias disponíveis no sistema.</p>
+            </a>
+
+            <!-- Análises e Relatórios -->
+            <a href="estatisticas.html" class="stat-card glass-card p-6 rounded-xl hover:shadow-xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-r from-orange-500 to-yellow-500 flex items-center justify-center text-white text-2xl">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <span class="px-3 py-1 bg-yellow-100 text-yellow-600 text-xs font-semibold rounded-full">
+                        <i class="fas fa-chart-line mr-1"></i> Estatísticas
+                    </span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Estatísticas Gerais</h3>
+                <p class="text-gray-600 text-sm mb-4">Relatórios detalhados e métricas de desempenho do sistema.</p>
+            </a>
+
+            <!-- NOVO CARD: Bank Aztec (import.html) -->
+            <a href="/laranja/import.html" class="stat-card glass-card p-6 rounded-xl hover:shadow-xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 flex items-center justify-center text-white text-2xl">
+                        <i class="fas fa-landmark"></i>
+                    </div>
+                    <span class="px-3 py-1 bg-amber-100 text-amber-600 text-xs font-semibold rounded-full">
+                        <i class="fas fa-database mr-1"></i> Bank
+                    </span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Bank Aztec</h3>
+                <p class="text-gray-600 text-sm mb-4">Banco de questões para concurseiros. Importe e gerencie questões.</p>
+            </a>
+
+        </div>
+    </main>
+
+    <!-- Footer - VERSÃO MAIS FINA E SEM BOTÃO DE VOLTAR -->
+    <footer class="bg-white border-t border-gray-200 py-2">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-2 md:mb-0 flex items-center">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-6 h-6 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 flex items-center justify-center">
+                            <span class="text-white font-bold text-xs">P</span>
+                        </div>
+                        <div>
+                            <span class="text-sm font-bold text-[#2B5E9B]">Panda Estudos</span>
+                            <p class="text-gray-600 text-xs mt-0">Sistema Educacional Administrativo</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center md:text-right">
+                    <p class="text-gray-600 text-xs">
+                        <i class="fas fa-shield-alt mr-1"></i> Versão 2.0 • Acesso Administrativo
+                    </p>
+                    <p class="text-gray-500 text-[10px] mt-0">© 2023 Todos os direitos reservados</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Carregar estatísticas
+        async function loadStats() {
+            try {
+                // Buscar dados da API
+                const [usersResponse, questionsResponse, materiasResponse] = await Promise.all([
+                    fetch('/api/contar-perfis').then(res => res.ok ? res.json() : { total: 0 }),
+                    fetch('/api/admin/estatisticas').then(res => res.ok ? res.json() : { total_questoes_principal: 0 }),
+                    fetch('/api/materias').then(res => res.ok ? res.json() : [])
+                ]);
+
+                // Estatísticas principais
+                const totalUsers = usersResponse.total || 0;
+                const totalQuestions = questionsResponse.total_questoes_principal || 0;
+                const totalMaterias = Array.isArray(materiasResponse) ? materiasResponse.length : 0;
+
+                console.log('Estatísticas carregadas:', { totalUsers, totalQuestions, totalMaterias });
+                
+            } catch (error) {
+                console.error('Erro ao carregar estatísticas:', error);
+            }
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+        });
+    </script>
+</body>
+</html>
